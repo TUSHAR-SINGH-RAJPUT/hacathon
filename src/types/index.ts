@@ -1,4 +1,5 @@
-export type ServiceCategory = "Painting" | "Gardening" | "Plumbing" | "Cleaning" | "Electrical" | "Handyman" | "Other";
+
+export type ServiceCategory = "Painting" | "Gardening" | "Plumbing" | "Cleaning" | "Electrical" | "Handyman" | "Landscaping" | "Other";
 
 export interface JobRequest {
   id: string;
@@ -27,4 +28,9 @@ export interface ServiceProvider {
   hourlyRate?: string;
   portfolioImages?: string[]; // URLs
   reviewsCount: number;
+}
+
+// Added for Cart functionality
+export interface CartItem extends ServiceProvider {
+  // Potentially add job-specific details later, e.g., selected service
 }

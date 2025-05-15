@@ -1,14 +1,12 @@
+
 import Image from 'next/image';
 import type { ServiceProvider } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, MessageSquare } from 'lucide-react';
+import { Star, MapPin, Briefcase, MessageSquare, User } from 'lucide-react';
 import Link from 'next/link';
-
-interface ProviderCardProps {
-  provider: ServiceProvider;
-}
+import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users } from 'lucide-react'; // Import specific icons
 
 const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
   const icons: Record<ServiceProvider['serviceTypes'][0], React.ReactNode> = {
@@ -18,29 +16,31 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
     Cleaning: <Sparkles className="h-4 w-4 mr-1 inline-block" />,
     Electrical: <Zap className="h-4 w-4 mr-1 inline-block" />,
     Handyman: <Users className="h-4 w-4 mr-1 inline-block" />,
+    Landscaping: <Sprout className="h-4 w-4 mr-1 inline-block" />, // Added Landscaping
     Other: <Briefcase className="h-4 w-4 mr-1 inline-block" />,
   };
   return icons[type] || <Briefcase className="h-4 w-4 mr-1 inline-block" />;
 };
 
-
-import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users } from 'lucide-react'; // Import specific icons
-
-export default function ProviderCard({ provider }: ProviderCardProps) {
+export default function ProviderCard({ provider }: { provider: ServiceProvider }) {
   return (
     <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden">
       <CardHeader className="p-0">
-        <div className="relative w-full h-48">
-          <Image
-            src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
-            alt={`${provider.name}'s profile`}
-            layout="fill"
-            objectFit="cover"
-            data-ai-hint="worker portrait"
-          />
-        </div>
+        <Link href={`/browse-providers/profile/${provider.id}`} passHref>
+          <div className="relative w-full h-48 cursor-pointer">
+            <Image
+              src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
+              alt={`${provider.name}'s profile`}
+              layout="fill"
+              objectFit="cover"
+              data-ai-hint="worker portrait"
+            />
+          </div>
+        </Link>
         <div className="p-4">
-          <CardTitle className="text-xl font-semibold mb-1">{provider.name}</CardTitle>
+          <Link href={`/browse-providers/profile/${provider.id}`} passHref>
+            <CardTitle className="text-xl font-semibold mb-1 hover:text-primary cursor-pointer">{provider.name}</CardTitle>
+          </Link>
           <div className="flex items-center text-sm text-amber-500 mb-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className={`h-5 w-5 ${i < Math.round(provider.rating) ? 'fill-current' : 'text-muted-foreground/50'}`} />
@@ -78,7 +78,10 @@ export default function ProviderCard({ provider }: ProviderCardProps) {
       <CardFooter className="p-4 border-t">
         <div className="flex w-full gap-2">
         <Link href={`/browse-providers/profile/${provider.id}`} passHref className="flex-1">
-          <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">View Profile</Button>
+          <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+            <User size={16} className="mr-2"/>
+            View Profile
+          </Button>
         </Link>
         <Button className="w-full flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
           <MessageSquare size={16} className="mr-2" /> Message
