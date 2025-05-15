@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase } from 'lucide-react'; // Added Briefcase
 import {
   Sheet,
   SheetContent,
@@ -40,6 +40,7 @@ export default function Header() {
     { href: '/', label: 'Home', icon: <Home size={18} /> },
     { href: '/post-job', label: 'Post a Job', icon: <PlusSquare size={18} /> },
     { href: '/browse-providers', label: 'Browse Services', icon: <Search size={18} /> },
+    { href: '/join-as-pro', label: 'Join as Pro', icon: <Briefcase size={18} /> }, // New Item
   ];
 
   return (
