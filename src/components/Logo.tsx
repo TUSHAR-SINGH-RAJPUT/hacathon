@@ -24,7 +24,7 @@ export default function Logo({ size = 'medium', className, iconOnly = false, ...
   return (
     <div className={`flex items-center gap-2 text-primary ${className}`}>
       <Construction className={`${sizeClasses[size]}`} strokeWidth={2.5} />
-      {!iconOnly && <span className={`font-bold ${textSizeClasses[size]}`}>HandyConnect</span>}
+      {!iconOnly && <span className={`font-bold ${textSizeClasses[size]}`}>kariGaar</span>}
     </div>
   );
 }

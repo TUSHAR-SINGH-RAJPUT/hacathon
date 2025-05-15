@@ -20,7 +20,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Alice+J',
     bio: 'Experienced painter and general handyman with over 10 years in the field. Detail-oriented and committed to quality work.',
     experienceYears: 10,
-    hourlyRate: '$50-$70',
+    hourlyRate: '3500-5000', // Updated to INR example range
     reviewsCount: 120,
   },
   {
@@ -32,7 +32,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Bob+W',
     bio: 'Passionate gardener transforming outdoor spaces. Specializes in sustainable gardening practices.',
     experienceYears: 7,
-    hourlyRate: '$40-$60',
+    hourlyRate: '3000-4500', // Updated
     reviewsCount: 85,
   },
   {
@@ -44,7 +44,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Carol+D',
     bio: 'Licensed plumber providing reliable and efficient solutions for all your plumbing needs. Emergency services available.',
     experienceYears: 12,
-    hourlyRate: '$60-$80',
+    hourlyRate: '4000-6000', // Updated
     reviewsCount: 200,
   },
   {
@@ -56,7 +56,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=David+M',
     bio: 'Dedicated to making your home spotless and functional. Offering regular cleaning and minor repair services.',
     experienceYears: 5,
-    hourlyRate: '$30-$50',
+    hourlyRate: '2500-4000', // Updated
     reviewsCount: 65,
   },
    {
@@ -68,7 +68,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Eva+G',
     bio: 'Certified electrician ensuring safety and quality for all electrical installations and repairs.',
     experienceYears: 8,
-    hourlyRate: '$55-$75',
+    hourlyRate: '3800-5500', // Updated
     reviewsCount: 92,
   },
   {
@@ -80,7 +80,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Frank+T',
     bio: 'Versatile handyman skilled in various trades. Your go-to for home maintenance and improvements.',
     experienceYears: 15,
-    hourlyRate: '$45-$65',
+    hourlyRate: '3200-4800', // Updated
     reviewsCount: 150,
   },
 ];

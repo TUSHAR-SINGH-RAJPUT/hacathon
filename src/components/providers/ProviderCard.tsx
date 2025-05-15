@@ -59,7 +59,7 @@ export default function ProviderCard({ provider }: ProviderCardProps) {
           </div>
           {provider.hourlyRate && (
              <div className="flex items-center">
-                <span className="font-bold text-lg text-primary mr-1">{provider.hourlyRate}</span> /hr (approx)
+                <span className="font-bold text-lg text-primary mr-1">₹{provider.hourlyRate}</span> /hr (approx)
             </div>
           )}
         </div>
