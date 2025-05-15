@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -29,7 +30,7 @@ export type EstimateJobPriceInput = z.infer<typeof EstimateJobPriceInputSchema>;
 const EstimateJobPriceOutputSchema = z.object({
   estimatedPriceRange: z
     .string()
-    .describe('Estimated price range for the job request (e.g., $50-$100).'),
+    .describe('Estimated price range for the job request in Indian Rupees (e.g., ₹500-₹1000).'),
   factorsConsidered: z
     .string()
     .describe('A brief explanation of factors that influenced the price estimate.'),
@@ -44,8 +45,8 @@ const estimateJobPricePrompt = ai.definePrompt({
   name: 'estimateJobPricePrompt',
   input: {schema: EstimateJobPriceInputSchema},
   output: {schema: EstimateJobPriceOutputSchema},
-  prompt: `You are an experienced estimator for various home services.
-  Based on the job details provided, estimate a price range for the job.
+  prompt: `You are an experienced estimator for various home services in India.
+  Based on the job details provided, estimate a price range for the job in Indian Rupees (₹).
   Consider the service type, job description, location, urgency, and other relevant factors.
 
   Service Type: {{{serviceType}}}
@@ -55,7 +56,7 @@ const estimateJobPricePrompt = ai.definePrompt({
   Size: {{{size}}}
 
   Provide an estimated price range and briefly explain the factors considered in the estimate.
-  Format the estimated price range as a string like "$50-$100".
+  Format the estimated price range as a string like "₹500-₹1000".
   Ensure the factors considered are concise and relevant to the job details.
   `,
 });

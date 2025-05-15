@@ -21,11 +21,11 @@ const fetchBookingDetails = async (bookingId: string) => {
         name: "Priya Sharma",
         serviceTypes: ["Painting"],
         profileImageUrl: 'https://placehold.co/80x80.png?text=Priya',
-        phone: "+91 98XXXXXX01" // Dummy phone
+        phone: "+91 98XXXXXX01" // Dummy Indian phone
       },
       status: "En Route", // Possible statuses: "Scheduled", "En Route", "In Progress", "Completed", "Cancelled"
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 mins from now
-      serviceAddress: "123, Koramangala, Bangalore, 560034",
+      serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034", // India-specific address
     };
   }
   return null;
@@ -77,7 +77,7 @@ export default function TrackServicePage() {
         <Info className="h-12 w-12 text-destructive mb-4" />
         <h1 className="text-xl font-semibold text-destructive mb-2">{error || "Booking Not Found"}</h1>
         <p className="text-muted-foreground mb-6">Please check the booking ID or contact support.</p>
-        <Button onClick={() => router.push('/')}><ArrowLeft className="mr-2 h-4 w-4" /> Back to Home</Button>
+        <Button onClick={() => router.push('/platform-home')}><ArrowLeft className="mr-2 h-4 w-4" /> Back to Home</Button>
       </div>
     );
   }
@@ -141,7 +141,7 @@ export default function TrackServicePage() {
           {/* Map Placeholder */}
           <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
             <MapPin className="h-12 w-12 text-muted-foreground" />
-            <p className="ml-4 text-muted-foreground text-center">Live map tracking would appear here. (Feature under development)</p>
+            <p className="ml-4 text-muted-foreground text-center">Live map tracking for India would appear here. (Feature under development)</p>
           </div>
           <p className="text-xs text-center text-muted-foreground">Service Address: {bookingDetails.serviceAddress}</p>
 

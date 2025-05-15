@@ -1,126 +1,136 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, CheckCircle, Users, Briefcase, Paintbrush, Sprout, Wrench, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
+import Logo from '@/components/Logo';
 
-const featureCards = [
-  {
-    icon: <Briefcase className="h-8 w-8 text-primary" />,
-    title: 'Post Your Job Easily',
-    description: 'Describe your task, set your location, and let skilled professionals come to you.',
-    link: '/post-job',
-    linkText: 'Get Started',
-  },
-  {
-    icon: <Users className="h-8 w-8 text-primary" />,
-    title: 'Find Trusted Pros',
-    description: 'Browse a directory of vetted service providers for any job, big or small.',
-    link: '/browse-providers',
-    linkText: 'Browse Pros',
-  },
-  {
-    icon: <CheckCircle className="h-8 w-8 text-primary" />,
-    title: 'Quality Guaranteed',
-    description: 'Connect with reliable experts committed to delivering top-notch service.',
-    link: '#',
-    linkText: 'Learn More',
-  },
-];
-
-const serviceCategories = [
-  { name: 'Painting', icon: <Paintbrush className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "painting wall" },
-  { name: 'Gardening', icon: <Sprout className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "gardening tools" },
-  { name: 'Plumbing', icon: <Wrench className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "plumbing pipes" },
-  { name: 'Cleaning', icon: <Sparkles className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "cleaning supplies" },
-  { name: 'Electrical', icon: <Zap className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "electrical wires" },
-  { name: 'Handyman', icon: <Users className="h-10 w-10 mx-auto text-accent-foreground group-hover:text-primary transition-colors" />, dataAiHint: "tools toolbox" },
-];
-
-export default function HomePage() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center space-y-12 md:space-y-16 animate-in fade-in duration-500">
+    <div className="flex flex-col min-h-screen animate-in fade-in duration-700">
       {/* Hero Section */}
-      <section className="text-center py-12 md:py-20 bg-card rounded-xl shadow-lg w-full">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-card-foreground">
-            Connect with Skilled Pros, <span className="text-primary">Effortlessly</span>.
+      <section className="relative flex flex-col items-center justify-center flex-grow text-center py-16 md:py-24 px-4 bg-gradient-to-br from-background via-secondary/30 to-background overflow-hidden">
+        {/* Floating decorative images - simple implementation */}
+        <Image 
+          src="https://placehold.co/200x200.png?text=Pro+1" 
+          alt="Service Professional"
+          data-ai-hint="worker person"
+          width={150} 
+          height={150} 
+          className="absolute top-10 left-10 opacity-20 animate-bounce-slow select-none" 
+        />
+        <Image 
+          src="https://placehold.co/200x200.png?text=Tool+Icon" 
+          alt="Service Tool" 
+          data-ai-hint="tools"
+          width={120} 
+          height={120} 
+          className="absolute bottom-20 right-16 opacity-20 animate-bounce-slow-delay select-none" 
+        />
+         <Image 
+          src="https://placehold.co/150x150.png?text=Happy+Client" 
+          alt="Happy Client"
+          data-ai-hint="happy person"
+          width={100} 
+          height={100} 
+          className="absolute top-1/4 right-10 opacity-10 animate-pulse select-none" 
+        />
+         <Image 
+          src="https://placehold.co/180x180.png?text=Service+Icon" 
+          alt="Service Icon"
+          data-ai-hint="gears"
+          width={130} 
+          height={130} 
+          className="absolute bottom-1/3 left-16 opacity-10 animate-pulse-delay select-none" 
+        />
+
+        <div className="relative z-10">
+          <Logo size="xlarge" className="mb-8 justify-center" />
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-foreground">
+            Find Skilled Help. <span className="text-primary">Fast.</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            kariGaar is your one-stop platform to find reliable local service providers for all your needs. From home repairs to garden makeovers, get it done right.
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10">
+            kariGaar connects you with trusted local professionals for any service you need. Get your tasks done, hassle-free.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/post-job" passHref>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-transform hover:scale-105">
-                Post a Job <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/browse-providers" passHref>
-              <Button size="lg" variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground shadow-md transition-transform hover:scale-105">
-                Find a Pro
-              </Button>
-            </Link>
+          <Link href="/platform-home" passHref>
+            <Button size="lg" className="px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
+              Get Started Now <ArrowRight className="ml-3 h-6 w-6" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Motivation Section */}
+      <section className="py-16 md:py-24 bg-card text-card-foreground">
+        <div className="container mx-auto px-4 text-center">
+          <Target className="h-16 w-16 text-primary mx-auto mb-6" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Motivation</h2>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            We believe finding reliable local services shouldn't be a chore. kariGaar was born from the desire to simplify this process, empowering both customers to find quality help and skilled professionals to grow their businesses and serve their communities.
+          </p>
+           <div className="grid md:grid-cols-3 gap-8 text-left">
+            <div className="p-6 bg-background rounded-lg shadow-md">
+              <Zap className="h-10 w-10 text-primary mb-3" />
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Efficiency</h3>
+              <p className="text-muted-foreground">Quickly post jobs, get estimates, and connect with pros without endless searching.</p>
+            </div>
+            <div className="p-6 bg-background rounded-lg shadow-md">
+              <Users className="h-10 w-10 text-primary mb-3" />
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Community</h3>
+              <p className="text-muted-foreground">Fostering connections between local customers and skilled karigaars (artisans).</p>
+            </div>
+            <div className="p-6 bg-background rounded-lg shadow-md">
+              <Lightbulb className="h-10 w-10 text-primary mb-3" />
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Trust</h3>
+              <p className="text-muted-foreground">Building a platform where quality service and reliability are paramount.</p>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* How It Works Section */}
-      <section className="w-full py-12 md:py-16">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">How kariGaar Works</h2>
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          {featureCards.map((feature) => (
-            <Card key={feature.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background">
-              <CardHeader className="items-center text-center">
-                {feature.icon}
-                <CardTitle className="mt-4 text-xl font-semibold">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">{feature.description}</p>
-                <Link href={feature.link} passHref>
-                  <Button variant="link" className="text-primary p-0 h-auto">
-                    {feature.linkText} <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
       
-      {/* Featured Services Section */}
-      <section className="w-full py-12 md:py-16">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">Explore Popular Services</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {serviceCategories.map((service) => (
-            <Link key={service.name} href={`/browse-providers?service=${encodeURIComponent(service.name)}`} passHref>
-              <Card className="group text-center p-6 shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-secondary hover:bg-primary/10">
-                <div className="mb-3 p-3 inline-block rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  {service.icon}
-                </div>
-                <h3 className="text-md font-semibold text-secondary-foreground group-hover:text-primary transition-colors">{service.name}</h3>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonial/Placeholder Section */}
-      <section className="w-full py-12 md:py-16 text-center bg-card rounded-xl shadow-lg">
-         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-6 text-card-foreground">Join Thousands of Satisfied Customers</h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-8">
-            Ready to tackle your to-do list? kariGaar makes it simple.
+      {/* Second Get Started Section */}
+      <section className="py-16 md:py-20 text-center bg-secondary">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">Ready to Simplify Your Service Needs?</h2>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10">
+            Join the kariGaar community today. Post a job or find a skilled professional in minutes.
           </p>
-          <Image 
-            src="https://placehold.co/800x400.png" 
-            alt="Satisfied customer collage"
-            data-ai-hint="happy people community" 
-            width={800} 
-            height={400} 
-            className="rounded-lg mx-auto shadow-md" 
-          />
+          <Link href="/platform-home" passHref>
+            <Button size="lg" className="px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
+              Explore the Platform <ArrowRight className="ml-3 h-6 w-6" />
+            </Button>
+          </Link>
         </div>
       </section>
+      <style jsx global>{`
+        .animate-bounce-slow {
+          animation: bounce-slow 5s infinite;
+        }
+        .animate-bounce-slow-delay {
+          animation: bounce-slow 5s infinite 1s; /* 1s delay */
+        }
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(-5%);
+            animation-timing-function: cubic-bezier(0.8,0,1,1);
+          }
+          50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0,0,0.2,1);
+          }
+        }
+        .animate-pulse {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .animate-pulse-delay {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
   );
 }

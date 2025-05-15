@@ -1,11 +1,15 @@
 
+"use client";
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Lock, KeyRound } from 'lucide-react'; // Added KeyRound for a generic social icon
+import { User, Lock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import { useRouter } from 'next/navigation';
 
 // Dummy SVG for Google Icon
 const GoogleIcon = () => (
@@ -27,6 +31,15 @@ const FacebookIcon = () => (
 
 
 export default function LoginPage() {
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const handleLogin = (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent default form submission
+    // Add actual login logic here if needed
+    login(); // Call the login function from AuthContext
+  };
+
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] animate-in fade-in duration-500 py-8">
       <Card className="w-full max-w-md shadow-xl bg-card">
@@ -36,49 +49,51 @@ export default function LoginPage() {
             Log in to access your account and manage your services.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center text-card-foreground"><User className="h-4 w-4 mr-2 text-primary" />Email Address</Label>
-            <Input id="email" type="email" placeholder="you@example.com" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center text-card-foreground"><Lock className="h-4 w-4 mr-2 text-primary" />Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" />
-          </div>
-          <div className="flex items-center justify-between">
-             <Link href="#" className="text-sm text-primary hover:underline">
-               Forgot password?
-             </Link>
-          </div>
+        <form onSubmit={handleLogin}>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center text-card-foreground"><User className="h-4 w-4 mr-2 text-primary" />Email Address</Label>
+              <Input id="email" type="email" placeholder="you@example.com" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="flex items-center text-card-foreground"><Lock className="h-4 w-4 mr-2 text-primary" />Password</Label>
+              <Input id="password" type="password" placeholder="••••••••" required />
+            </div>
+            <div className="flex items-center justify-between">
+               <Link href="#" className="text-sm text-primary hover:underline">
+                 Forgot password?
+               </Link>
+            </div>
 
-          <div className="relative my-4">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              OR
-            </span>
-          </div>
-          
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full text-foreground">
-              <GoogleIcon /> Login with Google
-            </Button>
-            <Button variant="outline" className="w-full text-foreground">
-              <FacebookIcon /> Login with Facebook
-            </Button>
-          </div>
+            <div className="relative my-4">
+              <Separator />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
+                OR
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              <Button variant="outline" className="w-full text-foreground" type="button" onClick={login}> {/* conceptual social login */}
+                <GoogleIcon /> Login with Google
+              </Button>
+              <Button variant="outline" className="w-full text-foreground" type="button" onClick={login}> {/* conceptual social login */}
+                <FacebookIcon /> Login with Facebook
+              </Button>
+            </div>
 
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-            Log In
-          </Button>
-          <p className="text-sm text-center text-muted-foreground">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-semibold text-primary hover:underline">
-              Sign Up
-            </Link>
-          </p>
-        </CardFooter>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+              Log In
+            </Button>
+            <p className="text-sm text-center text-muted-foreground">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="font-semibold text-primary hover:underline">
+                Sign Up
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   );

@@ -111,8 +111,6 @@ export default function JobPostingForm() {
         serviceType: values.serviceType,
         urgency: values.urgency,
         size: values.size,
-        // numberOfPeople is not part of EstimateJobPriceInput currently,
-        // but could be added to the Genkit flow if desired.
       };
       const result = await estimateJobPrice(estimateInput);
       setEstimationResult(result);
@@ -213,7 +211,7 @@ export default function JobPostingForm() {
             <FormItem>
               <FormLabel>Job Location</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Your Area, City, State or Pincode" {...field} />
+                <Input placeholder="e.g., Your Area, City, State or Pincode (India)" {...field} />
               </FormControl>
               <FormDescription>Specify where the service is needed (e.g., "Indiranagar, Bangalore" or "560038").</FormDescription>
               <FormMessage />
@@ -256,10 +254,10 @@ export default function JobPostingForm() {
                 <Select onValueChange={(value) => {
                     field.onChange(value);
                     if (!value.startsWith("Medium") && !value.startsWith("Large")) {
-                        form.setValue("numberOfPeople", undefined); // Clear if not medium/large
+                        form.setValue("numberOfPeople", undefined); 
                         form.clearErrors("numberOfPeople");
                     } else if (form.getValues("numberOfPeople") === undefined) {
-                        form.setValue("numberOfPeople", 1); // Default to 1 if medium/large and undefined
+                        form.setValue("numberOfPeople", 1); 
                     }
                 }} defaultValue={field.value}>
                   <FormControl>
@@ -308,7 +306,7 @@ export default function JobPostingForm() {
             <AlertDescription>
               <p className="font-medium text-lg">Estimated Range: {estimationResult.estimatedPriceRange}</p>
               <p className="text-sm mt-1">Factors considered: {estimationResult.factorsConsidered}</p>
-              <p className="text-xs mt-2 text-muted-foreground">Note: This is an AI-generated estimate. Actual bids from professionals may vary.</p>
+              <p className="text-xs mt-2 text-muted-foreground">Note: This is an AI-generated estimate for budgetary purposes only. Actual bids from professionals may vary.</p>
             </AlertDescription>
           </Alert>
         )}
@@ -333,7 +331,7 @@ export default function JobPostingForm() {
             ) : (
               <Wand2 className="mr-2 h-4 w-4" />
             )}
-            Get AI Price Estimate
+            Get AI Price Estimate (₹)
           </Button>
           <Button type="submit" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isEstimating}>
             Post Job & Get Quotes
