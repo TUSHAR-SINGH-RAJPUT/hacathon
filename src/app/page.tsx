@@ -47,7 +47,7 @@ export default function HomePage() {
             Connect with Skilled Pros, <span className="text-primary">Effortlessly</span>.
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            HandyConnect is your one-stop platform to find reliable local service providers for all your needs. From home repairs to garden makeovers, get it done right.
+            kariGaar is your one-stop platform to find reliable local service providers for all your needs. From home repairs to garden makeovers, get it done right.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/post-job" passHref>
@@ -66,7 +66,7 @@ export default function HomePage() {
 
       {/* How It Works Section */}
       <section className="w-full py-12 md:py-16">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">How HandyConnect Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">How kariGaar Works</h2>
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
           {featureCards.map((feature) => (
             <Card key={feature.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background">
@@ -109,7 +109,7 @@ export default function HomePage() {
          <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-6 text-card-foreground">Join Thousands of Satisfied Customers</h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-8">
-            Ready to tackle your to-do list? HandyConnect makes it simple.
+            Ready to tackle your to-do list? kariGaar makes it simple.
           </p>
           <Image 
             src="https://placehold.co/800x400.png" 

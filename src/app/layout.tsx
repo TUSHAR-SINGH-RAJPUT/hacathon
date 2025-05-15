@@ -12,7 +12,7 @@ const geistSans = Geist({ // Assuming Geist is a variable font, this setup is co
 
 
 export const metadata: Metadata = {
-  title: 'HandyConnect - Your Local Service Solution',
+  title: 'kariGaar - Your Local Service Solution',
   description: 'Find skilled professionals for your home and business needs. Post jobs, get estimates, and connect with local service providers easily.',
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
         </main>
         <Toaster />
         <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-          © {new Date().getFullYear()} HandyConnect. All rights reserved.
+          © {new Date().getFullYear()} kariGaar. All rights reserved.
         </footer>
       </body>
     </html>
