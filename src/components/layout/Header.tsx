@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, MessageSquareQuestion, StarIcon, Settings } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings } from 'lucide-react'; // Replaced MessageSquareQuestion with HelpCircle
 import {
   Sheet,
   SheetContent,
@@ -62,7 +62,7 @@ export default function Header() {
   }, []);
 
   const navItems = [
-    { href: '/platform-home', label: 'Home', icon: <Home size={18} /> }, // Changed from /
+    { href: '/platform-home', label: 'Home', icon: <Home size={18} /> }, 
     { href: '/post-job', label: 'Post a Job', icon: <PlusSquare size={18} /> },
     { href: '/browse-providers', label: 'Browse Services', icon: <Search size={18} /> },
     { href: '/join-as-pro', label: 'Join as Pro', icon: <Briefcase size={18} /> },
@@ -91,7 +91,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center space-x-2">
-          {isClient && isLoggedIn && ( // Only show cart if logged in (conceptual)
+          {isClient && isLoggedIn && ( 
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary hover:bg-primary/10">
@@ -170,7 +170,7 @@ export default function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild><Link href="/profile/edit" className="flex items-center gap-2 w-full"><Edit3 size={16}/> Edit Profile</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/profile/bookings" className="flex items-center gap-2 w-full"><ListOrdered size={16}/> My Bookings</Link></DropdownMenuItem>
-                  <DropdownMenuItem asChild><Link href="/support" className="flex items-center gap-2 w-full"><MessageSquareQuestion size={16}/> Customer Support</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/support" className="flex items-center gap-2 w-full"><HelpCircle size={16}/> Customer Support</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/profile/feedback" className="flex items-center gap-2 w-full"><StarIcon size={16}/> Feedbacks</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link href="/profile/security" className="flex items-center gap-2 w-full"><Shield size={16}/> Security</Link></DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -230,7 +230,7 @@ export default function Header() {
                   <>
                     <Link href="/profile/edit" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><Edit3 size={20}/>Edit Profile</Button></Link>
                     <Link href="/profile/bookings" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><ListOrdered size={20}/>My Bookings</Button></Link>
-                    <Link href="/support" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><MessageSquareQuestion size={20}/>Support</Button></Link>
+                    <Link href="/support" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><HelpCircle size={20}/>Support</Button></Link>
                     <Link href="/profile/feedback" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><StarIcon size={20}/>Feedback</Button></Link>
                     <Link href="/profile/security" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3"><Shield size={20}/>Security</Button></Link>
                     <Separator className="my-4 bg-border" />

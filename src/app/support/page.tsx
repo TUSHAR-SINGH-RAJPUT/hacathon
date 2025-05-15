@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { MessageSquareQuestion, Mail, Phone, LifeBuoy } from "lucide-react";
+import { HelpCircle, Mail, Phone, LifeBuoy } from "lucide-react"; // Replaced MessageSquareQuestion with HelpCircle
 import Link from "next/link";
 
 const faqItems = [
@@ -43,7 +43,7 @@ export default function SupportPage() {
       <Card className="bg-background shadow-lg">
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-foreground flex items-center">
-             <MessageSquareQuestion className="h-6 w-6 mr-3 text-primary" /> Frequently Asked Questions
+             <HelpCircle className="h-6 w-6 mr-3 text-primary" /> Frequently Asked Questions 
           </CardTitle>
         </CardHeader>
         <CardContent>
