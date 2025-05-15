@@ -106,13 +106,17 @@ export default function Header() {
           </Popover>
 
           <div className="hidden md:flex items-center space-x-2">
-            <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-              <UserCircle size={18} className="mr-2" />
-              Login
-            </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign Up
-            </Button>
+            <Link href="/login" passHref>
+              <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                <UserCircle size={18} className="mr-2" />
+                Login
+              </Button>
+            </Link>
+            <Link href="/signup" passHref>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -139,12 +143,16 @@ export default function Header() {
                   </Link>
                 ))}
                  <Separator className="my-4 bg-border" />
-                 <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                    <UserCircle size={20} /> Login
-                 </Button>
-                 <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                    Sign Up
-                 </Button>
+                 <Link href="/login" passHref>
+                   <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                      <UserCircle size={20} /> Login
+                   </Button>
+                 </Link>
+                 <Link href="/signup" passHref>
+                   <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                      Sign Up
+                   </Button>
+                 </Link>
               </div>
             </SheetContent>
           </Sheet>
