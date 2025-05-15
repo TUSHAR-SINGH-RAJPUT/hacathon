@@ -1,5 +1,5 @@
 
-import DocumentVerificationForm from './DocumentVerificationForm';
+import DocumentVerificationForm from '../DocumentVerificationForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { ShieldCheck } from 'lucide-react';
 
@@ -23,3 +23,4 @@ export default function VerifyDocumentsPage() {
     </div>
   );
 }
+
