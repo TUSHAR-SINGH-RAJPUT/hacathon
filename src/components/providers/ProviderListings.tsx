@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -15,10 +16,12 @@ interface ProviderListingsProps {
   serviceCategories: { value: ServiceCategory; label: string }[];
 }
 
+const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__"; // Define a non-empty constant for "All Categories"
+
 export default function ProviderListings({ initialProviders, serviceCategories }: ProviderListingsProps) {
   const [providers, setProviders] = useState<ServiceProvider[]>(initialProviders); // Not used for filtering, but for potential future dynamic updates
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>(''); // '' still means all categories internally
   const [minRating, setMinRating] = useState<number>(0);
   const [locationFilter, setLocationFilter] = useState('');
 
@@ -35,7 +38,7 @@ export default function ProviderListings({ initialProviders, serviceCategories }
 
   const resetFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
+    setSelectedCategory(''); // Internal state remains '' for all
     setMinRating(0);
     setLocationFilter('');
   };
@@ -58,12 +61,21 @@ export default function ProviderListings({ initialProviders, serviceCategories }
           </div>
           <div>
             <Label htmlFor="service-category" className="text-sm font-medium text-secondary-foreground">Service Category</Label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select 
+              value={selectedCategory === '' ? ALL_CATEGORIES_VALUE : selectedCategory} 
+              onValueChange={(value) => {
+                if (value === ALL_CATEGORIES_VALUE) {
+                  setSelectedCategory('');
+                } else {
+                  setSelectedCategory(value);
+                }
+              }}
+            >
               <SelectTrigger id="service-category" className="bg-background focus:ring-primary">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value={ALL_CATEGORIES_VALUE}>All Categories</SelectItem>
                 {serviceCategories.map(category => (
                   <SelectItem key={category.value} value={category.value}>
                     {category.label}
