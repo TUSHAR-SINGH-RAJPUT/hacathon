@@ -25,6 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 
 
 const NavLink = ({ href, children, icon }: { href: string; children: React.ReactNode; icon?: React.ReactNode }) => (
@@ -39,6 +40,11 @@ const NavLink = ({ href, children, icon }: { href: string; children: React.React
 export default function Header() {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false); // State to track client-side mount
+
+  useEffect(() => {
+    setIsClient(true); // Set to true after component mounts
+  }, []);
 
   const navItems = [
     { href: '/', label: 'Home', icon: <Home size={18} /> },
@@ -76,7 +82,7 @@ export default function Header() {
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary hover:bg-primary/10">
                 <ShoppingCart size={20} />
-                {cart.length > 0 && (
+                {isClient && cart.length > 0 && (
                   <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full bg-primary text-primary-foreground">
                     {cart.length}
                   </Badge>
@@ -125,6 +131,7 @@ export default function Header() {
                     <Button 
                       onClick={handleProceedToBooking} 
                       className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                      disabled={cart.length === 0} // Disable if cart is empty
                     >
                       Proceed to Booking
                     </Button>
