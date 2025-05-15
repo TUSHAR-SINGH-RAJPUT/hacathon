@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, CheckCircle, Users, Briefcase, Paintbrush, Sprout, Wrench, Sparkles, Zap, PieChart, UserCheck } from 'lucide-react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
-import { Pie, PieCell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts"; // Renamed to avoid conflict with ChartContainer
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
+import { Pie, Cell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts"; // Renamed to avoid conflict with ChartContainer
 
 const featureCards = [
   {
@@ -140,7 +140,7 @@ export default function PlatformHomePage() {
                 <RechartsResponsiveContainer width="100%" height="100%">
                   <Pie data={customerData} dataKey="value" nameKey="name" label>
                     {customerData.map((entry) => (
-                      <PieCell key={entry.name} fill={entry.fill} />
+                      <Cell key={entry.name} fill={entry.fill} />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -159,7 +159,7 @@ export default function PlatformHomePage() {
                  <RechartsResponsiveContainer width="100%" height="100%">
                   <Pie data={jobsData} dataKey="value" nameKey="name" label>
                     {jobsData.map((entry) => (
-                      <PieCell key={entry.name} fill={entry.fill} />
+                      <Cell key={entry.name} fill={entry.fill} />
                     ))}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
