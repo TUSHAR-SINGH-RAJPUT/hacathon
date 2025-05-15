@@ -9,6 +9,8 @@ interface CartContextType {
   addToCart: (provider: ServiceProvider) => void;
   removeFromCart: (providerId: string) => void;
   clearCart: () => void;
+  customerAddress: string | null;
+  setCustomerAddress: (address: string | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -22,19 +24,36 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return [];
   });
 
+  const [customerAddress, setCustomerAddress] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('kariGaarCustomerAddress') || null;
+    }
+    return null;
+  });
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('kariGaarCart', JSON.stringify(cart));
     }
   }, [cart]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (customerAddress) {
+        localStorage.setItem('kariGaarCustomerAddress', customerAddress);
+      } else {
+        localStorage.removeItem('kariGaarCustomerAddress');
+      }
+    }
+  }, [customerAddress]);
+
+
   const addToCart = (provider: ServiceProvider) => {
     setCart(prevCart => {
       if (!prevCart.find(item => item.id === provider.id)) {
-        // For now, CartItem is same as ServiceProvider. Can be extended.
         return [...prevCart, { ...provider }];
       }
-      return prevCart; // Already in cart
+      return prevCart;
     });
   };
 
@@ -44,10 +63,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => {
     setCart([]);
+    setCustomerAddress(null); // Also clear address when cart is cleared
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, customerAddress, setCustomerAddress }}>
       {children}
     </CartContext.Provider>
   );

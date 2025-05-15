@@ -1,18 +1,22 @@
 
 "use client";
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { dummyProviders, serviceCategories as allServiceCategories } from '@/components/providers/dummyData';
-import type { ServiceProvider, ServiceCategory } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { dummyProviders } from '@/components/providers/dummyData';
+import type { ServiceProvider, Review } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
-import { useCart } from '@/context/CartContext'; // Ensure this path is correct
+import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from 'react';
+import { Separator } from '@/components/ui/separator';
 
 const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
   const icons: Record<ServiceProvider['serviceTypes'][0], React.ReactNode> = {
@@ -28,24 +32,48 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
   return icons[type] || <Briefcase className="h-5 w-5 mr-2 text-primary" />;
 };
 
+const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
+  return (
+    <div className="flex items-center space-x-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-6 w-6 cursor-pointer transition-colors ${
+            star <= rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground hover:text-amber-300'
+          }`}
+          onClick={() => setRating(star)}
+        />
+      ))}
+    </div>
+  );
+};
+
 
 export default function ProviderProfilePage() {
   const params = useParams();
   const providerId = params.providerId as string;
   const { addToCart, cart } = useCart();
   const { toast } = useToast();
+  const router = useRouter();
 
-  const provider = dummyProviders.find(p => p.id === providerId);
+  const [provider, setProvider] = useState<ServiceProvider | undefined>(undefined);
+  const [userReview, setUserReview] = useState('');
+  const [userRating, setUserRating] = useState(0);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    const foundProvider = dummyProviders.find(p => p.id === providerId);
+    setProvider(foundProvider);
+  }, [providerId]);
+
 
   if (!provider) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 animate-in fade-in duration-500">
         <Users className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h1 className="text-2xl font-semibold">Provider not found</h1>
         <p className="text-muted-foreground mt-2">The provider you are looking for does not exist or may have been removed.</p>
-        <Link href="/browse-providers" passHref>
-          <Button className="mt-6">Back to Providers</Button>
-        </Link>
+        <Button className="mt-6" onClick={() => router.push('/browse-providers')}>Back to Providers</Button>
       </div>
     );
   }
@@ -54,9 +82,8 @@ export default function ProviderProfilePage() {
     .filter(p => p.id !== provider.id && p.serviceTypes.some(st => provider.serviceTypes.includes(st)))
     .slice(0, 3);
   
-  // Fallback to any other 3 providers if no similar ones found
-  if (recommendedProviders.length === 0) {
-    recommendedProviders.push(...dummyProviders.filter(p => p.id !== provider.id).slice(0, 3 - recommendedProviders.length));
+  if (recommendedProviders.length < 3) {
+    recommendedProviders.push(...dummyProviders.filter(p => p.id !== provider.id && !recommendedProviders.find(rp => rp.id === p.id)).slice(0, 3 - recommendedProviders.length));
   }
   
   const isProviderInCart = cart.some(item => item.id === provider.id);
@@ -74,6 +101,38 @@ export default function ProviderProfilePage() {
         variant: "default",
       });
     }
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userRating === 0) {
+      toast({ title: "Rating Required", description: "Please select a star rating.", variant: "destructive" });
+      return;
+    }
+    if (!userReview.trim()) {
+      toast({ title: "Review Comment Required", description: "Please write a comment for your review.", variant: "destructive" });
+      return;
+    }
+    setIsSubmittingReview(true);
+    console.log("Submitting review:", { providerId: provider.id, rating: userRating, comment: userReview });
+    // Simulate API call
+    setTimeout(() => {
+      const newReview: Review = {
+        id: `review-${Date.now()}`,
+        reviewerName: "You (Demo User)", // In a real app, this would be the logged-in user's name
+        rating: userRating,
+        comment: userReview,
+        date: new Date().toISOString(),
+      };
+      // Add review to the provider's list (client-side for demo)
+      // This won't persist, but shows UI update. A backend would handle this.
+      setProvider(prev => prev ? ({ ...prev, reviews: [newReview, ...(prev.reviews || [])], reviewsCount: (prev.reviewsCount || 0) + 1 }) : undefined);
+      
+      toast({ title: "Review Submitted!", description: "Thank you for your feedback." });
+      setUserReview('');
+      setUserRating(0);
+      setIsSubmittingReview(false);
+    }, 1000);
   };
 
   return (
@@ -106,7 +165,7 @@ export default function ProviderProfilePage() {
             <div className="md:col-span-2 space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-card-foreground mb-2">About {provider.name}</h3>
-                <p className="text-muted-foreground leading-relaxed">{provider.bio}</p>
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{provider.bio}</p>
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-card-foreground mb-3">Services Offered</h3>
@@ -119,6 +178,18 @@ export default function ProviderProfilePage() {
                   ))}
                 </div>
               </div>
+                 {provider.portfolioImages && provider.portfolioImages.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-semibold text-card-foreground mb-3">Portfolio / Past Work</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {provider.portfolioImages.map((img, index) => (
+                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden shadow-md">
+                        <Image src={img} alt={`Portfolio image ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="project example" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="space-y-4 p-4 bg-background rounded-lg shadow">
               <h3 className="text-lg font-semibold text-foreground border-b pb-2">Quick Info</h3>
@@ -139,12 +210,65 @@ export default function ProviderProfilePage() {
                 disabled={isProviderInCart}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
-                {isProviderInCart ? "Already in Job List" : "Add to Job List"}
+                {isProviderInCart ? "In Your Job List" : "Add to Job List"}
               </Button>
               <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                <MessageSquare className="mr-2 h-5 w-5" /> Message {provider.name.split(' ')[0]}
+                <MessageCircle className="mr-2 h-5 w-5" /> Message {provider.name.split(' ')[0]} (Simulated)
               </Button>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Reviews Section */}
+      <Card className="shadow-lg bg-card">
+        <CardHeader>
+          <CardTitle className="text-2xl text-card-foreground">Customer Reviews & Ratings</CardTitle>
+          <UiCardDescription className="text-muted-foreground">See what others are saying about {provider.name}.</UiCardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {provider.reviews && provider.reviews.length > 0 ? (
+            provider.reviews.map(review => (
+              <Card key={review.id} className="bg-background p-4 shadow-sm">
+                <div className="flex items-center mb-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
+                  ))}
+                  <span className="ml-auto text-xs text-muted-foreground">{new Date(review.date).toLocaleDateString()}</span>
+                </div>
+                <p className="text-sm text-foreground mb-1 font-medium">{review.reviewerName}</p>
+                <p className="text-sm text-muted-foreground whitespace-pre-line">{review.comment}</p>
+              </Card>
+            ))
+          ) : (
+            <p className="text-muted-foreground">No reviews yet for {provider.name}. Be the first to add one!</p>
+          )}
+
+          <Separator className="my-6" />
+
+          <div>
+            <h3 className="text-xl font-semibold text-card-foreground mb-3">Leave a Review for {provider.name}</h3>
+            <form onSubmit={handleSubmitReview} className="space-y-4">
+              <div>
+                <Label htmlFor="user-rating" className="mb-1 block font-medium">Your Rating</Label>
+                <StarRatingInput rating={userRating} setRating={setUserRating} />
+              </div>
+              <div>
+                <Label htmlFor="user-review" className="mb-1 block font-medium">Your Review</Label>
+                <Textarea
+                  id="user-review"
+                  placeholder={`Share your experience with ${provider.name}...`}
+                  value={userReview}
+                  onChange={(e) => setUserReview(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+              <Button type="submit" disabled={isSubmittingReview} className="bg-primary text-primary-foreground">
+                {isSubmittingReview ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : <><Send className="mr-2 h-4 w-4" /> Submit Review</>}
+              </Button>
+            </form>
           </div>
         </CardContent>
       </Card>

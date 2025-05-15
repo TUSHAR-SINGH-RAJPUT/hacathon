@@ -1,7 +1,8 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { estimateJobPrice, EstimateJobPriceInput, EstimateJobPriceOutput } from "@/ai/flows/estimate-job-price";
 import React, { useState } from "react";
-import { Loader2, Wand2 } from "lucide-react";
+import { Loader2, Wand2, Users } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { ServiceCategory } from "@/types";
 
@@ -36,6 +37,7 @@ const serviceCategories: { value: ServiceCategory; label: string }[] = [
   { value: "Cleaning", label: "Cleaning" },
   { value: "Electrical", label: "Electrical" },
   { value: "Handyman", label: "General Handyman" },
+  { value: "Landscaping", label: "Landscaping" },
   { value: "Other", label: "Other" },
 ];
 
@@ -51,6 +53,15 @@ const formSchema = z.object({
   location: z.string().min(3, { message: "Location is required." }).max(100),
   urgency: z.string().refine(value => urgencyLevels.includes(value), { message: "Please select an urgency level." }),
   size: z.string().refine(value => jobSizes.includes(value), { message: "Please select the job size." }),
+  numberOfPeople: z.coerce.number().min(1, "At least 1 person required").optional(),
+}).refine(data => {
+  if ((data.size.startsWith("Medium") || data.size.startsWith("Large")) && (data.numberOfPeople === undefined || data.numberOfPeople < 1)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Number of people is required for medium or large jobs.",
+  path: ["numberOfPeople"], // Path of the error
 });
 
 export default function JobPostingForm() {
@@ -65,24 +76,30 @@ export default function JobPostingForm() {
       jobTitle: "",
       jobDescription: "",
       location: "",
+      serviceType: undefined,
+      urgency: undefined,
+      size: undefined,
+      numberOfPeople: undefined,
     },
   });
 
+  const watchSize = form.watch("size");
+  const showNumberOfPeople = watchSize && (watchSize.startsWith("Medium") || watchSize.startsWith("Large"));
+
   async function handleEstimatePrice() {
     const values = form.getValues();
-    const validationResult = formSchema.safeParse(values);
+    const parseResult = formSchema.safeParse(values);
 
-    if (!validationResult.success) {
-      // Trigger validation display for all fields
-      form.trigger();
+    if (!parseResult.success) {
+      form.trigger(); // Show validation errors
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields correctly before estimating.",
+        description: "Please fill in all required fields correctly before estimating. Medium/Large jobs require number of people.",
         variant: "destructive",
       });
       return;
     }
-
+    
     setIsEstimating(true);
     setEstimationResult(null);
     setEstimationError(null);
@@ -94,6 +111,8 @@ export default function JobPostingForm() {
         serviceType: values.serviceType,
         urgency: values.urgency,
         size: values.size,
+        // numberOfPeople is not part of EstimateJobPriceInput currently,
+        // but could be added to the Genkit flow if desired.
       };
       const result = await estimateJobPrice(estimateInput);
       setEstimationResult(result);
@@ -116,15 +135,13 @@ export default function JobPostingForm() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Actual job posting logic is out of scope for this UI scaffold.
-    // This would typically involve sending data to a backend API.
     console.log("Form submitted:", values);
     toast({
       title: "Job Posted (Simulated)",
-      description: "Your job request has been successfully submitted.",
+      description: "Your job request has been successfully submitted. Professionals will be notified.",
     });
-    // form.reset(); // Optionally reset form
-    // setEstimationResult(null); // Clear estimation
+    // form.reset(); 
+    // setEstimationResult(null);
   }
 
   return (
@@ -137,9 +154,9 @@ export default function JobPostingForm() {
             <FormItem>
               <FormLabel>Job Title</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Interior Wall Painting" {...field} />
+                <Input placeholder="e.g., Interior Wall Painting for 2BHK" {...field} />
               </FormControl>
-              <FormDescription>A clear and concise title for your job.</FormDescription>
+              <FormDescription>A clear and concise title for your job (max 100 characters).</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -175,15 +192,15 @@ export default function JobPostingForm() {
           name="jobDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Job Description</FormLabel>
+              <FormLabel>Detailed Job Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Provide details about the job: tasks, materials, special requirements, etc."
+                  placeholder="Describe the work in detail: what needs to be done, specific tasks, any materials you'll provide or expect the pro to bring, measurements if applicable, and any special instructions or requirements. The more details, the better!"
                   className="resize-y min-h-[120px]"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>The more details you provide, the better the estimates and bids.</FormDescription>
+              <FormDescription>Provide as much detail as possible (min 20, max 1000 characters). This helps pros understand the scope and give accurate quotes.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -194,11 +211,11 @@ export default function JobPostingForm() {
           name="location"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Location</FormLabel>
+              <FormLabel>Job Location</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Your City, State or Zip Code" {...field} />
+                <Input placeholder="e.g., Your Area, City, State or Pincode" {...field} />
               </FormControl>
-              <FormDescription>Where the job needs to be performed.</FormDescription>
+              <FormDescription>Specify where the service is needed (e.g., "Indiranagar, Bangalore" or "560038").</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -210,7 +227,7 @@ export default function JobPostingForm() {
             name="urgency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Urgency</FormLabel>
+                <FormLabel>Urgency Level</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -235,8 +252,16 @@ export default function JobPostingForm() {
             name="size"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Job Size</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormLabel>Estimated Job Size</FormLabel>
+                <Select onValueChange={(value) => {
+                    field.onChange(value);
+                    if (!value.startsWith("Medium") && !value.startsWith("Large")) {
+                        form.setValue("numberOfPeople", undefined); // Clear if not medium/large
+                        form.clearErrors("numberOfPeople");
+                    } else if (form.getValues("numberOfPeople") === undefined) {
+                        form.setValue("numberOfPeople", 1); // Default to 1 if medium/large and undefined
+                    }
+                }} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Estimate the job size" />
@@ -256,6 +281,26 @@ export default function JobPostingForm() {
           />
         </div>
 
+        {showNumberOfPeople && (
+          <FormField
+            control={form.control}
+            name="numberOfPeople"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center"><Users className="h-4 w-4 mr-2 text-primary" />Number of People Required (Estimate)</FormLabel>
+                <FormControl>
+                  <Input type="number" min="1" placeholder="e.g., 1 or 2" {...field} 
+                  onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)}
+                  />
+                </FormControl>
+                <FormDescription>For medium or large jobs, estimate how many professionals might be needed.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+
         {estimationResult && (
           <Alert variant="default" className="bg-secondary text-secondary-foreground">
             <Wand2 className="h-5 w-5 text-primary" />
@@ -263,7 +308,7 @@ export default function JobPostingForm() {
             <AlertDescription>
               <p className="font-medium text-lg">Estimated Range: {estimationResult.estimatedPriceRange}</p>
               <p className="text-sm mt-1">Factors considered: {estimationResult.factorsConsidered}</p>
-              <p className="text-xs mt-2 text-muted-foreground">Note: This is an AI-generated estimate. Actual bids may vary.</p>
+              <p className="text-xs mt-2 text-muted-foreground">Note: This is an AI-generated estimate. Actual bids from professionals may vary.</p>
             </AlertDescription>
           </Alert>
         )}
@@ -291,7 +336,7 @@ export default function JobPostingForm() {
             Get AI Price Estimate
           </Button>
           <Button type="submit" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isEstimating}>
-            Post Job
+            Post Job & Get Quotes
           </Button>
         </div>
       </form>

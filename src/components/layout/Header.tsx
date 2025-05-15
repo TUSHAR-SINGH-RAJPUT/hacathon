@@ -1,10 +1,10 @@
 
-"use client"; // Add this for client-side hooks like useCart
+"use client"; 
 
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase } from 'lucide-react'; // Added Briefcase
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, BookOpen } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -19,9 +19,12 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { Menu } from 'lucide-react';
-import { useCart } from '@/context/CartContext'; // Import useCart
+import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation';
 
 
 const NavLink = ({ href, children, icon }: { href: string; children: React.ReactNode; icon?: React.ReactNode }) => (
@@ -34,14 +37,24 @@ const NavLink = ({ href, children, icon }: { href: string; children: React.React
 );
 
 export default function Header() {
-  const { cart, removeFromCart } = useCart(); // Use the cart context
+  const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
+  const router = useRouter();
 
   const navItems = [
     { href: '/', label: 'Home', icon: <Home size={18} /> },
     { href: '/post-job', label: 'Post a Job', icon: <PlusSquare size={18} /> },
     { href: '/browse-providers', label: 'Browse Services', icon: <Search size={18} /> },
-    { href: '/join-as-pro', label: 'Join as Pro', icon: <Briefcase size={18} /> }, // New Item
+    { href: '/join-as-pro', label: 'Join as Pro', icon: <Briefcase size={18} /> },
+    { href: '/about', label: 'About Us', icon: <InfoIcon size={18} /> },
   ];
+
+  const handleProceedToBooking = () => {
+    if (cart.length > 0) {
+       // Close popover first if it's open - this requires managing popover state or a ref,
+       // for simplicity, direct navigation for now.
+      router.push('/booking-confirmation');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,7 +63,7 @@ export default function Header() {
           <Logo size="medium" />
         </Link>
         
-        <nav className="hidden md:flex items-center space-x-2 lg:space-x-4">
+        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
           {navItems.map(item => (
             <NavLink key={item.href} href={item.href} icon={item.icon}>
               {item.label}
@@ -77,29 +90,45 @@ export default function Header() {
                 {cart.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Your job list is empty. Add providers you're interested in!</p>
                 ) : (
-                  <ul className="space-y-3 max-h-64 overflow-y-auto">
-                    {cart.map(item => (
-                      <li key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:bg-secondary/50 transition-colors">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                           <Image 
-                            src={item.profileImageUrl || `https://placehold.co/40x40.png`} 
-                            alt={item.name} 
-                            width={32} 
-                            height={32} 
-                            className="rounded-full" 
-                          />
-                          <span className="text-sm font-medium truncate text-foreground">{item.name}</span>
-                        </div>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
-                          <X size={16} />
-                          <span className="sr-only">Remove {item.name}</span>
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {cart.length > 0 && (
-                  <Button className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90">Proceed to Booking</Button>
+                  <>
+                    <ul className="space-y-3 max-h-48 overflow-y-auto">
+                      {cart.map(item => (
+                        <li key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:bg-secondary/50 transition-colors">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                             <Image 
+                              src={item.profileImageUrl || `https://placehold.co/40x40.png`} 
+                              alt={item.name} 
+                              width={32} 
+                              height={32} 
+                              className="rounded-full" 
+                            />
+                            <span className="text-sm font-medium truncate text-foreground">{item.name}</span>
+                          </div>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
+                            <X size={16} />
+                            <span className="sr-only">Remove {item.name}</span>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    <Separator className="my-3" />
+                    <div className="space-y-2">
+                      <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">Service Address (Optional)</Label>
+                      <Input 
+                        id="customer-address"
+                        placeholder="Enter your address or area" 
+                        value={customerAddress || ''}
+                        onChange={(e) => setCustomerAddress(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleProceedToBooking} 
+                      className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      Proceed to Booking
+                    </Button>
+                  </>
                 )}
               </div>
             </PopoverContent>
@@ -120,7 +149,7 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="md:hidden ml-2"> {/* Ensure some spacing for mobile cart icon */}
+        <div className="md:hidden ml-2">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">

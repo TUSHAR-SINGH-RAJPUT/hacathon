@@ -1,7 +1,7 @@
 
 import ProviderRegistrationForm from './ProviderRegistrationForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Briefcase, MapPin, Users } from 'lucide-react';
+import { Briefcase, MapPin, Users, Award, TrendingUp, ShieldCheck } from 'lucide-react';
 
 export default function JoinAsProPage() {
   return (
@@ -9,10 +9,10 @@ export default function JoinAsProPage() {
       <section className="text-center py-10 bg-card rounded-xl shadow-lg">
         <Briefcase className="mx-auto h-16 w-16 text-primary mb-4" />
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-card-foreground">
-          Join kariGaar as a Professional
+          Showcase Your Skills on kariGaar
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Offer your skills and services to a wide audience. Fill out the form below to get started and connect with customers seeking your expertise.
+          Become a valued professional on our platform. Connect with clients actively seeking your expertise, grow your business, and manage your work efficiently. Start by creating your profile below.
         </p>
       </section>
 
@@ -20,9 +20,9 @@ export default function JoinAsProPage() {
         <div className="md:col-span-2">
           <Card className="shadow-xl bg-background">
             <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-foreground">Your Professional Profile</CardTitle>
+              <CardTitle className="text-2xl font-semibold text-foreground">Create Your Professional Profile</CardTitle>
               <CardDescription className="text-muted-foreground">
-                Provide your details to create your provider profile. The more complete your profile, the more likely you are to attract clients.
+                Fill in your details to build a compelling profile. Accuracy and completeness will help you attract more clients and opportunities. This is the first step towards getting verified and listed.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -35,26 +35,28 @@ export default function JoinAsProPage() {
           <Card className="bg-secondary shadow-lg">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-secondary-foreground flex items-center">
-                <Users className="h-6 w-6 mr-3 text-primary" /> Why Join Us?
+                <TrendingUp className="h-6 w-6 mr-3 text-primary" /> Why Join kariGaar?
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-secondary-foreground space-y-3">
-              <p>Reach a wider customer base in your local area.</p>
-              <p>Manage your job requests and schedule easily.</p>
-              <p>Build your reputation with customer reviews.</p>
-              <p>Get fair price estimates for jobs to guide your quotes.</p>
+            <CardContent className="text-secondary-foreground space-y-3 text-sm">
+              <p><Users className="inline h-4 w-4 mr-1 text-primary" /> <strong>Wider Reach:</strong> Connect with a large pool of customers in your service area.</p>
+              <p><MapPin className="inline h-4 w-4 mr-1 text-primary" /> <strong>Local Focus:</strong> Get matched with jobs specifically in your preferred locations.</p>
+              <p><Award className="inline h-4 w-4 mr-1 text-primary" /> <strong>Build Reputation:</strong> Collect reviews and showcase your quality work to build trust.</p>
+              <p><ShieldCheck className="inline h-4 w-4 mr-1 text-primary" /> <strong>Verified Platform:</strong> Benefit from being part of a trusted network of professionals.</p>
+              <p>Manage job requests and your schedule with ease (future feature).</p>
             </CardContent>
           </Card>
 
           <Card className="bg-secondary shadow-lg">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-secondary-foreground flex items-center">
-                <MapPin className="h-6 w-6 mr-3 text-primary" /> Finding Opportunities
+                <Briefcase className="h-6 w-6 mr-3 text-primary" /> Finding Job Opportunities
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-secondary-foreground space-y-3">
-              <p>Once registered and approved, you'll be able to browse job postings relevant to your skills and location.</p>
-              <p className="text-sm text-muted-foreground">(Full job browsing functionality for providers is under development.)</p>
+            <CardContent className="text-secondary-foreground space-y-3 text-sm">
+              <p>Once your profile is registered and successfully verified, you'll gain access to view and bid on job postings relevant to your skills and chosen service locations.</p>
+              <p>Our platform aims to provide a steady stream of potential work, helping you grow your client base.</p>
+              <p className="text-xs text-muted-foreground">(Full job browsing and bidding functionality for providers is currently under development and will be rolled out soon.)</p>
             </CardContent>
           </Card>
         </div>

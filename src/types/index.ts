@@ -1,6 +1,14 @@
 
 export type ServiceCategory = "Painting" | "Gardening" | "Plumbing" | "Cleaning" | "Electrical" | "Handyman" | "Landscaping" | "Other";
 
+export interface Review {
+  id: string;
+  reviewerName: string;
+  rating: number; // 0-5
+  comment: string;
+  date: string; // ISO date string
+}
+
 export interface JobRequest {
   id: string;
   title: string;
@@ -9,6 +17,7 @@ export interface JobRequest {
   location: string;
   urgency: "Urgent" | "Within a week" | "Flexible";
   size: "Small" | "Medium" | "Large";
+  numberOfPeople?: number; // Added
   budget?: string; // Optional
   postedDate: string;
   status: "Open" | "In Progress" | "Completed" | "Cancelled";
@@ -28,9 +37,17 @@ export interface ServiceProvider {
   hourlyRate?: string;
   portfolioImages?: string[]; // URLs
   reviewsCount: number;
+  reviews?: Review[]; // Added
 }
 
 // Added for Cart functionality
 export interface CartItem extends ServiceProvider {
   // Potentially add job-specific details later, e.g., selected service
+}
+
+export interface BookingDetails {
+  provider: ServiceProvider;
+  customerAddress: string;
+  paymentMethod: "Cash on Delivery" | "Online Payment";
+  bookingDate: string; // ISO date string
 }
