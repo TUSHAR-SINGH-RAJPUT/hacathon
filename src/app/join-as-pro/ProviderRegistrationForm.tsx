@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,39 +17,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import { serviceCategories } from '@/components/providers/dummyData'; // Using existing categories
+import { serviceCategories } from '@/components/providers/dummyData';
 import type { ServiceCategory } from "@/types";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card"; // Renamed to avoid conflict
-import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, Image as ImageIcon, Info, ShieldCheck, FileText } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, Image as ImageIcon, Info } from "lucide-react";
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 const providerFormSchema = z.object({
   fullName: z.string().min(3, { message: "Full name must be at least 3 characters." }).max(100),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  phoneNumber: z.string().optional(), // Making phone optional for now
+  phoneNumber: z.string().optional(),
   location: z.string().min(3, { message: "Location is required." }).max(100),
   serviceTypes: z.array(z.string()).min(1, { message: "Please select at least one service type." }),
   experienceYears: z.coerce.number().min(0, { message: "Experience must be a positive number." }).max(50),
   bio: z.string().min(20, { message: "Bio must be at least 20 characters." }).max(1000),
-  hourlyRate: z.string().optional(), // e.g., "200-400" or "Contact for quote"
+  hourlyRate: z.string().optional(),
   profileImageUrl: z.string().optional().refine(val => !val || z.string().url().safeParse(val).success || val.startsWith('https://placehold.co'), {
     message: "Please enter a valid URL for profile image or leave blank for placeholder.",
   }),
-  // Verification fields
-  aadhaarNumber: z.string().optional().refine(val => !val || /^\d{4}\s\d{4}\s\d{4}$/.test(val) || /^\d{12}$/.test(val), {
-    message: "Enter a valid 12-digit Aadhaar number (optionally with spaces)."
-  }),
-  panNumber: z.string().optional().refine(val => !val || /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val), {
-    message: "Enter a valid PAN card number (e.g., ABCDE1234F)."
-  }),
-  otherDocumentsDetails: z.string().max(500, { message: "Details too long, max 500 characters."}).optional(),
 });
 
-export default function ProviderRegistrationForm() {
-  const { toast } = useToast();
+export type ProviderRegistrationData = z.infer<typeof providerFormSchema>;
 
-  const form = useForm<z.infer<typeof providerFormSchema>>({
+export default function ProviderRegistrationForm() {
+  const router = useRouter();
+  const form = useForm<ProviderRegistrationData>({
     resolver: zodResolver(providerFormSchema),
     defaultValues: {
       fullName: "",
@@ -61,20 +53,15 @@ export default function ProviderRegistrationForm() {
       bio: "",
       hourlyRate: "",
       profileImageUrl: "",
-      aadhaarNumber: "",
-      panNumber: "",
-      otherDocumentsDetails: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof providerFormSchema>) {
-    // Simulate form submission
-    console.log("Provider Registration Data:", values);
-    toast({
-      title: "Registration Submitted (Simulated)",
-      description: "Thank you for registering! Your profile and documents will be reviewed for verification.",
-    });
-    // form.reset(); // Optionally reset form
+  function onSubmit(values: ProviderRegistrationData) {
+    // Store data in sessionStorage to pass to the next step
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem('providerRegistrationData', JSON.stringify(values));
+    }
+    router.push('/join-as-pro/verify-documents');
   }
 
   return (
@@ -263,75 +250,13 @@ export default function ProviderRegistrationForm() {
             />
           </CardContent>
         </Card>
-
-        <Card className="bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-xl">Identity & Document Verification</CardTitle>
-            <UiCardDescription className="text-muted-foreground">
-              This information is required for verification purposes and will be kept confidential.
-              Actual document upload functionality would be part of a full implementation.
-            </UiCardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="aadhaarNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />Aadhaar Number (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="XXXX XXXX XXXX" {...field} />
-                  </FormControl>
-                  <FormDescription>Enter your 12-digit Aadhaar number.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="panNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />PAN Card Number (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="ABCDE1234F" {...field} />
-                  </FormControl>
-                  <FormDescription>Enter your 10-character PAN number.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="otherDocumentsDetails"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><FileText className="h-4 w-4 mr-2 text-primary" />Other Relevant Documents (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="e.g., Trade license details, previous work certifications, etc. Mention any documents you can provide for verification."
-                      className="resize-y min-h-[80px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    List any other documents or certifications that can help verify your profile.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
         
         <div className="pt-6">
           <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-            Register as a Provider
+            Next: Document Verification
           </Button>
         </div>
       </form>
     </Form>
   );
 }
-
-    
