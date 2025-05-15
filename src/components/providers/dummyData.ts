@@ -8,7 +8,7 @@ export const serviceCategories: { value: ServiceCategory; label: string }[] = [
   { value: "Cleaning", label: "Cleaning" },
   { value: "Electrical", label: "Electrical" },
   { value: "Handyman", label: "General Handyman" },
-  { value: "Landscaping", label: "Landscaping" }, // Added Landscaping
+  { value: "Landscaping", label: "Landscaping" },
   { value: "Other", label: "Other" },
 ];
 
@@ -22,7 +22,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Priya+S',
     bio: 'Experienced painter and general handyman with over 10 years in the field. Detail-oriented and committed to quality work. I specialize in residential and commercial painting, offering a range of finishes and techniques. Also proficient in minor plumbing, electrical fixes, and furniture assembly.',
     experienceYears: 10,
-    hourlyRate: '3500-5000',
+    hourlyRate: '350-500', // Updated
     reviewsCount: 120,
     portfolioImages: [
       'https://placehold.co/600x400.png?text=Painting+Project+1',
@@ -39,7 +39,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Rohan+P',
     bio: 'Passionate gardener and landscaper transforming outdoor spaces. Specializes in sustainable gardening practices, landscape design, and regular garden maintenance. From lawn care to creating beautiful flower beds, I can help your garden thrive.',
     experienceYears: 7,
-    hourlyRate: '3000-4500',
+    hourlyRate: '300-450', // Updated
     reviewsCount: 85,
     portfolioImages: [
       'https://placehold.co/600x400.png?text=Garden+Makeover',
@@ -55,7 +55,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Ananya+R',
     bio: 'Licensed plumber providing reliable and efficient solutions for all your plumbing needs. Emergency services available 24/7. Expertise in leak detection, pipe repairs, fixture installations, and drain cleaning.',
     experienceYears: 12,
-    hourlyRate: '4000-6000',
+    hourlyRate: '400-600', // Updated
     reviewsCount: 200,
   },
   {
@@ -67,7 +67,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Vikram+S',
     bio: 'Dedicated to making your home spotless and functional. Offering regular house cleaning, deep cleaning services, and minor repair tasks. I bring my own eco-friendly cleaning supplies.',
     experienceYears: 5,
-    hourlyRate: '2500-4000',
+    hourlyRate: '250-400', // Updated
     reviewsCount: 65,
      portfolioImages: [
       'https://placehold.co/600x400.png?text=Sparkling+Clean+Kitchen',
@@ -83,7 +83,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Susmita+B',
     bio: 'Certified electrician ensuring safety and quality for all electrical installations and repairs. Experienced in wiring, light fixture installation, circuit breaker issues, and smart home setups.',
     experienceYears: 8,
-    hourlyRate: '3800-5500',
+    hourlyRate: '380-550', // Updated
     reviewsCount: 92,
   },
   {
@@ -95,7 +95,7 @@ export const dummyProviders: ServiceProvider[] = [
     profileImageUrl: 'https://placehold.co/400x300.png?text=Arjun+R',
     bio: 'Versatile handyman skilled in various trades. Your go-to for home maintenance and improvements. Proficient in painting, minor plumbing repairs, carpentry, and general upkeep tasks.',
     experienceYears: 15,
-    hourlyRate: '3200-4800',
+    hourlyRate: '320-480', // Updated
     reviewsCount: 150,
   },
 ];
