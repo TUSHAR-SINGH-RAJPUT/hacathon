@@ -3,7 +3,7 @@
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 import type { ServiceProvider } from '@/types';
 import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users, Briefcase } from 'lucide-react';
-import React from 'react';
+import React from 'react'; // Added React import
 
 // Define the icon mapping carefully, ensure ServiceProvider['serviceTypes'][0] is compatible with the keys
 // Typically, ServiceCategory from types/index.ts would be used here if it's a union of literals
@@ -29,7 +29,7 @@ const ServiceTypeIcon = ({ type, className = "h-5 w-5" }: ServiceTypeIconProps) 
   // Clone the element to apply the className prop.
   // Check if iconElement is a valid React element before cloning.
   if (React.isValidElement(iconElement)) {
-    return React.cloneElement(iconElement, { className });
+    return React.cloneElement(iconElement as React.ReactElement, { className });
   }
   return <Briefcase className={className} />; // Fallback
 };
