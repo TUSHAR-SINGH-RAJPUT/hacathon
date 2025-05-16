@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, CheckCircle, Users, Briefcase, Paintbrush, Sprout, Wrench, Sparkles, Zap, PieChart, UserCheck } from 'lucide-react';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Pie, Cell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts"; 
+import React from 'react'; // Added React import
 
 const featureCards = [
   {
