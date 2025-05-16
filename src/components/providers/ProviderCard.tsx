@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import type { ServiceProvider } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,9 @@ interface ProviderCardProps {
   translations: any;
 }
 
-export default function ProviderCard({ provider, locale, translations: t }: ProviderCardProps) {
+export default function ProviderCard({ provider, locale, translations: tProp }: ProviderCardProps) {
+  const t = tProp || {}; // Ensure t is always an object
+
   return (
     <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden transform hover:-translate-y-1">
       <CardHeader className="p-0">
