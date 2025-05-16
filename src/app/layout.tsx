@@ -35,13 +35,9 @@ export default function RootLayout({
     
     const initializeGoogleTranslate = () => {
       if ((window as any).google && (window as any).google.translate) {
-        new (window as any).google.translate.TranslateElement(
-          { 
-            pageLanguage: 'en', 
-            layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE 
-          },
-          'google_translate_element'
-        );
+        // Initialization will now be triggered from Header.tsx
+        // This function definition needs to be globally available.
+        console.log("Google Translate API loaded, init function is ready.");
       }
     };
 
@@ -52,10 +48,9 @@ export default function RootLayout({
       document.body.appendChild(addScript);
       (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
     } else {
-      // If script exists, ensure init function is called if element is present
-      // This might be needed if the script loaded but element wasn't ready
-      if (document.getElementById('google_translate_element')) {
-        initializeGoogleTranslate();
+      if (document.getElementById('google_translate_element') && (window as any).googleTranslateElementInitGlobal) {
+        // If script and element exist, ensure init function is called (though Header will primarily handle this)
+        // (window as any).googleTranslateElementInitGlobal();
       }
     }
   }, []);
@@ -130,10 +125,10 @@ export default function RootLayout({
           </div>
         )}
         
-        {/* Google Translate Widget - Fixed Box at Bottom Left */}
-        <div className="fixed bottom-4 left-4 bg-card p-2 rounded-md shadow-lg z-50 border border-border">
+        {/* Google Translate Widget - Removed from here, will be in Header */}
+        {/* <div className="fixed bottom-4 left-4 bg-card p-1.5 rounded-md shadow-md z-50 border border-border">
           <div id="google_translate_element"></div>
-        </div>
+        </div> */}
 
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">

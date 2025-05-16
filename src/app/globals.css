@@ -123,3 +123,77 @@
      color: hsl(var(--foreground)); /* Use dark theme foreground for headings */
   }
 }
+
+/* Styles for Google Translate Widget to fit navbar */
+#google_translate_element_header .goog-te-gadget-simple,
+#google_translate_element_header_mobile .goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important; /* Inherit font size from parent */
+}
+
+#google_translate_element_header .goog-te-menu-value span,
+#google_translate_element_header_mobile .goog-te-menu-value span {
+  color: hsl(var(--popover-foreground)) !important; /* Match popover/card text */
+  font-size: 0.875rem !important; /* text-sm */
+  padding: 0.25rem 0.5rem !important;
+}
+.dark #google_translate_element_header .goog-te-menu-value span,
+.dark #google_translate_element_header_mobile .goog-te-menu-value span {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+
+#google_translate_element_header .goog-te-gadget-icon,
+#google_translate_element_header_mobile .goog-te-gadget-icon {
+  display: none !important; /* Hide Google's icon if present */
+}
+
+/* Styling the actual dropdown menu that Google Translate creates */
+.goog-te-menu-frame {
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important; /* Tailwind shadow-md */
+  background-color: hsl(var(--popover)) !important;
+}
+
+.goog-te-menu-frame .goog-te-menu2-item div, 
+.goog-te-menu-frame .goog-te-menu2-item:link div, 
+.goog-te-menu-frame .goog-te-menu2-item:visited div, 
+.goog-te-menu-frame .goog-te-menu2-item:active div {
+  color: hsl(var(--popover-foreground)) !important;
+  background-color: hsl(var(--popover)) !important;
+  padding: 0.5rem 1rem !important; /* Adjust padding */
+  font-size: 0.875rem !important; /* text-sm */
+}
+
+.goog-te-menu-frame .goog-te-menu2-item-selected div,
+.goog-te-menu-frame .goog-te-menu2-item:hover div {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Mobile specific: make the select take full width within its container */
+#google_translate_element_header_mobile .goog-te-combo {
+  width: 100% !important;
+  padding: 0.5rem !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  background-color: hsl(var(--input)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-size: 0.875rem !important;
+}
+
+.dark #google_translate_element_header_mobile .goog-te-combo {
+  background-color: hsl(var(--input)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+
+/* Make the popover content for language slightly wider if needed */
+.popover-content-language-translator {
+  width: auto !important; /* Adjust as needed */
+  min-width: 150px; /* Example min-width */
+}
