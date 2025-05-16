@@ -1,5 +1,5 @@
 
-"use client"; 
+"use client";
 
 import Link from 'next/link';
 import Logo from '@/components/Logo';
@@ -54,9 +54,9 @@ interface NavLinkProps {
 
 const NavLink = React.memo(({ href, children, icon, onClick, className, currentPath, locale }: NavLinkProps) => {
   const isActive = href ? currentPath === `/${locale}${href}` || (href === '/platform-home' && currentPath === `/${locale}`) : false;
-  
+
   const content = (
-    <Button 
+    <Button
       variant={isActive ? "secondary" : "ghost"}
       className={cn(
         "text-sm font-medium flex items-center gap-2 w-full justify-start py-3 text-lg md:text-sm md:justify-center md:py-2 md:text-base",
@@ -76,26 +76,26 @@ NavLink.displayName = 'NavLink';
 
 interface HeaderProps {
   locale: string;
-  fullDict: any; 
+  fullDict: any;
 }
 
 export default function Header({ locale, fullDict }: HeaderProps) {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
-  const pathname = usePathname(); 
-  
+  const pathname = usePathname();
+
   const [isClient, setIsClient] = useState(false);
-  const [isSheetOpen, setIsSheetOpen] = useState(false); 
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); 
+    setIsClient(true);
   }, []);
-  
+
   const t = useMemo(() => (fullDict?.Header) || {}, [fullDict]);
 
   const navItems = useMemo(() => [
-    { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> }, 
+    { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
     { href: `/post-job`, label: t.navPostJob || "Post a Job", icon: <PlusSquare size={18} /> },
     { href: `/browse-providers`, label: t.navBrowseServices || "Browse Services", icon: <Search size={18} /> },
     { href: `/join-as-pro`, label: t.navJoinAsPro || "Join as Pro", icon: <Briefcase size={18} /> },
@@ -107,7 +107,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
       router.push(`/${locale}/booking-confirmation`);
     }
   };
-  
+
   const profileNavItems = useMemo(() => [
     { href: `/profile/edit`, label: t.editProfile || "Edit Profile", icon: <Edit3 size={16}/> },
     { href: `/profile/bookings`, label: t.myBookings || "My Bookings", icon: <ListOrdered size={16}/> },
@@ -119,18 +119,23 @@ export default function Header({ locale, fullDict }: HeaderProps) {
   const pathWithoutLocale = useMemo(() => {
     if (pathname) {
       const segments = pathname.split('/');
-      if (segments.length > 1 && i18nConfig.locales.includes(segments[1])) { // Use i18nConfig from import
-        return pathname.substring(pathname.indexOf('/', 1)); 
+      if (segments.length > 1 && i18nConfig.locales.includes(segments[1])) {
+        return pathname.substring(pathname.indexOf('/', 1));
       }
     }
     return pathname || '/';
-  }, [pathname]); // i18nConfig is static, no need in deps array
+  }, [pathname]);
 
   const handleLanguageChange = useCallback((newLocale: string) => {
     router.push(pathWithoutLocale, { locale: newLocale });
-    setIsSheetOpen(false); 
+    setIsSheetOpen(false);
   }, [router, pathWithoutLocale]);
 
+  const languageOptions = [
+    { locale: 'en', label: t.english || "English" },
+    { locale: 'hi', label: t.hindi || "Hindi" },
+    { locale: 'kn', label: t.kannada || "Kannada" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -138,7 +143,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         <Link href={isLoggedIn ? `/${locale}/platform-home` : `/${locale}/`} passHref>
           <Logo size="medium" />
         </Link>
-        
+
         <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
           {navItems.map(item => (
             <NavLink key={item.label} href={item.href} icon={item.icon} currentPath={pathname} locale={locale}>
@@ -148,7 +153,28 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         </nav>
 
         <div className="flex items-center space-x-2">
-          {isClient && isLoggedIn && ( 
+          {/* Language Switcher - Desktop */}
+          <div className="hidden md:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10">
+                  <Globe size={20} />
+                  <span className="sr-only">{t.language || "Language"}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-card text-card-foreground">
+                <DropdownMenuLabel>{t.language || "Language"}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {languageOptions.map(lang => (
+                  <DropdownMenuItem key={lang.locale} onClick={() => handleLanguageChange(lang.locale)}>
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {isClient && isLoggedIn && (
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary hover:bg-primary/10">
@@ -172,12 +198,12 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                         {cart.map(item => (
                           <li key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:bg-secondary/50 transition-colors">
                             <div className="flex items-center gap-2 overflow-hidden">
-                               <Image 
-                                src={item.profileImageUrl || `https://placehold.co/40x40.png`} 
-                                alt={item.name} 
-                                width={32} 
-                                height={32} 
-                                className="rounded-full" 
+                               <Image
+                                src={item.profileImageUrl || `https://placehold.co/40x40.png`}
+                                alt={item.name}
+                                width={32}
+                                height={32}
+                                className="rounded-full"
                               />
                               <span className="text-sm font-medium truncate text-foreground">{item.name}</span>
                             </div>
@@ -191,7 +217,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                       <Separator className="my-3" />
                       <div className="space-y-2">
                         <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional || "Service Address (Optional)"}</Label>
-                        <Input 
+                        <Input
                           id="customer-address"
                           placeholder={t.enterAddressPlaceholder || "Enter your address"}
                           value={customerAddress || ''}
@@ -199,8 +225,8 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                           className="text-sm"
                         />
                       </div>
-                      <Button 
-                        onClick={handleProceedToBooking} 
+                      <Button
+                        onClick={handleProceedToBooking}
                         className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
                         disabled={cart.length === 0}
                       >
@@ -231,25 +257,6 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                      </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center gap-2 w-full">
-                      <Globe size={16} /> {t.language || "Language"}
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent>
-                        <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
-                          {t.english || "English"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>
-                          {t.hindi || "Hindi"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleLanguageChange('kn')}>
-                          {t.kannada || "Kannada"}
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout || "Logout"}
                   </DropdownMenuItem>
@@ -268,7 +275,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                   </Button>
                 </Link>
               </>
-            ) : ( 
+            ) : (
               <>
                 <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
                 <Button disabled>{t.navSignUp || "Sign Up"}</Button>
@@ -303,6 +310,20 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                   </Link>
                 ))}
                 <Separator className="my-3 bg-border" />
+
+                {/* Language Switcher - Mobile */}
+                <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language || "Language"}</p>
+                {languageOptions.map(lang => (
+                  <Link key={lang.locale} href={pathWithoutLocale} locale={lang.locale} passHref>
+                    <SheetClose asChild>
+                      <Button variant="ghost" onClick={() => handleLanguageChange(lang.locale)} className="w-full justify-start text-lg py-3 gap-3">
+                        {lang.label}
+                      </Button>
+                    </SheetClose>
+                  </Link>
+                ))}
+                <Separator className="my-3 bg-border" />
+
                 {isClient && isLoggedIn ? (
                   <>
                     {profileNavItems.map(item => (
@@ -314,29 +335,6 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                             </SheetClose>
                         </Link>
                     ))}
-                    <Separator className="my-3 bg-border" />
-                     <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language || "Language"}</p>
-                      <Link href={pathWithoutLocale} locale="en" passHref>
-                        <SheetClose asChild>
-                           <Button variant="ghost" onClick={() => handleLanguageChange('en')} className="w-full justify-start text-lg py-3 gap-3">
-                            {t.english || "English"}
-                          </Button>
-                        </SheetClose>
-                      </Link>
-                      <Link href={pathWithoutLocale} locale="hi" passHref>
-                        <SheetClose asChild>
-                          <Button variant="ghost" onClick={() => handleLanguageChange('hi')} className="w-full justify-start text-lg py-3 gap-3">
-                            {t.hindi || "Hindi"}
-                          </Button>
-                        </SheetClose>
-                      </Link>
-                      <Link href={pathWithoutLocale} locale="kn" passHref>
-                        <SheetClose asChild>
-                          <Button variant="ghost" onClick={() => handleLanguageChange('kn')} className="w-full justify-start text-lg py-3 gap-3">
-                            {t.kannada || "Kannada"}
-                          </Button>
-                        </SheetClose>
-                      </Link>
                     <Separator className="my-3 bg-border" />
                     <SheetClose asChild>
                         <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
