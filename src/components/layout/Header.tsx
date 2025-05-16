@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Globe } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -34,10 +34,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/context/CartContext';
@@ -50,12 +46,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
-// Define i18nConfig at the module level - though not used after revert, kept for structure if re-enabled
-const i18nConfig = {
-  locales: ['en', 'hi', 'kn'],
-  defaultLocale: 'en',
-};
-
 interface NavLinkProps {
   href?: string;
   children: React.ReactNode;
@@ -63,12 +53,10 @@ interface NavLinkProps {
   onClick?: () => void;
   className?: string;
   currentPath: string;
-  // locale: string; // Removed as app is English-only now
 }
 
 const NavLink = React.memo(({ href, children, icon, onClick, className, currentPath }: NavLinkProps) => {
-  const linkHref = href ? `${href}` : '#'; // Removed locale prefix
-  const isActive = href ? currentPath === `${href}` : false;
+  const isActive = href ? currentPath === href : false;
 
   const content = (
     <Button
@@ -84,10 +72,9 @@ const NavLink = React.memo(({ href, children, icon, onClick, className, currentP
       {children}
     </Button>
   );
-  return href ? <Link href={linkHref} passHref>{content}</Link> : content;
+  return href ? <Link href={href} passHref>{content}</Link> : content;
 });
 NavLink.displayName = 'NavLink';
-
 
 // Hardcoded English translations since i18n was reverted
 const t = {
@@ -105,7 +92,7 @@ const t = {
     customerSupport: "Customer Support",
     feedbacks: "Feedbacks",
     security: "Security",
-    language: "Language", // Kept for structure, but functionality is for later
+    language: "Language",
     english: "English",
     hindi: "हिंदी (Hindi)",
     kannada: "ಕನ್ನಡ (Kannada)",
@@ -145,7 +132,6 @@ export default function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isVoiceDialogVisible, setIsVoiceDialogVisible] = useState(false);
 
-  // State for voice recognition
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
@@ -155,7 +141,6 @@ export default function Header() {
   useEffect(() => {
     setIsClient(true);
 
-    // Initialize SpeechRecognition API
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setIsRecognitionApiSupported(false);
@@ -168,7 +153,7 @@ export default function Header() {
     if (!recognition) return;
 
     recognition.continuous = false;
-    recognition.interimResults = true; 
+    recognition.interimResults = true;
     recognition.lang = 'en-US'; // Explicitly set language
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -182,10 +167,13 @@ export default function Header() {
         }
       }
       setTranscript(finalTranscript || interimTranscript);
+      if (finalTranscript) {
+        setRecognitionError(null); // Clear previous errors if we get a final result
+      }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error("Speech recognition error", event.error);
+      console.error("Speech recognition error object:", event);
       let errorMessage = t.voiceAssistErrorGeneric;
       if (event.error === 'no-speech') {
         errorMessage = t.voiceAssistErrorNoSpeech;
@@ -195,6 +183,7 @@ export default function Header() {
         errorMessage = t.voiceAssistErrorNotAllowed;
       } else if (event.error === 'network') {
         errorMessage = t.voiceAssistErrorNetwork;
+        console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service, or a temporary service outage.");
       }
       setRecognitionError(errorMessage);
       setIsListening(false);
@@ -212,7 +201,7 @@ export default function Header() {
         recognitionRef.current.onend = null;
       }
     };
-  }, []); 
+  }, []);
 
   const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome, icon: <Home size={18} /> },
@@ -241,7 +230,7 @@ export default function Header() {
     setRecognitionError(null);
     setIsVoiceDialogVisible(true);
   }, []);
-  
+
   const handleToggleListening = () => {
     if (!recognitionRef.current) {
       setRecognitionError(t.voiceAssistErrorInit);
@@ -251,7 +240,7 @@ export default function Header() {
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      setTranscript(''); 
+      setTranscript('');
       setRecognitionError(null);
       try {
         recognitionRef.current.start();
@@ -282,20 +271,19 @@ export default function Header() {
                 {item.label}
               </NavLink>
             ))}
-             <Button
-              variant="ghost"
-              size="icon"
-              onClick={openVoiceDialog}
-              className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
-              aria-label={t.voiceAssistLabel}
-            >
-              <Mic size={20} />
-            </Button>
           </nav>
 
           <div className="flex items-center space-x-2">
-            {/* Language switcher removed as per previous undo, can be re-added if i18n is restored */}
-            
+             <Button
+                variant="ghost"
+                size="icon"
+                onClick={openVoiceDialog}
+                className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
+                aria-label={t.voiceAssistLabel}
+              >
+                <Mic size={20} />
+              </Button>
+
             {isClient && isLoggedIn && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -375,11 +363,10 @@ export default function Header() {
                     <DropdownMenuSeparator />
                     {profileNavItems.map(item => (
                        <DropdownMenuItem key={item.label} asChild>
-                         <Link href={`${item.href}`} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
+                         <Link href={item.href} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
                        </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    {/* Language submenu moved out for now */}
                     <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                       <LogOut size={16} /> {t.navLogout}
                     </DropdownMenuItem>
@@ -398,7 +385,7 @@ export default function Header() {
                     </Button>
                   </Link>
                 </>
-              ) : ( 
+              ) : (
                 <>
                   <Button variant="outline" disabled>{t.navLogin}</Button>
                   <Button disabled>{t.navSignUp}</Button>
@@ -430,12 +417,11 @@ export default function Header() {
                     </SheetClose>
                   ))}
                   <SheetClose asChild>
-                    <Button onClick={openVoiceDialog} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10">
-                      <Mic size={20} /> {t.voiceAssistLabel}
-                    </Button>
+                     <Button onClick={openVoiceDialog} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10">
+                        <Mic size={20} /> {t.voiceAssistLabel}
+                      </Button>
                   </SheetClose>
                   <Separator className="my-3 bg-border" />
-                  {/* Language options in mobile menu were removed during i18n revert */}
                   
                   {isClient && isLoggedIn ? (
                     <>
