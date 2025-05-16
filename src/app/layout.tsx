@@ -11,37 +11,52 @@ import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 
+// Hardcoded English translations for layout-specific elements
+const layoutTranslations = {
+  chatWithUsTitle: "Chat with Our Assistant",
+  chatWithUs: "Chat with Us",
+  closeChat: "Close Chat",
+  pageTitle: "kariGaar - Your Local Service Solution",
+  pageDescription: "Find reliable local service professionals for all your needs.",
+  footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const [isChatOpen, setIsChatOpen] = useState(false);
-
-  const tLayout = {
-    chatWithUsTitle: "Chat with Our Assistant",
-    chatWithUs: "Chat with Us",
-    closeChat: "Close Chat"
-  };
+  const currentYear = new Date().getFullYear();
 
   // Function to initialize Google Translate Element
-  // This needs to be globally accessible for the Google script's callback
   useEffect(() => {
     const existingScript = document.getElementById('google-translate-api');
-    if (!existingScript) {
-      const addScript = document.createElement('script');
-      addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
-      addScript.setAttribute('id', 'google-translate-api');
-      document.body.appendChild(addScript);
-    }
     
-    if (!(window as any).googleTranslateElementInit) {
-        (window as any).googleTranslateElementInit = () => {
+    const initializeGoogleTranslate = () => {
+      if ((window as any).google && (window as any).google.translate) {
         new (window as any).google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE },
+          { 
+            pageLanguage: 'en', 
+            layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE 
+          },
           'google_translate_element'
         );
-      };
+      }
+    };
+
+    if (!existingScript) {
+      const addScript = document.createElement('script');
+      addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal');
+      addScript.setAttribute('id', 'google-translate-api');
+      document.body.appendChild(addScript);
+      (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
+    } else {
+      // If script exists, ensure init function is called if element is present
+      // This might be needed if the script loaded but element wasn't ready
+      if (document.getElementById('google_translate_element')) {
+        initializeGoogleTranslate();
+      }
     }
   }, []);
 
@@ -49,8 +64,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <title>kariGaar - Your Local Service Solution</title>
-        <meta name="description" content="Find reliable local service professionals for all your needs." />
+        <title>{layoutTranslations.pageTitle}</title>
+        <meta name="description" content={layoutTranslations.pageDescription} />
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
@@ -61,17 +76,17 @@ export default function RootLayout({
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              <div id="google_translate_element" className="mb-4"></div>
-              © {new Date().getFullYear()} kariGaar. All rights reserved.
+              {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
         </AuthProvider>
 
+        {/* Jotform Chatbot Trigger and Panel */}
         {!isChatOpen && (
           <button
             onClick={() => setIsChatOpen(true)}
             className="fixed bottom-6 right-6 bg-primary text-primary-foreground p-4 rounded-full shadow-xl hover:bg-primary/90 transition-all duration-300 z-[9999]"
-            aria-label={tLayout.chatWithUs}
+            aria-label={layoutTranslations.chatWithUs}
           >
             <MessageCircle size={28} />
           </button>
@@ -80,8 +95,8 @@ export default function RootLayout({
         {isChatOpen && (
           <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full h-full sm:w-[400px] sm:h-[calc(100%-4rem)] max-h-[700px] bg-card text-card-foreground shadow-2xl rounded-t-lg sm:rounded-lg flex flex-col z-[10000] overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b bg-secondary text-secondary-foreground">
-              <h3 className="font-semibold text-lg">{tLayout.chatWithUsTitle}</h3>
-              <button onClick={() => setIsChatOpen(false)} className="p-1 rounded-md hover:bg-secondary/80" aria-label={tLayout.closeChat}>
+              <h3 className="font-semibold text-lg">{layoutTranslations.chatWithUsTitle}</h3>
+              <button onClick={() => setIsChatOpen(false)} className="p-1 rounded-md hover:bg-secondary/80" aria-label={layoutTranslations.closeChat}>
                 <CloseIcon size={20} />
               </button>
             </div>
@@ -115,6 +130,11 @@ export default function RootLayout({
           </div>
         )}
         
+        {/* Google Translate Widget - Fixed Box at Bottom Left */}
+        <div className="fixed bottom-4 left-4 bg-card p-2 rounded-md shadow-lg z-50 border border-border">
+          <div id="google_translate_element"></div>
+        </div>
+
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">
           {`
