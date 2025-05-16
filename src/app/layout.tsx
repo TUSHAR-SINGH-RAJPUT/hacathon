@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
+import Script from 'next/script'; // Import the Next.js Script component
 
 const geistSans = Geist({ 
   subsets: ['latin'],
@@ -37,6 +38,31 @@ export default function RootLayout({
             </footer>
           </CartProvider>
         </AuthProvider>
+
+        {/*
+          BOTPRESS CHATBOT INTEGRATION:
+          1. Go to your Botpress dashboard.
+          2. Find your chatbot and go to its "Integrations" or "Channels" section.
+          3. Look for "Web Chat" or a similar embed option.
+          4. Copy the provided <script>...</script> tag.
+          5. Replace this entire comment block with the script tag you copied from Botpress.
+             It's generally recommended to place chat widget scripts just before the closing </body> tag.
+          
+          Example of what Botpress script might look like (DO NOT USE THIS, GET YOUR OWN):
+          <script src="https://cdn.botpress.cloud/webchat/v1/inject.js"></script>
+          <script>
+            window.botpressWebChat.init({
+              "composerPlaceholder": "Chat with bot",
+              "botConversationDescription": "This is a friendly chatbot",
+              "botId": "YOUR_BOT_ID_HERE",
+              "hostUrl": "https://cdn.botpress.cloud/webchat/v1",
+              "messagingUrl": "https://messaging.botpress.cloud",
+              "clientId": "YOUR_CLIENT_ID_HERE",
+              // ... other configuration options
+            });
+          </script>
+        */}
+
       </body>
     </html>
   );
