@@ -120,7 +120,7 @@ export default function LandingPage() {
               id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
               title="Tyrone: Job Application Assistant"
               onLoad={(e: any) => e.target.parentElement.scrollTo(0, 0)}
-              allowTransparency={true}
+              allowtransparency="true"
               allow="geolocation; microphone; camera; fullscreen"
               src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
               frameBorder="0"
