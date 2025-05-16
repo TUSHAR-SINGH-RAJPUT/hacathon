@@ -1,5 +1,6 @@
+
 import type { SVGProps } from 'react';
-import { Construction } from 'lucide-react';
+import { Sparkles } from 'lucide-react'; // Changed from Construction to Sparkles
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -23,7 +24,7 @@ export default function Logo({ size = 'medium', className, iconOnly = false, ...
 
   return (
     <div className={`flex items-center gap-2 text-primary ${className}`}>
-      <Construction className={`${sizeClasses[size]}`} strokeWidth={2.5} />
+      <Sparkles className={`${sizeClasses[size]}`} strokeWidth={2.5} />
       {!iconOnly && <span className={`font-bold ${textSizeClasses[size]}`}>kariGaar</span>}
     </div>
   );

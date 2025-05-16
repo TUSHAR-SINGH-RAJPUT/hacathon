@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, CheckCircle, Users, Briefcase, Paintbrush, Sprout, Wrench, Sparkles, Zap, PieChart, UserCheck } from 'lucide-react';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
-import { Pie, Cell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts"; // Renamed to avoid conflict with ChartContainer
+import { Pie, Cell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts"; 
 
 const featureCards = [
   {
@@ -28,18 +28,18 @@ const featureCards = [
     icon: <CheckCircle className="h-8 w-8 text-primary" />,
     title: 'Quality Guaranteed',
     description: 'Connect with reliable experts committed to delivering top-notch service.',
-    link: '/about', // Link to about page
+    link: '/about', 
     linkText: 'Learn More',
   },
 ];
 
 const serviceCategories = [
-  { name: 'Painting', icon: <Paintbrush className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "painting wall" },
-  { name: 'Gardening', icon: <Sprout className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "gardening tools" },
-  { name: 'Plumbing', icon: <Wrench className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "plumbing pipes" },
-  { name: 'Cleaning', icon: <Sparkles className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "cleaning supplies" },
-  { name: 'Electrical', icon: <Zap className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "electrical wires" },
-  { name: 'Handyman', icon: <Users className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "tools toolbox" },
+  { name: 'Painting', icon: <Paintbrush className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "painting wall", bgColor: "bg-red-500/10", hoverBgColor: "hover:bg-red-500/20", iconColor: "text-red-500" },
+  { name: 'Gardening', icon: <Sprout className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "gardening tools", bgColor: "bg-green-500/10", hoverBgColor: "hover:bg-green-500/20", iconColor: "text-green-500" },
+  { name: 'Plumbing', icon: <Wrench className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "plumbing pipes", bgColor: "bg-blue-500/10", hoverBgColor: "hover:bg-blue-500/20", iconColor: "text-blue-500" },
+  { name: 'Cleaning', icon: <Sparkles className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "cleaning supplies", bgColor: "bg-yellow-500/10", hoverBgColor: "hover:bg-yellow-500/20", iconColor: "text-yellow-500" },
+  { name: 'Electrical', icon: <Zap className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "electrical wires", bgColor: "bg-purple-500/10", hoverBgColor: "hover:bg-purple-500/20", iconColor: "text-purple-500" },
+  { name: 'Handyman', icon: <Users className="h-10 w-10 mx-auto text-primary group-hover:text-primary/80 transition-colors" />, dataAiHint: "tools toolbox", bgColor: "bg-orange-500/10", hoverBgColor: "hover:bg-orange-500/20", iconColor: "text-orange-500" },
 ];
 
 const customerData = [
@@ -90,13 +90,13 @@ export default function PlatformHomePage() {
 
       {/* How It Works Section */}
       <section className="w-full py-12 md:py-16">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">How kariGaar Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-foreground">How kariGaar Works</h2>
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
           {featureCards.map((feature) => (
-            <Card key={feature.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background">
+            <Card key={feature.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background transform hover:-translate-y-1">
               <CardHeader className="items-center text-center">
                 {feature.icon}
-                <CardTitle className="mt-4 text-xl font-semibold">{feature.title}</CardTitle>
+                <CardTitle className="mt-4 text-xl font-semibold text-foreground">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-muted-foreground mb-4">{feature.description}</p>
@@ -113,15 +113,15 @@ export default function PlatformHomePage() {
       
       {/* Featured Services Section */}
       <section className="w-full py-12 md:py-16">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12">Explore Popular Services</h2>
+        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-foreground">Explore Popular Services</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {serviceCategories.map((service) => (
             <Link key={service.name} href={`/browse-providers?service=${encodeURIComponent(service.name)}`} passHref>
-              <Card className="group text-center p-4 shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-background hover:bg-secondary/70 aspect-square flex flex-col justify-center items-center">
-                <div className="mb-3 p-3 inline-block rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  {service.icon}
+              <Card className={`group text-center p-4 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer bg-background hover:bg-secondary/70 aspect-square flex flex-col justify-center items-center transform hover:scale-105`}>
+                <div className={`mb-3 p-4 inline-block rounded-full ${service.bgColor} group-hover:scale-110 ${service.hoverBgColor} transition-all duration-300`}>
+                  {React.cloneElement(service.icon as React.ReactElement, { className: `h-10 w-10 mx-auto ${service.iconColor} group-hover:scale-110 transition-transform duration-300` })}
                 </div>
-                <h3 className="text-md font-semibold text-foreground group-hover:text-primary transition-colors">{service.name}</h3>
+                <h3 className={`text-md font-semibold text-foreground group-hover:text-primary transition-colors`}>{service.name}</h3>
               </Card>
             </Link>
           ))}
@@ -135,7 +135,7 @@ export default function PlatformHomePage() {
           <Card className="bg-background">
             <CardHeader className="items-center">
               <PieChart className="h-10 w-10 text-primary" />
-              <CardTitle className="text-xl">Customer Growth</CardTitle>
+              <CardTitle className="text-xl text-foreground">Customer Growth</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
@@ -154,7 +154,7 @@ export default function PlatformHomePage() {
           <Card className="bg-background">
             <CardHeader className="items-center">
               <UserCheck className="h-10 w-10 text-primary" />
-              <CardTitle className="text-xl">Job Connections</CardTitle>
+              <CardTitle className="text-xl text-foreground">Job Connections</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">

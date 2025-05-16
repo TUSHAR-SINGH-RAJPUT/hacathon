@@ -9,7 +9,7 @@ import type { ServiceProvider, Review } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react'; // Added Loader2, ArrowLeft, ArrowRight
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
@@ -60,11 +60,25 @@ export default function ProviderProfilePage() {
   const [userReview, setUserReview] = useState('');
   const [userRating, setUserRating] = useState(0);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
   useEffect(() => {
     const foundProvider = dummyProviders.find(p => p.id === providerId);
     setProvider(foundProvider);
+    setCurrentReviewIndex(0); // Reset index when provider changes
   }, [providerId]);
+
+  const handleNextReview = () => {
+    if (provider && provider.reviews && provider.reviews.length > 0) {
+      setCurrentReviewIndex((prevIndex) => (prevIndex + 1) % provider.reviews!.length);
+    }
+  };
+
+  const handlePrevReview = () => {
+    if (provider && provider.reviews && provider.reviews.length > 0) {
+      setCurrentReviewIndex((prevIndex) => (prevIndex - 1 + provider.reviews!.length) % provider.reviews!.length);
+    }
+  };
 
 
   if (!provider) {
@@ -119,14 +133,18 @@ export default function ProviderProfilePage() {
     setTimeout(() => {
       const newReview: Review = {
         id: `review-${Date.now()}`,
-        reviewerName: "You (Demo User)", // In a real app, this would be the logged-in user's name
+        reviewerName: "You (Demo User)", 
         rating: userRating,
         comment: userReview,
         date: new Date().toISOString(),
       };
-      // Add review to the provider's list (client-side for demo)
-      // This won't persist, but shows UI update. A backend would handle this.
-      setProvider(prev => prev ? ({ ...prev, reviews: [newReview, ...(prev.reviews || [])], reviewsCount: (prev.reviewsCount || 0) + 1 }) : undefined);
+      setProvider(prev => {
+        if (!prev) return undefined;
+        const updatedReviews = [newReview, ...(prev.reviews || [])];
+        // Reset slideshow to show the new review first
+        setCurrentReviewIndex(0); 
+        return { ...prev, reviews: updatedReviews, reviewsCount: (prev.reviewsCount || 0) + 1 };
+      });
       
       toast({ title: "Review Submitted!", description: "Thank you for your feedback." });
       setUserReview('');
@@ -134,6 +152,8 @@ export default function ProviderProfilePage() {
       setIsSubmittingReview(false);
     }, 1000);
   };
+
+  const currentReview = provider.reviews && provider.reviews.length > 0 ? provider.reviews[currentReviewIndex] : null;
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-12 animate-in fade-in duration-500">
@@ -143,8 +163,8 @@ export default function ProviderProfilePage() {
             <Image
               src={provider.profileImageUrl || `https://placehold.co/800x400.png?text=${provider.name.split(' ').join('+')}`}
               alt={`${provider.name}'s profile background`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{objectFit: 'cover'}}
               data-ai-hint="professional service action"
               className="opacity-50"
             />
@@ -183,8 +203,8 @@ export default function ProviderProfilePage() {
                   <h3 className="text-xl font-semibold text-card-foreground mb-3">Portfolio / Past Work</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {provider.portfolioImages.map((img, index) => (
-                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden shadow-md">
-                        <Image src={img} alt={`Portfolio image ${index + 1}`} layout="fill" objectFit="cover" data-ai-hint="project example" />
+                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden shadow-md group">
+                        <Image src={img} alt={`Portfolio image ${index + 1}`} fill style={{objectFit:"cover"}} data-ai-hint="project example" className="group-hover:scale-105 transition-transform duration-300"/>
                       </div>
                     ))}
                   </div>
@@ -230,18 +250,37 @@ export default function ProviderProfilePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {provider.reviews && provider.reviews.length > 0 ? (
-            provider.reviews.map(review => (
-              <Card key={review.id} className="bg-background p-4 shadow-sm">
-                <div className="flex items-center mb-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
-                  ))}
-                  <span className="ml-auto text-xs text-muted-foreground">{new Date(review.date).toLocaleDateString()}</span>
-                </div>
-                <p className="text-sm text-foreground mb-1 font-medium">{review.reviewerName}</p>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">{review.comment}</p>
+            <div className="relative">
+              <Card className="bg-background p-4 shadow-sm min-h-[150px] flex flex-col justify-center transition-opacity duration-300 ease-in-out">
+                {currentReview ? (
+                  <>
+                    <div className="flex items-center mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-5 w-5 ${i < currentReview.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
+                      ))}
+                      <span className="ml-auto text-xs text-muted-foreground">{new Date(currentReview.date).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-sm text-foreground mb-1 font-medium">{currentReview.reviewerName}</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">{currentReview.comment}</p>
+                  </>
+                ) : (
+                  <p className="text-muted-foreground text-center">Loading review...</p>
+                )}
               </Card>
-            ))
+              {provider.reviews.length > 1 && (
+                <div className="flex justify-between items-center mt-4">
+                  <Button variant="outline" onClick={handlePrevReview} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                    <ArrowLeft className="h-4 w-4 mr-2" /> Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    {currentReviewIndex + 1} of {provider.reviews.length}
+                  </span>
+                  <Button variant="outline" onClick={handleNextReview} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                    Next <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              )}
+            </div>
           ) : (
             <p className="text-muted-foreground">No reviews yet for {provider.name}. Be the first to add one!</p>
           )}
@@ -275,7 +314,7 @@ export default function ProviderProfilePage() {
 
       {recommendedProviders.length > 0 && (
         <section>
-          <h2 className="text-2xl font-bold text-center mb-8">Recommended Professionals</h2>
+          <h2 className="text-2xl font-bold text-center mb-8 text-foreground">Recommended Professionals</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedProviders.map(recProvider => (
               <ProviderCard key={recProvider.id} provider={recProvider} />
