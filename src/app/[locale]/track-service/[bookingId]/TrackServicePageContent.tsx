@@ -1,0 +1,162 @@
+
+"use client";
+
+import { useRouter } from 'next/navigation'; // Removed useParams, bookingId is now a prop
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+// Removed: import { getDictionary } from '@/lib/dictionaries';
+
+const fetchBookingDetails = async (bookingId: string) => {
+  console.log("Fetching booking details for:", bookingId);
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  if (bookingId === "dummy-booking-123") {
+    return {
+      id: "dummy-booking-123",
+      provider: {
+        name: "Priya Sharma",
+        serviceTypes: ["Painting"],
+        profileImageUrl: 'https://placehold.co/80x80.png?text=Priya',
+        phone: "+91 98XXXXXX01" 
+      },
+      status: "En Route", 
+      estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), 
+      serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034", 
+    };
+  }
+  return null;
+};
+
+interface TrackServicePageContentProps {
+  t: any;
+  locale: string;
+  bookingId: string;
+}
+
+export default function TrackServicePageContent({ t, locale, bookingId }: TrackServicePageContentProps) {
+  const router = useRouter();
+
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (bookingId && Object.keys(t).length > 0) {
+      setLoading(true); 
+      fetchBookingDetails(bookingId)
+        .then(data => {
+          if (data) {
+            setBookingDetails(data);
+          } else {
+            setError(t.bookingNotFoundOrInvalid || "Booking not found or invalid ID.");
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching booking:", err);
+          setError(t.failedToLoadBooking || "Failed to load booking details.");
+        })
+        .finally(() => setLoading(false));
+    } else if (Object.keys(t).length > 0) { // Only set error if t is loaded
+      setError(t.bookingNotFoundOrInvalid || "Booking not found or invalid ID.");
+      setLoading(false);
+    }
+  }, [bookingId, t]);
+
+  if (loading || Object.keys(t).length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] animate-in fade-in duration-500">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">{t.loadingBookingDetails || "Loading booking details..."}</p>
+      </div>
+    );
+  }
+
+  if (error || !bookingDetails) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] animate-in fade-in duration-500">
+        <Info className="h-12 w-12 text-destructive mb-4" />
+        <h1 className="text-xl font-semibold text-destructive mb-2">{error || (t.bookingNotFound || "Booking Not Found")}</h1>
+        <p className="text-muted-foreground mb-6">{t.checkBookingIdContactSupport || "Please check the booking ID or contact support."}</p>
+        <Button onClick={() => router.push(`/${locale}/`)}><ArrowLeft className="mr-2 h-4 w-4" /> {t.backToHome || "Back to Home"}</Button>
+      </div>
+    );
+  }
+  
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case "En Route": return <Clock className="h-5 w-5 text-blue-500 mr-2" />;
+      case "In Progress": return <Loader2 className="h-5 w-5 text-orange-500 mr-2 animate-spin" />;
+      case "Completed": return <CheckCircle className="h-5 w-5 text-green-500 mr-2" />;
+      default: return <Info className="h-5 w-5 text-muted-foreground mr-2" />;
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-6">
+      <Button variant="outline" onClick={() => router.back()} className="mb-4">
+        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+      </Button>
+
+      <Card className="shadow-xl bg-card">
+        <CardHeader>
+          <CardTitle className="text-2xl md:text-3xl font-bold text-card-foreground">
+            {t.trackYourService || "Track Your Service"}
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            {t.bookingIdLabel || "Booking ID"}: {bookingDetails.id}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center gap-4 p-4 bg-background rounded-lg shadow-sm">
+            <Image
+              src={bookingDetails.provider.profileImageUrl || `https://placehold.co/80x80.png`}
+              alt={bookingDetails.provider.name}
+              width={60}
+              height={60}
+              className="rounded-full"
+            />
+            <div>
+              <p className="text-lg font-semibold text-foreground">{bookingDetails.provider.name}</p>
+              <p className="text-sm text-muted-foreground">{bookingDetails.provider.serviceTypes.join(', ')}</p>
+            </div>
+          </div>
+
+          <Card className="bg-secondary">
+            <CardContent className="p-4 space-y-2">
+              <div className="flex items-center">
+                {getStatusIcon(bookingDetails.status)}
+                <p className="text-lg font-medium text-secondary-foreground">{t.statusLabel || "Status"}: {bookingDetails.status}</p>
+              </div>
+              {bookingDetails.status === "En Route" && bookingDetails.estimatedArrivalTime && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                   <Clock className="h-4 w-4 mr-2"/>
+                   {t.estimatedArrival || "Estimated Arrival"}: {new Date(bookingDetails.estimatedArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
+            <MapPin className="h-12 w-12 text-muted-foreground" />
+            <p className="ml-4 text-muted-foreground text-center">{t.liveMapPlaceholder || "Live map tracking for India would appear here. (Feature under development)"}</p>
+          </div>
+          <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel || "Service Address"}: {bookingDetails.serviceAddress}</p>
+
+
+          <div className="grid grid-cols-2 gap-4 pt-4">
+            <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+              <Phone className="mr-2 h-5 w-5" /> {typeof t.callProvider === 'function' ? t.callProvider(bookingDetails.provider.name) : `Call ${bookingDetails.provider.name.split(' ')[0]}`}
+            </Button>
+            <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+              <MessageSquare className="mr-2 h-5 w-5" /> {t.messageProvider || "Message"}
+            </Button>
+          </div>
+          <p className="text-xs text-center text-muted-foreground">{t.contactOptionsSimulated || "Contact options are simulated for this demo."}</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
