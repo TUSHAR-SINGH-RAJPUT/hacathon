@@ -40,7 +40,7 @@ import { Label } from '@/components/ui/label';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { cn } from "@/lib/utils";
-import { i18n as i18nConfig } from '../../../next.config'; // Correctly import the named export
+import { i18n as i18nConfig } from '../../../next.config';
 
 interface NavLinkProps {
   href?: string;
@@ -76,10 +76,10 @@ NavLink.displayName = 'NavLink';
 
 interface HeaderProps {
   locale: string;
-  fullDict: Record<string, any>; // Expecting the full dictionary object
+  translations: Record<string, any>; // Expecting Header translations, e.g., { navHome: "...", ... }
 }
 
-export default function Header({ locale, fullDict }: HeaderProps) {
+export default function Header({ locale, translations }: HeaderProps) {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
@@ -92,12 +92,8 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     setIsClient(true);
   }, []);
 
-  const t = useMemo(() => {
-    if (fullDict && typeof fullDict === 'object' && fullDict.Header && typeof fullDict.Header === 'object') {
-      return fullDict.Header;
-    }
-    return {}; // Default to empty object if any check fails
-  }, [fullDict]);
+  // Use the translations prop directly, ensuring it's an object
+  const t = translations || {};
 
   const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
@@ -223,12 +219,31 @@ export default function Header({ locale, fullDict }: HeaderProps) {
             </Popover>
           )}
 
+          {/* Desktop Language Switcher & Auth Buttons */}
           <div className="hidden md:flex items-center space-x-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10">
+                  <Globe size={20} />
+                  <span className="sr-only">{t.language || "Language"}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-card text-card-foreground">
+                <DropdownMenuLabel>{t.language || "Language"}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {languageOptions.map(lang => (
+                  <DropdownMenuItem key={lang.locale} onClick={() => handleLanguageChange(lang.locale)} className="cursor-pointer">
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isClient && isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <UserCircle size={24} className="text-primary" />
+                  <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:text-primary hover:bg-primary/10">
+                    <UserCircle size={24} />
                      <span className="sr-only">{t.myAccount || "My Account"}</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -240,22 +255,6 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                        <Link href={`/${locale}${item.href}`} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
                      </DropdownMenuItem>
                   ))}
-                  <DropdownMenuSeparator />
-                  {/* Language Submenu for Desktop Logged In Users */}
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center gap-2 w-full cursor-pointer">
-                      <Globe size={16} /> {t.language || "Language"}
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent className="bg-card text-card-foreground">
-                        {languageOptions.map(lang => (
-                          <DropdownMenuItem key={lang.locale} onClick={() => handleLanguageChange(lang.locale)} className="cursor-pointer">
-                            {lang.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout || "Logout"}
@@ -275,7 +274,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                   </Button>
                 </Link>
               </>
-            ) : (
+            ) : ( // Fallback for SSR or when isClient is false
               <>
                 <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
                 <Button disabled>{t.navSignUp || "Sign Up"}</Button>
@@ -301,21 +300,18 @@ export default function Header({ locale, fullDict }: HeaderProps) {
               </SheetHeader>
               <div className="flex flex-col space-y-2">
                 {navItems.map(item => (
-                  <Link key={item.label} href={`/${locale}${item.href === '/' ? '' : item.href}`} passHref>
-                    <SheetClose asChild>
-                        <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
-                        {item.label}
-                        </NavLink>
-                    </SheetClose>
-                  </Link>
+                   <SheetClose asChild key={item.label}>
+                    <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
+                      {item.label}
+                    </NavLink>
+                  </SheetClose>
                 ))}
                 <Separator className="my-3 bg-border" />
 
-                {/* Language Switcher - Mobile */}
                 <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language || "Language"}</p>
                 {languageOptions.map(lang => (
                   <SheetClose asChild key={lang.locale}>
-                    <Button variant="ghost" onClick={() => handleLanguageChange(lang.locale)} className="w-full justify-start text-lg py-3 gap-3">
+                     <Button variant="ghost" onClick={() => handleLanguageChange(lang.locale)} className="w-full justify-start text-lg py-3 gap-3">
                       {lang.label}
                     </Button>
                   </SheetClose>
@@ -325,13 +321,11 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                 {isClient && isLoggedIn ? (
                   <>
                     {profileNavItems.map(item => (
-                        <Link key={item.label} href={`/${locale}${item.href}`} passHref>
-                           <SheetClose asChild>
-                                <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
-                                {item.label}
-                                </NavLink>
-                            </SheetClose>
-                        </Link>
+                       <SheetClose asChild key={item.label}>
+                        <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
+                          {item.label}
+                        </NavLink>
+                       </SheetClose>
                     ))}
                     <Separator className="my-3 bg-border" />
                     <SheetClose asChild>
@@ -366,4 +360,3 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     </header>
   );
 }
-
