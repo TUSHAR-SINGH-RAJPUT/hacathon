@@ -20,8 +20,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { serviceCategories } from '@/components/providers/dummyData';
 import type { ServiceCategory } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, ImageIcon, Info, FileUp } from "lucide-react";
+import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, ImageIcon, Info, FileUp, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast";
+import React from 'react';
 
 const createProviderFormSchema = (t: any) => {
   const validation = t.validationMessages || {};
@@ -58,6 +60,8 @@ interface ProviderRegistrationFormProps {
 
 export default function ProviderRegistrationForm({ translations: t }: ProviderRegistrationFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const providerFormSchema = createProviderFormSchema(t);
   
   const form = useForm<ProviderRegistrationData>({
@@ -76,22 +80,60 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
     },
   });
 
-  function onSubmit(values: ProviderRegistrationData) {
+  async function onSubmit(values: ProviderRegistrationData) {
+    setIsSubmitting(true);
     let resumeFileName: string | undefined = undefined;
+
     if (values.resume && values.resume.length > 0) {
-      resumeFileName = values.resume[0].name;
+      const file = values.resume[0];
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      try {
+        const response = await fetch('/api/upload-resume', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          toast({
+            title: "Resume Upload Failed",
+            description: result.message || "Could not upload resume. Please try again.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        resumeFileName = result.fileName; // Store the filename from the successful mock upload
+        toast({
+          title: "Resume Uploaded (Mock)",
+          description: `${result.fileName} processed.`,
+        });
+      } catch (error) {
+        console.error("Resume upload fetch error:", error);
+        toast({
+          title: "Resume Upload Error",
+          description: "An error occurred while uploading the resume. Please check your connection and try again.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     const dataToStore = {
       ...values,
-      resume: undefined, 
-      resumeFileName: resumeFileName,
+      resume: undefined, // Don't store the FileList in session storage
+      resumeFileName: resumeFileName, // Store the name of the (mock) uploaded file
     };
     
     if (typeof window !== "undefined") {
       sessionStorage.setItem('providerRegistrationData', JSON.stringify(dataToStore));
     }
     router.push(`/join-as-pro/verify-documents`);
+    setIsSubmitting(false);
   }
 
   return (
@@ -281,7 +323,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
             <FormField
               control={form.control}
               name="resume"
-              render={({ field: { onChange, value, ...restField } }) => (
+              render={({ field: { onChange, value, ...restField } }) => ( // Correctly destructure field
                 <FormItem>
                   <FormLabel className="flex items-center"><FileUp className="h-4 w-4 mr-2 text-primary" />{t.resumeOptionalPDF || "Resume (Optional, PDF only, max 5MB)"}</FormLabel>
                   <FormControl>
@@ -301,7 +343,8 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
         </Card>
         
         <div className="pt-6">
-          <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
             {t.nextDocumentVerification || "Next: Document Verification"}
           </Button>
         </div>
@@ -309,3 +352,4 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
     </Form>
   );
 }
+
