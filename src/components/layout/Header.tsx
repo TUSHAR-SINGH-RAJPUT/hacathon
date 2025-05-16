@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, ArrowRight, Globe } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Globe } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -50,7 +50,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
-// Define i18nConfig at the module level
+// Define i18nConfig at the module level - though not used after revert, kept for structure if re-enabled
 const i18nConfig = {
   locales: ['en', 'hi', 'kn'],
   defaultLocale: 'en',
@@ -63,12 +63,12 @@ interface NavLinkProps {
   onClick?: () => void;
   className?: string;
   currentPath: string;
-  locale: string;
+  // locale: string; // Removed as app is English-only now
 }
 
-const NavLink = React.memo(({ href, children, icon, onClick, className, currentPath, locale }: NavLinkProps) => {
-  const linkHref = href ? `/${locale}${href}` : '#';
-  const isActive = href ? currentPath === `/${locale}${href}` || (href === '/platform-home' && currentPath === `/${locale}`) : false;
+const NavLink = React.memo(({ href, children, icon, onClick, className, currentPath }: NavLinkProps) => {
+  const linkHref = href ? `${href}` : '#'; // Removed locale prefix
+  const isActive = href ? currentPath === `${href}` : false;
 
   const content = (
     <Button
@@ -88,12 +88,54 @@ const NavLink = React.memo(({ href, children, icon, onClick, className, currentP
 });
 NavLink.displayName = 'NavLink';
 
-interface HeaderProps {
-  locale: string;
-  fullDict: Record<string, any>; // Expecting the full dictionary
-}
 
-export default function Header({ locale, fullDict }: HeaderProps) {
+// Hardcoded English translations since i18n was reverted
+const t = {
+    navHome: "Home",
+    navPostJob: "Post a Job",
+    navBrowseServices: "Browse Services",
+    navJoinAsPro: "Join as Pro",
+    navAboutUs: "About Us",
+    navLogin: "Login",
+    navSignUp: "Sign Up",
+    navLogout: "Logout",
+    myAccount: "My Account",
+    editProfile: "Edit Profile",
+    myBookings: "My Bookings",
+    customerSupport: "Customer Support",
+    feedbacks: "Feedbacks",
+    security: "Security",
+    language: "Language", // Kept for structure, but functionality is for later
+    english: "English",
+    hindi: "हिंदी (Hindi)",
+    kannada: "ಕನ್ನಡ (Kannada)",
+    jobList: "Your Job List",
+    jobListEmpty: "Your job list is empty. Add providers!",
+    serviceAddressOptional: "Service Address (Optional)",
+    enterAddressPlaceholder: "Enter your address or area",
+    proceedToBooking: "Proceed to Booking",
+    toggleMenu: "Toggle Menu",
+    removeProvider: (name: string) => `Remove ${name}`,
+    close: "Close",
+    voiceAssistLabel: "Voice Assistant",
+    voiceAssistDialogTitle: "Voice Assistant (Simulated)",
+    voiceAssistDialogDescription: "Click the microphone below to start speaking.",
+    voiceAssistListening: "Listening...",
+    voiceAssistPrompt: "Click the microphone below to start speaking.",
+    voiceAssistNotSupported: "Voice recognition not supported in your browser.",
+    voiceAssistStopListening: "Stop Listening",
+    voiceAssistStartListening: "Start Listening",
+    voiceAssistErrorGeneric: "An error occurred during speech recognition.",
+    voiceAssistErrorNoSpeech: "No speech was detected. Please try again.",
+    voiceAssistErrorAudioCapture: "Microphone problem. Please ensure it's enabled and working.",
+    voiceAssistErrorNotAllowed: "Permission to use microphone was denied. Please enable it in your browser settings.",
+    voiceAssistErrorNetwork: "Network error during speech recognition. Please check your connection or try again later.",
+    voiceAssistErrorInit: "Speech recognition is not initialized.",
+    voiceAssistErrorStart: "Could not start voice recognition. Ensure microphone is connected and permissions allowed."
+};
+
+
+export default function Header() {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
@@ -110,14 +152,6 @@ export default function Header({ locale, fullDict }: HeaderProps) {
   const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-
-  const t = useMemo(() => {
-    if (fullDict && typeof fullDict === 'object' && fullDict.Header && typeof fullDict.Header === 'object') {
-      return fullDict.Header;
-    }
-    return {}; // Default to empty object if any check fails
-  }, [fullDict]);
-
   useEffect(() => {
     setIsClient(true);
 
@@ -125,7 +159,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setIsRecognitionApiSupported(false);
-      setRecognitionError(t.voiceAssistNotSupported || "Speech recognition is not supported in your browser.");
+      setRecognitionError(t.voiceAssistNotSupported);
       return;
     }
 
@@ -134,7 +168,8 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     if (!recognition) return;
 
     recognition.continuous = false;
-    recognition.interimResults = true; // Get interim results for faster feedback
+    recognition.interimResults = true; 
+    recognition.lang = 'en-US'; // Explicitly set language
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interimTranscript = '';
@@ -147,23 +182,19 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         }
       }
       setTranscript(finalTranscript || interimTranscript);
-      // if (finalTranscript) {
-      //   // Here you could trigger a command based on finalTranscript
-      //   // For example: handleVoiceCommandAction(finalTranscript);
-      // }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error", event.error);
-      let errorMessage = t.voiceAssistErrorGeneric || "An error occurred during speech recognition.";
+      let errorMessage = t.voiceAssistErrorGeneric;
       if (event.error === 'no-speech') {
-        errorMessage = t.voiceAssistErrorNoSpeech || "No speech was detected. Please try again.";
+        errorMessage = t.voiceAssistErrorNoSpeech;
       } else if (event.error === 'audio-capture') {
-        errorMessage = t.voiceAssistErrorAudioCapture || "Microphone problem. Please ensure it's enabled and working.";
+        errorMessage = t.voiceAssistErrorAudioCapture;
       } else if (event.error === 'not-allowed') {
-        errorMessage = t.voiceAssistErrorNotAllowed || "Permission to use microphone was denied. Please enable it in your browser settings.";
+        errorMessage = t.voiceAssistErrorNotAllowed;
       } else if (event.error === 'network') {
-        errorMessage = t.voiceAssistErrorNetwork || "Network error during speech recognition. Please check your connection.";
+        errorMessage = t.voiceAssistErrorNetwork;
       }
       setRecognitionError(errorMessage);
       setIsListening(false);
@@ -181,39 +212,29 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         recognitionRef.current.onend = null;
       }
     };
-  }, [t]); // Added t to dependency array
-
-  const pathWithoutLocale = useMemo(() => {
-    if (!currentPathname) return '/';
-    const segments = currentPathname.split('/');
-    if (segments.length > 1 && i18nConfig.locales.includes(segments[1])) {
-      return `/${segments.slice(2).join('/')}`;
-    }
-    return currentPathname;
-  }, [currentPathname]);
-
+  }, []); 
 
   const navItems = useMemo(() => [
-    { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
-    { href: `/post-job`, label: t.navPostJob || "Post a Job", icon: <PlusSquare size={18} /> },
-    { href: `/browse-providers`, label: t.navBrowseServices || "Browse Services", icon: <Search size={18} /> },
-    { href: `/join-as-pro`, label: t.navJoinAsPro || "Join as Pro", icon: <Briefcase size={18} /> },
-    { href: `/about`, label: t.navAboutUs || "About Us", icon: <InfoIcon size={18} /> },
-  ], [t]);
+    { href: `/platform-home`, label: t.navHome, icon: <Home size={18} /> },
+    { href: `/post-job`, label: t.navPostJob, icon: <PlusSquare size={18} /> },
+    { href: `/browse-providers`, label: t.navBrowseServices, icon: <Search size={18} /> },
+    { href: `/join-as-pro`, label: t.navJoinAsPro, icon: <Briefcase size={18} /> },
+    { href: `/about`, label: t.navAboutUs, icon: <InfoIcon size={18} /> },
+  ], []);
 
   const handleProceedToBooking = () => {
     if (cart.length > 0) {
-      router.push(`/${locale}/booking-confirmation`);
+      router.push(`/booking-confirmation`);
     }
   };
 
   const profileNavItems = useMemo(() => [
-    { href: `/profile/edit`, label: t.editProfile || "Edit Profile", icon: <Edit3 size={16}/> },
-    { href: `/profile/bookings`, label: t.myBookings || "My Bookings", icon: <ListOrdered size={16}/> },
-    { href: `/support`, label: t.customerSupport || "Customer Support", icon: <HelpCircle size={16}/> },
-    { href: `/profile/feedback`, label: t.feedbacks || "Feedbacks", icon: <StarIcon size={16}/> },
-    { href: `/profile/security`, label: t.security || "Security", icon: <Shield size={16}/> },
-  ], [t]);
+    { href: `/profile/edit`, label: t.editProfile, icon: <Edit3 size={16}/> },
+    { href: `/profile/bookings`, label: t.myBookings, icon: <ListOrdered size={16}/> },
+    { href: `/support`, label: t.customerSupport, icon: <HelpCircle size={16}/> },
+    { href: `/profile/feedback`, label: t.feedbacks, icon: <StarIcon size={16}/> },
+    { href: `/profile/security`, label: t.security, icon: <Shield size={16}/> },
+  ], []);
 
   const openVoiceDialog = useCallback(() => {
     setTranscript('');
@@ -223,7 +244,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
   
   const handleToggleListening = () => {
     if (!recognitionRef.current) {
-      setRecognitionError(t.voiceAssistErrorInit || "Speech recognition is not initialized.");
+      setRecognitionError(t.voiceAssistErrorInit);
       return;
     }
     if (isListening) {
@@ -238,32 +259,26 @@ export default function Header({ locale, fullDict }: HeaderProps) {
       } catch (error: any) {
           console.error("Error starting recognition:", error);
           if (error instanceof DOMException && error.name === 'NotAllowedError') {
-               setRecognitionError(t.voiceAssistErrorNotAllowed || "Microphone access was denied. Please enable it in browser settings.");
+               setRecognitionError(t.voiceAssistErrorNotAllowed);
           } else {
-               setRecognitionError(t.voiceAssistErrorStart || "Could not start voice recognition. Ensure microphone is connected and permissions allowed.");
+               setRecognitionError(t.voiceAssistErrorStart);
           }
           setIsListening(false);
       }
     }
   };
 
-  const languageOptions = [
-    { value: 'en', label: t.english || 'English' },
-    { value: 'hi', label: t.hindi || 'हिंदी (Hindi)' },
-    { value: 'kn', label: t.kannada || 'ಕನ್ನಡ (Kannada)' },
-  ];
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href={`/${locale}${isLoggedIn ? '/platform-home' : '/'}`} passHref>
+          <Link href={`${isLoggedIn ? '/platform-home' : '/'}`} passHref>
             <Logo size="medium" />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {navItems.map(item => (
-              <NavLink key={item.label} href={item.href} icon={item.icon} currentPath={currentPathname} locale={locale}>
+              <NavLink key={item.label} href={item.href} icon={item.icon} currentPath={currentPathname}>
                 {item.label}
               </NavLink>
             ))}
@@ -272,33 +287,15 @@ export default function Header({ locale, fullDict }: HeaderProps) {
               size="icon"
               onClick={openVoiceDialog}
               className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
-              aria-label={t.voiceAssistLabel || "Voice Assistant"}
+              aria-label={t.voiceAssistLabel}
             >
               <Mic size={20} />
             </Button>
           </nav>
 
           <div className="flex items-center space-x-2">
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10">
-                  <Globe size={20} />
-                  <span className="sr-only">{t.language || "Language"}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-card text-card-foreground">
-                <DropdownMenuLabel>{t.language || "Language"}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {languageOptions.map(langOpt => (
-                  <DropdownMenuItem key={langOpt.value} asChild disabled={locale === langOpt.value}>
-                    <Link href={pathWithoutLocale} locale={langOpt.value} passHref>
-                      {langOpt.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
+            {/* Language switcher removed as per previous undo, can be re-added if i18n is restored */}
+            
             {isClient && isLoggedIn && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -309,14 +306,14 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                         {cart.length}
                       </Badge>
                     )}
-                    <span className="sr-only">{t.jobList || "Your Job List"}</span>
+                    <span className="sr-only">{t.jobList}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 z-50 mr-4 mt-1 bg-card text-card-foreground shadow-xl rounded-lg">
                   <div className="p-4">
-                    <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList || "Your Job List"}</h4>
+                    <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList}</h4>
                     {cart.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">{t.jobListEmpty || "Your job list is empty."}</p>
+                      <p className="text-sm text-muted-foreground">{t.jobListEmpty}</p>
                     ) : (
                       <>
                         <ul className="space-y-3 max-h-48 overflow-y-auto">
@@ -334,17 +331,17 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                               </div>
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
                                 <X size={16} />
-                                <span className="sr-only">{t.removeProvider ? t.removeProvider(item.name) : `Remove ${item.name}`}</span>
+                                <span className="sr-only">{t.removeProvider(item.name)}</span>
                               </Button>
                             </li>
                           ))}
                         </ul>
                         <Separator className="my-3" />
                         <div className="space-y-2">
-                          <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional || "Service Address (Optional)"}</Label>
+                          <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional}</Label>
                           <Input
                             id="customer-address"
-                            placeholder={t.enterAddressPlaceholder || "Enter your address or area"}
+                            placeholder={t.enterAddressPlaceholder}
                             value={customerAddress || ''}
                             onChange={(e) => setCustomerAddress(e.target.value)}
                             className="text-sm"
@@ -355,7 +352,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                           className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
                           disabled={cart.length === 0}
                         >
-                          {t.proceedToBooking || "Proceed to Booking"}
+                          {t.proceedToBooking}
                         </Button>
                       </>
                     )}
@@ -370,40 +367,41 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:text-primary hover:bg-primary/10">
                       <UserCircle size={24} />
-                       <span className="sr-only">{t.myAccount || "My Account"}</span>
+                       <span className="sr-only">{t.myAccount}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-card text-card-foreground">
-                    <DropdownMenuLabel>{t.myAccount || "My Account"}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t.myAccount}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {profileNavItems.map(item => (
                        <DropdownMenuItem key={item.label} asChild>
-                         <Link href={`/${locale}${item.href}`} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
+                         <Link href={`${item.href}`} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
                        </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
+                    {/* Language submenu moved out for now */}
                     <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
-                      <LogOut size={16} /> {t.navLogout || "Logout"}
+                      <LogOut size={16} /> {t.navLogout}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : isClient ? (
                 <>
-                  <Link href={`/${locale}/login`} passHref>
+                  <Link href={`/login`} passHref>
                     <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                      {t.navLogin || "Login"}
+                      {t.navLogin}
                     </Button>
                   </Link>
-                  <Link href={`/${locale}/signup`} passHref>
+                  <Link href={`/signup`} passHref>
                     <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                      {t.navSignUp || "Sign Up"}
+                      {t.navSignUp}
                     </Button>
                   </Link>
                 </>
               ) : ( 
                 <>
-                  <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
-                  <Button disabled>{t.navSignUp || "Sign Up"}</Button>
+                  <Button variant="outline" disabled>{t.navLogin}</Button>
+                  <Button disabled>{t.navSignUp}</Button>
                 </>
               )}
             </div>
@@ -414,7 +412,7 @@ export default function Header({ locale, fullDict }: HeaderProps) {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t.toggleMenu || "Toggle menu"}</span>
+                  <span className="sr-only">{t.toggleMenu}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-card text-card-foreground">
@@ -426,39 +424,24 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                 <div className="flex flex-col space-y-2">
                   {navItems.map(item => (
                      <SheetClose asChild key={item.label}>
-                      <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname} locale={locale}>
+                      <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
                         {item.label}
                       </NavLink>
                     </SheetClose>
                   ))}
                   <SheetClose asChild>
                     <Button onClick={openVoiceDialog} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10">
-                      <Mic size={20} /> {t.voiceAssistLabel || "Voice Assistant"}
+                      <Mic size={20} /> {t.voiceAssistLabel}
                     </Button>
                   </SheetClose>
                   <Separator className="my-3 bg-border" />
-
-                  <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language || "Language"}</p>
-                  {languageOptions.map(langOpt => (
-                    <Link key={langOpt.value} href={pathWithoutLocale} locale={langOpt.value} passHref>
-                       <SheetClose asChild>
-                        <Button 
-                            variant={locale === langOpt.value ? "secondary" : "ghost"} 
-                            className="w-full justify-start text-lg py-3 gap-3"
-                        >
-                            {langOpt.label}
-                        </Button>
-                       </SheetClose>
-                    </Link>
-                  ))}
-                  <Separator className="my-3 bg-border" />
-
-
+                  {/* Language options in mobile menu were removed during i18n revert */}
+                  
                   {isClient && isLoggedIn ? (
                     <>
                       {profileNavItems.map(item => (
                          <SheetClose asChild key={item.label}>
-                          <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname} locale={locale}>
+                          <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
                             {item.label}
                           </NavLink>
                          </SheetClose>
@@ -466,23 +449,23 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                       <Separator className="my-3 bg-border" />
                       <SheetClose asChild>
                           <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
-                          <LogOut size={20} /> {t.navLogout || "Logout"}
+                          <LogOut size={20} /> {t.navLogout}
                           </Button>
                       </SheetClose>
                     </>
                   ) : isClient ? (
                     <>
                       <SheetClose asChild>
-                          <Link href={`/${locale}/login`} passHref>
+                          <Link href={`/login`} passHref>
                           <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                              <UserCircle size={20} /> {t.navLogin || "Login"}
+                              <UserCircle size={20} /> {t.navLogin}
                           </Button>
                           </Link>
                       </SheetClose>
                       <SheetClose asChild>
-                          <Link href={`/${locale}/signup`} passHref>
+                          <Link href={`/signup`} passHref>
                           <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                              {t.navSignUp || "Sign Up"}
+                              {t.navSignUp}
                           </Button>
                           </Link>
                       </SheetClose>
@@ -499,23 +482,23 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         <DialogContent className="sm:max-w-md bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Mic className="text-primary" /> {t.voiceAssistDialogTitle || "Voice Assistant (Simulated)"}
+              <Mic className="text-primary" /> {t.voiceAssistDialogTitle}
             </DialogTitle>
             <DialogDescription>
-             {t.voiceAssistDialogDescription || "Click the microphone to start speaking."}
+             {t.voiceAssistDialogDescription}
             </DialogDescription>
           </DialogHeader>
           
           <div className="my-4 p-4 bg-background rounded-md min-h-[60px] flex items-center justify-center text-center">
             {isListening ? (
-              <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening || "Listening..."}</p>
+              <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening}</p>
             ) : transcript ? (
               <p className="text-sm text-foreground">{transcript}</p>
             ) : recognitionError ? (
               <p className="text-sm text-destructive">{recognitionError}</p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {isRecognitionApiSupported ? (t.voiceAssistPrompt || "Click the microphone below to start speaking.") : (t.voiceAssistNotSupported || "Voice recognition not supported in your browser.")}
+                {isRecognitionApiSupported ? t.voiceAssistPrompt : t.voiceAssistNotSupported}
               </p>
             )}
           </div>
@@ -527,13 +510,13 @@ export default function Header({ locale, fullDict }: HeaderProps) {
             disabled={!isRecognitionApiSupported}
           >
             <Mic className="mr-2 h-4 w-4" />
-            {isListening ? (t.voiceAssistStopListening || "Stop Listening") : (t.voiceAssistStartListening || "Start Listening")}
+            {isListening ? t.voiceAssistStopListening : t.voiceAssistStartListening}
           </Button>
 
           <DialogFooter className="mt-6">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
-                {t.close || "Close"}
+                {t.close}
               </Button>
             </DialogClose>
           </DialogFooter>
@@ -542,5 +525,3 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     </>
   );
 }
-
-    
