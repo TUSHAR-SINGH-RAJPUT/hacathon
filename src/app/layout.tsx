@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning> {/* Ensure "dark" class is here */}
+    <html lang="en" suppressHydrationWarning> {/* Removed "dark" class */}
       <body className={`${geistSans.variable} antialiased flex flex-col min-h-screen bg-background`}>
         <AuthProvider>
           <CartProvider> 
