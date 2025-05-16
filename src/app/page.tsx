@@ -7,6 +7,25 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
 import Logo from '@/components/Logo';
 
+// Hardcoded English strings since i18n was reverted
+const t = {
+  appName: "kariGaar",
+  tagline: "Your Local Service Solution",
+  getStarted: "Get Started",
+  getStartedNow: "Get Started Now",
+  explorePlatform: "Explore the Platform",
+  ourMotivation: "Our Motivation",
+  motivationText: "We believe finding reliable local services shouldn't be a chore. kariGaar was born from the desire to simplify this process, empowering both customers to find quality help and skilled professionals to grow their businesses and serve their communities.",
+  efficiency: "Efficiency",
+  efficiencyText: "Quickly post jobs, get estimates, and connect with pros without endless searching.",
+  community: "Community",
+  communityText: "Fostering connections between local customers and skilled karigaars (artisans).",
+  trust: "Trust",
+  trustText: "Building a platform where quality service and reliability are paramount.",
+  readyToSimplify: "Ready to Simplify Your Service Needs?",
+  joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes."
+};
+
 // Content from LandingPageContent.tsx is now directly here
 export default function LandingPage() {
   return (
@@ -14,33 +33,33 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center flex-grow text-center py-16 md:py-24 px-4 bg-gradient-to-br from-background via-card/30 to-background overflow-hidden">
         <Image
-          src="https://placehold.co/200x200.png?text=Pro+1"
+          src="https://placehold.co/200x200.png"
           alt="Service Professional"
-          data-ai-hint="worker person"
+          data-ai-hint="worker professional"
           width={150}
           height={150}
           className="absolute top-10 left-10 opacity-10 animate-bounce-slow select-none"
         />
         <Image
-          src="https://placehold.co/200x200.png?text=Tool+Icon"
+          src="https://placehold.co/180x180.png"
           alt="Service Tool"
-          data-ai-hint="tools"
+          data-ai-hint="tools equipment"
           width={120}
           height={120}
           className="absolute bottom-20 right-16 opacity-10 animate-bounce-slow-delay select-none"
         />
          <Image
-          src="https://placehold.co/150x150.png?text=Happy+Client"
+          src="https://placehold.co/150x150.png"
           alt="Happy Client"
-          data-ai-hint="happy person"
+          data-ai-hint="happy client"
           width={100}
           height={100}
           className="absolute top-1/4 right-10 opacity-5 animate-pulse select-none"
         />
          <Image
-          src="https://placehold.co/180x180.png?text=Service+Icon"
+          src="https://placehold.co/130x130.png"
           alt="Service Icon"
-          data-ai-hint="gears"
+          data-ai-hint="gears process"
           width={130}
           height={130}
           className="absolute bottom-1/3 left-16 opacity-5 animate-pulse-delay select-none"
@@ -49,14 +68,14 @@ export default function LandingPage() {
         <div className="relative z-10">
           <Logo size="xlarge" className="mb-8 justify-center" />
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-foreground/80">
-            kariGaar <span className="text-primary">Get Started</span>
+            {t.appName} <span className="text-primary">{t.getStarted}</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10">
-            Your Local Service Solution
+            {t.tagline}
           </p>
           <Link href="/platform-home" passHref>
             <Button size="lg" className="px-10 py-6 text-lg transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
-              Get Started Now <ArrowRight className="ml-3 h-6 w-6" />
+              {t.getStartedNow} <ArrowRight className="ml-3 h-6 w-6" />
             </Button>
           </Link>
         </div>
@@ -66,25 +85,25 @@ export default function LandingPage() {
       <section className="py-16 md:py-24 bg-card text-card-foreground">
         <div className="container mx-auto px-4 text-center">
           <Target className="h-16 w-16 text-primary mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Motivation</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">{t.ourMotivation}</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            We believe finding reliable local services shouldn't be a chore. kariGaar was born from the desire to simplify this process, empowering both customers to find quality help and skilled professionals to grow their businesses and serve their communities.
+            {t.motivationText}
           </p>
            <div className="grid md:grid-cols-3 gap-8 text-left">
             <div className="p-6 bg-background rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
               <Zap className="h-10 w-10 text-primary mb-3" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">Efficiency</h3>
-              <p className="text-muted-foreground">Quickly post jobs, get estimates, and connect with pros without endless searching.</p>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{t.efficiency}</h3>
+              <p className="text-muted-foreground">{t.efficiencyText}</p>
             </div>
             <div className="p-6 bg-background rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
               <Users className="h-10 w-10 text-primary mb-3" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">Community</h3>
-              <p className="text-muted-foreground">Fostering connections between local customers and skilled karigaars (artisans).</p>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{t.community}</h3>
+              <p className="text-muted-foreground">{t.communityText}</p>
             </div>
             <div className="p-6 bg-background rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
               <Lightbulb className="h-10 w-10 text-primary mb-3" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground">Trust</h3>
-              <p className="text-muted-foreground">Building a platform where quality service and reliability are paramount.</p>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{t.trust}</h3>
+              <p className="text-muted-foreground">{t.trustText}</p>
             </div>
           </div>
         </div>
@@ -92,13 +111,13 @@ export default function LandingPage() {
 
       <section className="py-16 md:py-20 text-center bg-secondary">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">Ready to Simplify Your Service Needs?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">{t.readyToSimplify}</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10">
-            Join the kariGaar community today. Post a job or find a skilled professional in minutes.
+            {t.joinCommunityText}
           </p>
           <Link href="/platform-home" passHref>
             <Button size="lg" className="px-10 py-6 text-lg transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
-              Explore the Platform <ArrowRight className="ml-3 h-6 w-6" />
+              {t.explorePlatform} <ArrowRight className="ml-3 h-6 w-6" />
             </Button>
           </Link>
         </div>
