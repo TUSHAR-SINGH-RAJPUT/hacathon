@@ -5,102 +5,101 @@
 
 @layer base {
   :root {
-    /* Default Light Theme (fallback, based on original app style before dark themes) */
-    --background: 210 17% 98%; /* Light Gray #F9FAFB */
-    --foreground: 0 0% 13%; /* Near Black */
+    /* Steel-Smoke Light Theme (fallback) */
+    --background: 210 25% 96%; /* Very Light Cool Gray / Bright Steel #F2F5F8 */
+    --foreground: 220 10% 20%; /* Dark Charcoal / Smoke #2E3238 */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 220 10% 20%; /* Dark Charcoal */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 220 10% 20%; /* Dark Charcoal */
 
-    --primary: 259 87% 61%; /* Original Primary Purple */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --primary: 210 30% 48%; /* Steel Blue #5C7A9B */
+    --primary-foreground: 210 20% 98%; /* Almost White for text on primary */
 
-    --secondary: 260 87% 95%; /* Light Lavender for CTA type backgrounds */
-    --secondary-foreground: 269 53% 37%; /* Rich Purple Text on secondary */
+    --secondary: 210 25% 90%; /* Light Cool Gray / Misted Steel #DDE3EA */
+    --secondary-foreground: 210 25% 35%; /* Medium-Dark Steel Blue #4A637D */
 
-    --muted: 210 17% 92%; /* Muted BG - slightly darker light gray */
-    --muted-foreground: 220 6% 49%; /* Secondary Text Gray */
+    --muted: 210 25% 93%; /* Very Light Muted Gray #E7EAEE */
+    --muted-foreground: 210 10% 45%; /* Medium Gray #69707A */
 
-    --accent: 259 60% 75%; /* A Lighter Purple - for general accents */
-    --accent-foreground: 0 0% 100%; /* White text for these accents */
+    --accent: 210 30% 60%;  /* Lighter Steel Blue #7D96B3 */
+    --accent-foreground: 210 20% 98%; /* Almost White */
 
     --destructive: 0 72% 51%; /* Red */
-    --destructive-foreground: 0 0% 98%; /* White on red */
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 210 17% 88%; /* Light gray border */
-    --input: 0 0% 100%; /* White input BG */
-    --ring: 259 87% 61%; /* Primary Purple for focus rings */
+    --border: 210 20% 88%; /* Light Gray Border #D5DAE0 */
+    --input: 0 0% 100%; /* White Input BG */
+    --ring: 210 30% 48%; /* Steel Blue for focus rings */
 
     --radius: 0.5rem;
 
-    --chart-1: 259 87% 61%;
-    --chart-2: 259 60% 75%;
-    --chart-3: 330 70% 65%;
-    --chart-4: 269 53% 55%;
-    --chart-5: 240 60% 70%;
+    /* Light Theme Chart Colors - Steel Blue based */
+    --chart-1: 210 30% 48%; /* Primary Steel Blue */
+    --chart-2: 210 30% 60%; /* Accent Steel Blue */
+    --chart-3: 210 25% 70%; /* Lighter Steel */
+    --chart-4: 220 10% 55%; /* Medium Gray */
+    --chart-5: 210 20% 75%; /* Soft Steel */
 
     /* Sidebar variables for light theme */
-    --sidebar-background: 210 17% 95%;
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 259 87% 61%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 87% 95%;
-    --sidebar-accent-foreground: 269 53% 37%;
-    --sidebar-border: 210 17% 88%;
-    --sidebar-ring: 259 87% 61%;
+    --sidebar-background: 210 25% 94%; /* Slightly off-white steel */
+    --sidebar-foreground: 220 10% 20%;
+    --sidebar-primary: 210 30% 48%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 210 25% 90%;
+    --sidebar-accent-foreground: 210 25% 35%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 210 30% 48%;
   }
 
   .dark {
-    /* Dark Teal Theme */
-    --background: 222 47% 11%; /* Dark Navy Blue e.g., #111827 */
-    --foreground: 210 40% 98%; /* Almost White e.g., #f9fafb */
+    /* Steel-Smoke Dark Theme */
+    --background: 220 13% 12%; /* Very Dark Cool Gray / Deep Smoke #1A1C20 */
+    --foreground: 210 17% 87%; /* Light Cool Gray / Steel Highlight #D4D9E0 */
 
-    --card: 222 47% 15%; /* Slightly Lighter Navy for cards e.g., #1f2937 */
-    --card-foreground: 210 40% 98%;
+    --card: 220 13% 18%; /* Dark Cool Gray / Smoked Steel #26292E */
+    --card-foreground: 210 17% 87%; /* Light Cool Gray */
 
-    --popover: 222 47% 11%; /* Popover BG */
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 13% 12%; /* Deep Smoke Popover BG */
+    --popover-foreground: 210 17% 87%;
 
-    --primary: 173 80% 40%;  /* Vibrant Teal e.g., #14B8A6 */
-    --primary-foreground: 180 100% 5%; /* Very dark, almost black, for text on Teal */
+    --primary: 210 35% 60%;  /* Medium Steel Blue #7392B7 */
+    --primary-foreground: 220 10% 10%; /* Very Dark Gray for text on primary */
 
-    --secondary: 215 28% 25%; /* Muted Dark Blue/Slate for secondary elements e.g., #2d3748 */
-    --secondary-foreground: 210 40% 96%; /* Light text on secondary */
+    --secondary: 220 10% 25%; /* Muted Dark Gray / Faded Smoke #3A3F44 */
+    --secondary-foreground: 210 15% 80%; /* Lighter Gray for text on secondary */
 
-    --muted: 215 28% 17%; /* Even darker muted for less emphasis e.g., #1a202c */
-    --muted-foreground: 215 20% 65%; /* Muted text e.g., #a0aec0 */
+    --muted: 220 10% 15%; /* Even Darker Muted Gray #212529 */
+    --muted-foreground: 210 10% 60%; /* Medium-Light Cool Gray #8C93A0 */
 
-    --accent: 180 70% 55%; /* Brighter Cyan/Teal for accents e.g., #2dd4bf */
-    --accent-foreground: 180 100% 5%; /* Dark text for accents */
+    --accent: 210 30% 70%; /* Brighter Steel Blue / Polished Steel #98B3D2 */
+    --accent-foreground: 220 10% 10%; /* Very Dark Gray for text on accent */
 
-    --destructive: 0 65% 55%; /* Red for destructive actions */
-    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
+    --destructive: 0 65% 55%; /* Red */
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 215 28% 20%; /* Borders e.g., #293140 */
-    --input: 215 28% 17%; /* Input background */
-    --ring: 173 70% 50%; /* Teal for focus rings (slightly lighter for visibility) */
+    --border: 220 10% 22%; /* Slightly Lighter Border #31363C */
+    --input: 220 10% 15%; /* Input background (same as muted) */
+    --ring: 210 35% 60%; /* Steel Blue for focus rings */
 
-    --radius: 0.5rem;
-
-    /* Dark Theme Chart Colors - Teal based */
-    --chart-1: 173 80% 40%; /* Primary Teal */
-    --chart-2: 180 70% 55%; /* Accent Teal/Cyan */
-    --chart-3: 173 60% 60%; /* Lighter Teal */
-    --chart-4: 215 28% 45%; /* Muted Blue for contrast */
-    --chart-5: 173 40% 70%; /* Desaturated Teal */
+    /* Dark Theme Chart Colors - Steel Blue/Gray based */
+    --chart-1: 210 35% 60%; /* Primary Steel Blue */
+    --chart-2: 210 30% 70%; /* Accent Steel Blue */
+    --chart-3: 210 25% 50%; /* Darker Steel */
+    --chart-4: 220 10% 45%; /* Medium Cool Gray */
+    --chart-5: 210 20% 75%; /* Lightest Gray-Blue */
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 222 47% 9%; /* Slightly darker than main dark bg */
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 173 80% 40%; /* Teal */
-    --sidebar-primary-foreground: 180 100% 5%;
-    --sidebar-accent: 215 28% 20%; /* Muted Blue for sidebar accents */
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 215 28% 15%;
-    --sidebar-ring: 173 70% 50%;
+    --sidebar-background: 220 13% 10%; /* Slightly darker than main dark bg */
+    --sidebar-foreground: 210 17% 87%;
+    --sidebar-primary: 210 35% 60%; 
+    --sidebar-primary-foreground: 220 10% 10%;
+    --sidebar-accent: 220 10% 22%; 
+    --sidebar-accent-foreground: 210 15% 80%;
+    --sidebar-border: 220 10% 18%;
+    --sidebar-ring: 210 35% 60%;
   }
 }
 
@@ -117,7 +116,7 @@
   }
   /* Headings for light theme (if :root is light and no .dark class) */
   :root:not(.dark) h1, :root:not(.dark) h2, :root:not(.dark) h3, :root:not(.dark) h4, :root:not(.dark) h5, :root:not(.dark) h6 {
-     color: #000000; /* Main headings Text Black for light theme */
+     color: hsl(var(--foreground)); /* Use light theme foreground for headings */
   }
    /* Headings for dark theme */
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
