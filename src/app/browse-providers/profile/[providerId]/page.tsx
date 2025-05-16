@@ -9,7 +9,7 @@ import type { ServiceProvider, Review } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users as UsersIcon, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react'; // Renamed Users to UsersIcon
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +25,7 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
     Plumbing: <Wrench className="h-5 w-5 mr-2 text-primary" />,
     Cleaning: <Sparkles className="h-5 w-5 mr-2 text-primary" />,
     Electrical: <Zap className="h-5 w-5 mr-2 text-primary" />,
-    Handyman: <Users className="h-5 w-5 mr-2 text-primary" />,
+    Handyman: <UsersIcon className="h-5 w-5 mr-2 text-primary" />, // Used UsersIcon
     Landscaping: <Sprout className="h-5 w-5 mr-2 text-primary" />,
     Other: <Briefcase className="h-5 w-5 mr-2 text-primary" />,
   };
@@ -97,13 +97,14 @@ export default function ProviderProfilePage() {
         clearInterval(reviewIntervalRef.current);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider, isHoveringReviews, provider?.reviews?.length]);
 
 
   if (!provider) {
     return (
       <div className="text-center py-20 animate-in fade-in duration-500">
-        <Users className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <UsersIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" /> {/* Used UsersIcon */}
         <h1 className="text-2xl font-semibold">Provider not found</h1>
         <p className="text-muted-foreground mt-2">The provider you are looking for does not exist or may have been removed.</p>
         <Button className="mt-6" onClick={() => router.push('/browse-providers')}>Back to Providers</Button>
@@ -250,9 +251,11 @@ export default function ProviderProfilePage() {
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                 {isProviderInCart ? "In Your Job List" : "Add to Job List"}
               </Button>
-              <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                <MessageCircle className="mr-2 h-5 w-5" /> Message {provider.name.split(' ')[0]} (Simulated)
-              </Button>
+              <Link href={`/chat/${provider.id}`} passHref>
+                <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                  <MessageCircle className="mr-2 h-5 w-5" /> Message {provider.name.split(' ')[0]}
+                </Button>
+              </Link>
             </div>
           </div>
         </CardContent>
@@ -290,7 +293,7 @@ export default function ProviderProfilePage() {
                 )}
               </Card>
               {provider.reviews.length > 1 && (
-                <div className={`absolute inset-0 flex justify-between items-center transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`absolute inset-0 flex justify-between items-center transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                   <Button 
                     variant="outline" 
                     size="icon" 

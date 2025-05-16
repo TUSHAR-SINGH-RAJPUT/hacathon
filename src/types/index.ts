@@ -51,3 +51,12 @@ export interface BookingDetails {
   paymentMethod: "Cash on Delivery" | "Online Payment";
   bookingDate: string; // ISO date string
 }
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'provider';
+  timestamp: Date;
+  providerId?: string; // Optional: to associate message with a provider if needed globally
+  userId?: string; // Optional: to associate message with a user
+}

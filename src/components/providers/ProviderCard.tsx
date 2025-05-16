@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Briefcase, MessageSquare, User } from 'lucide-react';
 import Link from 'next/link';
-import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users } from 'lucide-react'; // Import specific icons
+import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users as UsersIcon } from 'lucide-react'; // Renamed Users to UsersIcon
 
 const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
   const icons: Record<ServiceProvider['serviceTypes'][0], React.ReactNode> = {
@@ -15,8 +15,8 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
     Plumbing: <Wrench className="h-4 w-4 mr-1 inline-block" />,
     Cleaning: <Sparkles className="h-4 w-4 mr-1 inline-block" />,
     Electrical: <Zap className="h-4 w-4 mr-1 inline-block" />,
-    Handyman: <Users className="h-4 w-4 mr-1 inline-block" />,
-    Landscaping: <Sprout className="h-4 w-4 mr-1 inline-block" />, // Added Landscaping
+    Handyman: <UsersIcon className="h-4 w-4 mr-1 inline-block" />, // Used UsersIcon
+    Landscaping: <Sprout className="h-4 w-4 mr-1 inline-block" />,
     Other: <Briefcase className="h-4 w-4 mr-1 inline-block" />,
   };
   return icons[type] || <Briefcase className="h-4 w-4 mr-1 inline-block" />;
@@ -24,16 +24,17 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
 
 export default function ProviderCard({ provider }: { provider: ServiceProvider }) {
   return (
-    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden">
+    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden transform hover:-translate-y-1">
       <CardHeader className="p-0">
         <Link href={`/browse-providers/profile/${provider.id}`} passHref>
-          <div className="relative w-full h-48 cursor-pointer">
+          <div className="relative w-full h-48 cursor-pointer group">
             <Image
               src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
               alt={`${provider.name}'s profile`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{objectFit:"cover"}}
               data-ai-hint="worker portrait"
+              className="group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         </Link>
@@ -83,9 +84,11 @@ export default function ProviderCard({ provider }: { provider: ServiceProvider }
             View Profile
           </Button>
         </Link>
-        <Button className="w-full flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
-          <MessageSquare size={16} className="mr-2" /> Message
-        </Button>
+        <Link href={`/chat/${provider.id}`} passHref className="flex-1">
+          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+            <MessageSquare size={16} className="mr-2" /> Message
+          </Button>
+        </Link>
         </div>
       </CardFooter>
     </Card>
