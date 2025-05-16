@@ -55,7 +55,7 @@
   }
 
   .dark {
-    /* Refined Dark Theme */
+    /* Refined Dark Theme (Teal) */
     --background: 220 18% 11%; /* Dark Slate Blue/Charcoal */
     --foreground: 210 20% 95%; /* Lighter Gray for text */
 
@@ -109,7 +109,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
   h1, h2, h3, h4, h5, h6 {
     @apply text-foreground;
@@ -196,4 +195,13 @@
 .popover-content-language-translator {
   width: auto !important; /* Adjust as needed */
   min-width: 150px; /* Example min-width */
+}
+
+/* Hide the Google Translate banner */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important; /* Prevent body from being pushed down by the banner */
 }
