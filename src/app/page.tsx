@@ -4,11 +4,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Lightbulb, Users, Target, MessageCircle } from 'lucide-react';
+import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react'; // Removed MessageCircle, X
 import Logo from '@/components/Logo';
-import Script from 'next/script';
-import React, { useState } from 'react'; // Added useState
-import { X as CloseIcon } from 'lucide-react'; // For close button
+// Removed Script and useState for chatbot as it's moved to layout
 
 // Hardcoded English strings since i18n was reverted
 const t = {
@@ -27,20 +25,18 @@ const t = {
   trustText: "Building a platform where quality service and reliability are paramount.",
   readyToSimplify: "Ready to Simplify Your Service Needs?",
   joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes.",
-  chatWithUs: "Chat with Our Assistant",
-  chatWithUsTitle: "Chat with Our Assistant",
-  closeChat: "Close Chat"
+  // Removed chat-specific translations
 };
 
 export default function LandingPage() {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  // Removed isChatOpen state as it's handled in layout
 
   return (
     <div className="flex flex-col min-h-screen animate-in fade-in duration-700">
       {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center text-center py-16 md:py-24 px-4 bg-gradient-to-br from-background via-card/30 to-background overflow-hidden">
         <Image
-          src="https://placehold.co/200x200.png"
+          src="https://placehold.co/150x150.png"
           alt="Service Professional"
           data-ai-hint="worker professional"
           width={150}
@@ -48,7 +44,7 @@ export default function LandingPage() {
           className="absolute top-10 left-10 opacity-10 animate-bounce-slow select-none"
         />
         <Image
-          src="https://placehold.co/180x180.png"
+          src="https://placehold.co/120x120.png"
           alt="Service Tool"
           data-ai-hint="tools equipment"
           width={120}
@@ -56,7 +52,7 @@ export default function LandingPage() {
           className="absolute bottom-20 right-16 opacity-10 animate-bounce-slow-delay select-none"
         />
          <Image
-          src="https://placehold.co/150x150.png"
+          src="https://placehold.co/100x100.png"
           alt="Happy Client"
           data-ai-hint="happy client"
           width={100}
@@ -116,40 +112,7 @@ export default function LandingPage() {
         </div>
       </section>
       
-      {/* Chatbot Section - Restored direct embed
-      <section className="py-16 md:py-20 bg-background">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">{t.chatWithUs}</h2>
-          <div className="max-w-3xl mx-auto bg-card p-4 sm:p-6 rounded-xl shadow-2xl">
-            <iframe
-              id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
-              title="Tyrone: Job Application Assistant"
-              onLoad={(e: any) => {
-                if (e.target && e.target.contentWindow && e.target.contentWindow.parent) {
-                   try {
-                    e.target.contentWindow.parent.scrollTo(0, 0);
-                   } catch (err) {
-                    console.warn("Could not scroll parent window from iframe onload:", err);
-                   }
-                }
-              }}
-              allowtransparency="true"
-              allow="geolocation; microphone; camera; fullscreen"
-              src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
-              frameBorder="0"
-              style={{
-                minWidth: '100%',
-                maxWidth: '100%',
-                height: '688px',
-                border: 'none',
-                width: '100%',
-              }}
-              scrolling="no"
-            ></iframe>
-          </div>
-        </div>
-      </section>
-      */}
+      {/* Removed direct chatbot embed section */}
       
       <section className="py-16 md:py-20 text-center bg-secondary">
         <div className="container mx-auto px-4">
@@ -165,72 +128,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Floating Chat Button */}
-      {!isChatOpen && (
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 right-6 bg-primary text-primary-foreground p-4 rounded-full shadow-xl hover:bg-primary/90 transition-all duration-300 z-[9999]"
-          aria-label={t.chatWithUs}
-        >
-          <MessageCircle size={28} />
-        </button>
-      )}
-
-      {/* Chat Panel */}
-      {isChatOpen && (
-        <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full h-full sm:w-[400px] sm:h-[700px] bg-card text-card-foreground shadow-2xl rounded-t-lg sm:rounded-lg flex flex-col z-[10000] overflow-hidden">
-          <div className="flex items-center justify-between p-3 border-b bg-secondary text-secondary-foreground">
-            <h3 className="font-semibold text-lg">{t.chatWithUsTitle}</h3>
-            <button onClick={() => setIsChatOpen(false)} className="p-1 rounded-md hover:bg-secondary/80" aria-label={t.closeChat}>
-              <CloseIcon size={20} />
-            </button>
-          </div>
-          <div className="flex-grow overflow-hidden">
-            <iframe
-              id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
-              title="Tyrone: Job Application Assistant"
-              onLoad={(e: any) => {
-                 if (e.target && e.target.contentWindow && e.target.contentWindow.parent) {
-                   try {
-                    e.target.contentWindow.parent.scrollTo(0, 0);
-                   } catch (err) {
-                    console.warn("Could not scroll parent window from iframe onload:", err);
-                   }
-                }
-              }}
-              allowtransparency="true"
-              allow="geolocation; microphone; camera; fullscreen"
-              src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
-              frameBorder="0"
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-              }}
-              scrolling="no"
-            ></iframe>
-          </div>
-        </div>
-      )}
+      {/* Floating Chat Button and Panel are now in layout.tsx */}
       
-      <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
-      <Script id="jotform-init" strategy="lazyOnload">
-        {`
-          if (window.jotformEmbedHandler) {
-            window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
-          } else {
-            const iframe = document.getElementById('JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e');
-            if (iframe) {
-              const checkHandler = setInterval(() => {
-                if (window.jotformEmbedHandler) {
-                  clearInterval(checkHandler);
-                  window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
-                }
-              }, 100);
-            }
-          }
-        `}
-      </Script>
+      {/* Script tags for Jotform are now in layout.tsx */}
       
       <style jsx global>{`
         .animate-bounce-slow {
@@ -268,4 +168,3 @@ export default function LandingPage() {
     </div>
   );
 }
-    
