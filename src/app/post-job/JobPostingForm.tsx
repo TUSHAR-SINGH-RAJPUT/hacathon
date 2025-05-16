@@ -1,6 +1,3 @@
-
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,33 +29,34 @@ import { Loader2, Wand2, Users, Briefcase, MessageSquare, MapPin, Clock, Calenda
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card";
 import type { ServiceCategory } from "@/types";
-import { serviceCategories as allServiceCategories } from '@/components/providers/dummyData'; // Import from dummyData
+import { serviceCategories as allServiceCategories } from '@/components/providers/dummyData'; 
 
 const urgencyLevels = ["Urgent (ASAP)", "Within a week", "Flexible (within a month)"];
 const jobSizes = ["Small (e.g., minor repair, single room)", "Medium (e.g., multiple rooms, larger task)", "Large (e.g., full renovation, extensive work)"];
 
-const formSchema = z.object({
-  jobTitle: z.string().min(5, { message: "Job title must be at least 5 characters." }).max(100),
-  jobDescription: z.string().min(20, { message: "Description must be at least 20 characters." }).max(1000),
-  serviceType: z.enum(allServiceCategories.map(sc => sc.value) as [ServiceCategory, ...ServiceCategory[]], { // Use imported categories
-    errorMap: () => ({ message: "Please select a service type." }),
+const createFormSchema = (t: any) => z.object({
+  jobTitle: z.string().min(5, { message: t.validationMessages?.jobTitleMin || "Job title must be at least 5 characters." }).max(100),
+  jobDescription: z.string().min(20, { message: t.validationMessages?.jobDescriptionMin || "Description must be at least 20 characters." }).max(1000),
+  serviceType: z.enum(allServiceCategories.map(sc => sc.value) as [ServiceCategory, ...ServiceCategory[]], { 
+    errorMap: () => ({ message: t.validationMessages?.serviceTypeRequired || "Please select a service type." }),
   }),
-  location: z.string().min(3, { message: "Location is required." }).max(100),
-  urgency: z.string().refine(value => urgencyLevels.includes(value), { message: "Please select an urgency level." }),
-  size: z.string().refine(value => jobSizes.includes(value), { message: "Please select the job size." }),
-  numberOfPeople: z.coerce.number().min(1, "At least 1 person required").optional(),
+  location: z.string().min(3, { message: t.validationMessages?.locationMin || "Location is required." }).max(100),
+  urgency: z.string().refine(value => urgencyLevels.includes(value), { message: t.validationMessages?.urgencyRequired || "Please select an urgency level." }),
+  size: z.string().refine(value => jobSizes.includes(value), { message: t.validationMessages?.sizeRequired || "Please select the job size." }),
+  numberOfPeople: z.coerce.number().min(1, t.validationMessages?.numberOfPeopleMin || "At least 1 person required").optional(),
 }).refine(data => {
   if ((data.size.startsWith("Medium") || data.size.startsWith("Large")) && (data.numberOfPeople === undefined || data.numberOfPeople < 1)) {
     return false;
   }
   return true;
 }, {
-  message: "Number of people is required for medium or large jobs.",
+  message: t.validationMessages?.numberOfPeopleRequiredForMediumLarge || "Number of people is required for medium or large jobs.",
   path: ["numberOfPeople"], 
 });
 
+
 interface JobPostingFormProps {
-  translations: any; // Simplified for this example
+  translations: any; 
 }
 
 export default function JobPostingForm({ translations: t }: JobPostingFormProps) {
@@ -66,6 +64,8 @@ export default function JobPostingForm({ translations: t }: JobPostingFormProps)
   const [isEstimating, setIsEstimating] = useState(false);
   const [estimationResult, setEstimationResult] = useState<EstimateJobPriceOutput | null>(null);
   const [estimationError, setEstimationError] = useState<string | null>(null);
+
+  const formSchema = createFormSchema(t); // Create schema with translations
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -177,7 +177,7 @@ export default function JobPostingForm({ translations: t }: JobPostingFormProps)
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {allServiceCategories.map(category => ( // Use imported categories
+                      {allServiceCategories.map(category => ( 
                         <SelectItem key={category.value} value={category.value}>
                           {category.label}
                         </SelectItem>

@@ -1,6 +1,3 @@
-
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card";
 import { ShieldCheck, FileText } from "lucide-react";
-import type { ProviderRegistrationData } from './ProviderRegistrationForm'; // Ensure this type is compatible
+import type { ProviderRegistrationData } from './ProviderRegistrationForm'; 
 import { useRouter } from 'next/navigation';
 
 const documentVerificationSchema = z.object({
@@ -42,7 +39,7 @@ interface DocumentVerificationFormProps {
   translations: any;
 }
 
-interface StoredProviderData extends Omit<ProviderRegistrationData, 'resume'> { // Omit FileList
+interface StoredProviderData extends Omit<ProviderRegistrationData, 'resume'> { 
   resumeFileName?: string;
 }
 
@@ -74,12 +71,12 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
         description: t.couldNotRetrieveInitialData,
         variant: "destructive",
       });
-      router.push('/join-as-pro'); 
+      router.push(`/join-as-pro`); 
       return;
     }
 
     const completeRegistrationData = {
-      ...initialData, // This includes resumeFileName if it was stored
+      ...initialData, 
       ...values,
     };
 
@@ -93,7 +90,7 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
       sessionStorage.removeItem('providerRegistrationData'); 
     }
     form.reset(); 
-    router.push('/'); // Redirect to home after successful registration.
+    router.push(`/`); 
   }
 
   return (
@@ -143,7 +140,7 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
                   <FormLabel className="flex items-center"><FileText className="h-4 w-4 mr-2 text-primary" />{t.otherDocumentsDetails}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g., Trade license details, previous work certifications, etc. List any documents you can provide for verification."
+                      placeholder={t.otherDocumentsPlaceholder || "e.g., Trade license details, previous work certifications, etc. List any documents you can provide for verification."}
                       className="resize-y min-h-[80px]"
                       {...field}
                     />

@@ -1,5 +1,3 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client"; // This page uses React state and form handling
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,15 +7,6 @@ import { Label } from "@/components/ui/label";
 import { StarIcon, Send } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import React from 'react';
-// import { getDictionary } from '@/lib/dictionaries'; // Client component
-// import type { Locale } from '@/../next.config';
-
-// As this is a client component, translations would ideally be passed via props or context.
-// For simplicity, using hardcoded English or very basic prop structure.
-
-// type Props = {
-//   params: { locale: Locale };
-// };
 
 const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
   return (
@@ -35,23 +24,21 @@ const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (ra
   );
 };
 
+// Hardcoded English strings
+const t = {
+  shareYourFeedback: "Share Your Feedback",
+  helpUsImprove: "Help us improve kariGaar! Let us know about your experience.",
+  overallRating: "Overall Rating",
+  feedbackType: "Feedback Type",
+  generalPlatformFeedback: "General Platform Feedback",
+  specificServiceExperience: "Specific Service Experience",
+  suggestionFeatureRequest: "Suggestion / Feature Request",
+  comments: "Comments",
+  tellUsMore: "Tell us more...",
+  submitFeedbackSimulated: "Submit Feedback (Simulated)"
+};
 
-export default function FeedbackPage(/*{ params: { locale } }: Props*/) {
-  // const dict = await getDictionary(locale); // Cannot use await in client component
-  // Hardcode or pass translations for client components
-  const t = {
-    shareYourFeedback: "Share Your Feedback",
-    helpUsImprove: "Help us improve kariGaar! Let us know about your experience.",
-    overallRating: "Overall Rating",
-    feedbackType: "Feedback Type",
-    generalPlatformFeedback: "General Platform Feedback",
-    specificServiceExperience: "Specific Service Experience",
-    suggestionFeatureRequest: "Suggestion / Feature Request",
-    comments: "Comments",
-    tellUsMore: "Tell us more...",
-    submitFeedbackSimulated: "Submit Feedback (Simulated)"
-  };
-
+export default function FeedbackPage() {
   const [rating, setRating] = React.useState(0);
   const [feedbackType, setFeedbackType] = React.useState("general");
   const [comments, setComments] = React.useState("");

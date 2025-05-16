@@ -1,6 +1,3 @@
-
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";

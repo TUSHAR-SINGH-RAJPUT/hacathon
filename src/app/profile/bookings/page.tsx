@@ -1,4 +1,3 @@
-
 "use client"; // Add this directive
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,7 @@ const dummyBookings = [
     provider: { name: "Priya Sharma", phone: "9876543210" }, // Example phone
     date: "2024-08-15", 
     status: "Completed", 
-    link: "/track-service/dummy-booking-123"
+    link: "/track-service/dummy-booking-123" 
   },
   { 
     id: "booking-456", 

@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} antialiased flex flex-col min-h-screen bg-background`}>
         <AuthProvider>
           <CartProvider> 
-            <Header /> {/* Removed locale prop */}
+            <Header /> {/* Removed locale and dict props */}
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
               {children}
             </main>
