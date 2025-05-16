@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -74,7 +75,6 @@ export default function ProviderProfilePage() {
   const params = useParams();
   const router = useRouter();
   const providerId = params.providerId as string;
-  // const locale = params.locale as string || 'en'; // Removed locale usage
 
   const { addToCart, cart } = useCart();
   const { toast } = useToast();
@@ -130,7 +130,7 @@ export default function ProviderProfilePage() {
         <UsersIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h1 className="text-2xl font-semibold">{t.providerNotFound}</h1>
         <p className="text-muted-foreground mt-2">{t.providerNotFoundDesc}</p>
-        <Button className="mt-6" onClick={() => router.push(`/browse-providers`)}>{t.backToProviders}</Button> {/* Removed locale from router.push */}
+        <Button className="mt-6" onClick={() => router.push(`/browse-providers`)}>{t.backToProviders}</Button>
       </div>
     );
   }
@@ -274,7 +274,7 @@ export default function ProviderProfilePage() {
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                 {isProviderInCart ? t.inYourJobList : t.addToJobList}
               </Button>
-              <Link href={`/chat/${provider.id}`} passHref> {/* Removed locale */}
+              <Link href={`/chat/${provider.id}`} passHref>
                 <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                   <MessageCircle className="mr-2 h-5 w-5" /> {t.messageProvider(provider.name)}
                 </Button>
@@ -376,7 +376,7 @@ export default function ProviderProfilePage() {
           <h2 className="text-2xl font-bold text-center mb-8 text-foreground">{t.recommendedProfessionals}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedProviders.map(recProvider => (
-              <ProviderCard key={recProvider.id} provider={recProvider} locale={"en"} /> {/* Passing "en" as default locale */}
+              <ProviderCard key={recProvider.id} provider={recProvider} locale={"en"} />
             ))}
           </div>
         </section>
@@ -384,3 +384,5 @@ export default function ProviderProfilePage() {
     </div>
   );
 }
+
+    

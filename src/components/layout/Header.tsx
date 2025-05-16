@@ -1,3 +1,4 @@
+
 "use client"; 
 
 import Link from 'next/link';
@@ -33,7 +34,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Added useMemo
 import { cn } from "@/lib/utils";
 
 interface NavLinkProps {
@@ -45,8 +46,9 @@ interface NavLinkProps {
   currentPath: string;
 }
 
-const NavLink = ({ href, children, icon, onClick, className, currentPath }: NavLinkProps) => {
-  const isActive = href ? currentPath === (href === '/' ? '/' : href) : false;
+// Memoize NavLink
+const NavLink = React.memo(({ href, children, icon, onClick, className, currentPath }: NavLinkProps) => {
+  const isActive = href ? currentPath === href : false;
   
   const content = (
     <Button 
@@ -63,7 +65,9 @@ const NavLink = ({ href, children, icon, onClick, className, currentPath }: NavL
     </Button>
   );
   return href ? <Link href={href} passHref>{content}</Link> : content;
-};
+});
+NavLink.displayName = 'NavLink';
+
 
 // Hardcoded English translations for header
 const t = {
@@ -103,13 +107,14 @@ export default function Header() {
     setIsClient(true); 
   }, []);
 
-  const navItems = [
+  // Memoize navItems
+  const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome, icon: <Home size={18} /> }, 
     { href: `/post-job`, label: t.navPostJob, icon: <PlusSquare size={18} /> },
     { href: `/browse-providers`, label: t.navBrowseServices, icon: <Search size={18} /> },
     { href: `/join-as-pro`, label: t.navJoinAsPro, icon: <Briefcase size={18} /> },
     { href: `/about`, label: t.navAboutUs, icon: <InfoIcon size={18} /> },
-  ];
+  ], []); // t is a constant, so it's not needed in dependency array
 
   const handleProceedToBooking = () => {
     if (cart.length > 0) {
@@ -117,13 +122,14 @@ export default function Header() {
     }
   };
   
-  const profileNavItems = [
+  // Memoize profileNavItems
+  const profileNavItems = useMemo(() => [
     { href: `/profile/edit`, label: t.editProfile, icon: <Edit3 size={16}/> },
     { href: `/profile/bookings`, label: t.myBookings, icon: <ListOrdered size={16}/> },
     { href: `/support`, label: t.customerSupport, icon: <HelpCircle size={16}/> },
     { href: `/profile/feedback`, label: t.feedbacks, icon: <StarIcon size={16}/> },
     { href: `/profile/security`, label: t.security, icon: <Shield size={16}/> },
-  ];
+  ], []); // t is a constant
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -222,7 +228,6 @@ export default function Header() {
                      <DropdownMenuItem key={item.label} asChild><Link href={item.href} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link></DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  {/* Language switcher removed */}
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout}
                   </DropdownMenuItem>
@@ -288,7 +293,6 @@ export default function Header() {
                         </Link>
                     ))}
                     <Separator className="my-3 bg-border" />
-                    {/* Language switcher removed */}
                     <SheetClose asChild>
                         <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
                         <LogOut size={20} /> {t.navLogout}
@@ -321,3 +325,5 @@ export default function Header() {
     </header>
   );
 }
+
+    
