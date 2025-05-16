@@ -23,26 +23,35 @@ const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__";
 
 export default function ProviderListings({ initialProviders, serviceCategories, filterTranslations: t, providerCardTranslations, locale }: ProviderListingsProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES_VALUE); // Default to ALL_CATEGORIES_VALUE
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES_VALUE);
   const [minRating, setMinRating] = useState<number>(0);
   const [locationFilter, setLocationFilter] = useState('');
 
   const filteredProviders = useMemo(() => {
     return initialProviders.filter(provider => {
-      // Keyword search logic
-      let keywordMatch = true; // Assume match if no search term
-      if (searchTerm.trim() !== '') {
-        const searchKeywords = searchTerm.toLowerCase().split(' ').filter(kw => kw.length > 0);
-        if (searchKeywords.length > 0) {
-          const providerNameLower = provider.name.toLowerCase();
-          const providerBioLower = provider.bio.toLowerCase();
-          const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
-          
+      const searchTermLower = searchTerm.toLowerCase().trim();
+      const providerNameLower = provider.name.toLowerCase();
+      const providerBioLower = provider.bio.toLowerCase();
+      const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
+
+      let keywordMatch = true; // Default to true, will be set to false if criteria not met
+
+      if (searchTermLower !== '') {
+        const searchKeywords = searchTermLower.split(' ').filter(kw => kw.length > 0);
+
+        if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present
           keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
+        } else if (searchKeywords.length === 1) { // Single-word/initial search
+          const singleKeyword = searchKeywords[0];
+          // Match if name starts with the keyword OR keyword is present anywhere in name/bio
+          keywordMatch = providerNameLower.startsWith(singleKeyword) || providerCombinedText.includes(singleKeyword);
+        } else { 
+          // If searchKeywords is empty (e.g., user typed only spaces), treat as no keyword filter
+          keywordMatch = true;
         }
       }
 
-      const categoryMatch = selectedCategory === '' || selectedCategory === ALL_CATEGORIES_VALUE || provider.serviceTypes.includes(selectedCategory as ServiceCategory);
+      const categoryMatch = selectedCategory === ALL_CATEGORIES_VALUE || provider.serviceTypes.includes(selectedCategory as ServiceCategory);
       const ratingMatch = provider.rating >= minRating;
       const locationMatch = locationFilter === '' || provider.location.toLowerCase().includes(locationFilter.toLowerCase());
       
@@ -141,3 +150,4 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     </div>
   );
 }
+
