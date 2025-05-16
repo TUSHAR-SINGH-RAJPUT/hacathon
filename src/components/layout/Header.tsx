@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client"; 
@@ -12,7 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose, // Added SheetClose
+  SheetClose,
 } from "@/components/ui/sheet";
 import {
   Popover,
@@ -26,10 +27,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,      // Added
-  DropdownMenuSubTrigger, // Added
-  DropdownMenuSubContent, // Added
-  DropdownMenuPortal    // Added
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { Menu } from 'lucide-react';
@@ -39,10 +40,10 @@ import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter, usePathname } from 'next/navigation'; // Using next/navigation
+import { useRouter, usePathname } from 'next/navigation';
 import React, { useState, useEffect, useCallback } from 'react';
+import { cn } from "@/lib/utils"; // Ensure this import is present
 
-// Assuming i18n config is simple like this for now
 const i18nConfig = {
   locales: ['en', 'hi', 'kn'],
   defaultLocale: 'en',
@@ -62,25 +63,18 @@ const NavLink = ({ href, children, icon, onClick, className }: { href?: string; 
   return href ? <Link href={href} passHref>{content}</Link> : content;
 };
 
-// Make dict prop optional initially, fetch if not provided.
-// For now, Header is a client component, so it can't use async getDictionary easily.
-// We'll pass translated strings or the dict itself.
-// For this pass, locale is passed, and we'll manage simple translations here or assume they come via props.
 interface HeaderProps {
   locale: string;
-  // dict: any; // Dictionary object
 }
 
 export default function Header({ locale }: HeaderProps) {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
-  const currentPathname = usePathname(); // e.g. /en/about
+  const currentPathname = usePathname(); 
   const [isClient, setIsClient] = useState(false);
-  const [isSheetOpen, setIsSheetOpen] = useState(false); // For mobile menu
+  const [isSheetOpen, setIsSheetOpen] = useState(false); 
 
-  // Simplified translations directly in the component for demonstration
-  // In a real app, these would come from the dictionary passed as a prop
   const translations = {
     en: {
       navHome: "Home", navPostJob: "Post a Job", navBrowseServices: "Browse Services",
@@ -115,7 +109,6 @@ export default function Header({ locale }: HeaderProps) {
   };
   const t = translations[locale as keyof typeof translations] || translations.en;
 
-
   useEffect(() => {
     setIsClient(true); 
   }, []);
@@ -139,11 +132,10 @@ export default function Header({ locale }: HeaderProps) {
     const segments = pathname.split('/');
     if (segments.length > 1 && locales.includes(segments[1])) {
       const path = '/' + segments.slice(2).join('/');
-      return path === '//' ? '/' : path; // Avoid // for root path
+      return path === '//' ? '/' : path; 
     }
     return pathname;
   }, []);
-
 
   const pathWithoutLocale = getPathWithoutLocale(currentPathname);
 
@@ -154,7 +146,6 @@ export default function Header({ locale }: HeaderProps) {
     { href: "/profile/feedback", label: t.feedbacks, icon: <StarIcon size={16}/> },
     { href: "/profile/security", label: t.security, icon: <Shield size={16}/> },
   ];
-
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -291,7 +282,6 @@ export default function Header({ locale }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div className="md:hidden ml-2">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
@@ -325,7 +315,6 @@ export default function Header({ locale }: HeaderProps) {
                         </SheetClose>
                     ))}
                     <Separator className="my-3 bg-border" />
-                    {/* Language switcher for mobile */}
                     <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language}</p>
                     <SheetClose asChild><Link href={pathWithoutLocale} locale="en" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.english}</Button></Link></SheetClose>
                     <SheetClose asChild><Link href={pathWithoutLocale} locale="hi" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.hindi}</Button></Link></SheetClose>
