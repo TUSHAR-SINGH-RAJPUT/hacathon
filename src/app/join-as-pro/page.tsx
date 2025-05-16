@@ -1,50 +1,61 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 
 import ProviderRegistrationForm from './ProviderRegistrationForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Briefcase, MapPin, Users, Award, TrendingUp, ShieldCheck } from 'lucide-react';
-import { getDictionary } from '@/lib/dictionaries';
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
+// Hardcoded English strings
+const t = {
+  showcaseSkills: "Showcase Your Skills on kariGaar",
+  joinAsProIntro: "Become a valued professional on our platform. Connect with clients actively seeking your expertise, grow your business, and manage your work efficiently. Start by creating your profile below.",
+  createProfessionalProfile: "Create Your Professional Profile",
+  createProfileDescription: "Fill in your details to build a compelling profile. Accuracy and completeness will help you attract more clients and opportunities. This is the first step towards getting verified and listed.",
+  whyJoinKariGaar: "Why Join kariGaar?",
+  widerReach: "Wider Reach:",
+  widerReachText: "Connect with a large pool of customers in your service area.",
+  localFocus: "Local Focus:",
+  localFocusText: "Get matched with jobs specifically in your preferred locations.",
+  buildReputation: "Build Reputation:",
+  buildReputationText: "Collect reviews and showcase your quality work to build trust.",
+  verifiedPlatform: "Verified Platform:",
+  verifiedPlatformText: "Benefit from being part of a trusted network of professionals.",
+  manageJobRequestsFuture: "Manage job requests and your schedule with ease (future feature).",
+  findingJobOpportunities: "Finding Job Opportunities",
+  findingJobOpportunitiesText1: "Once your profile is registered and successfully verified, you'll gain access to view and bid on job postings relevant to your skills and chosen service locations.",
+  findingJobOpportunitiesText2: "Our platform aims to provide a steady stream of potential work, helping you grow your client base.",
+  findingJobOpportunitiesNote: "(Full job browsing and bidding functionality for providers is currently under development and will be rolled out soon.)"
 };
 
-export default async function JoinAsProPage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-  
-  // Simplified dictionary for the child form component
-  // In a larger app, this might be part of dict or a separate form dictionary
-  const formTranslations = {
-    fullName: dict.fullName || "Full Name",
-    emailAddress: dict.emailAddress || "Email Address",
-    phoneNumberOptional: dict.phoneNumberOptional || "Phone Number (Optional)",
-    primaryServiceLocation: dict.primaryServiceLocation || "Primary Service Location",
-    locationDescription: dict.locationDescription || "City, State where you primarily offer services.",
-    servicesYouOffer: dict.servicesYouOffer || "Services You Offer",
-    servicesDescription: dict.servicesDescription || "Select all services you are proficient in.",
-    yearsOfExperience: dict.yearsOfExperience || "Years of Experience",
-    typicalHourlyRateOptional: dict.typicalHourlyRateOptional || "Typical Hourly Rate (Optional)",
-    rateDescription: dict.rateDescription || "Provide a range or indicate custom quotes.",
-    aboutYouServices: dict.aboutYouServices || "About You / Your Services",
-    bioPlaceholder: dict.bioPlaceholder || "Describe your skills, experience, and what makes your service stand out.",
-    profileImageUrlOptional: dict.profileImageUrlOptional || "Profile Image URL (Optional)",
-    profileImageDescription: dict.profileImageDescription || "Link to your professional photo. If blank, a placeholder will be used.",
-    nextDocumentVerification: dict.nextDocumentVerification || "Next: Document Verification",
-    basicInformation: dict.basicInformation || "Basic Information",
-    serviceDetails: dict.serviceDetails || "Service Details",
-    // ... add more as needed by ProviderRegistrationForm
-  };
+// Form translations (hardcoded English)
+const formTranslations = {
+    fullName: "Full Name",
+    emailAddress: "Email Address",
+    phoneNumberOptional: "Phone Number (Optional)",
+    primaryServiceLocation: "Primary Service Location",
+    locationDescription: "City, State where you primarily offer services.",
+    servicesYouOffer: "Services You Offer",
+    servicesDescription: "Select all services you are proficient in.",
+    yearsOfExperience: "Years of Experience",
+    typicalHourlyRateOptional: "Typical Hourly Rate (Optional)",
+    rateDescription: "Provide a range or indicate custom quotes.",
+    aboutYouServices: "About You / Your Services",
+    bioPlaceholder: "Describe your skills, experience, and what makes your service stand out.",
+    profileImageUrlOptional: "Profile Image URL (Optional)",
+    profileImageDescription: "Link to your professional photo. If blank, a placeholder will be used.",
+    nextDocumentVerification: "Next: Document Verification",
+    basicInformation: "Basic Information",
+    serviceDetails: "Service Details",
+};
 
+export default function JoinAsProPage() {
   return (
     <div className="animate-in fade-in duration-500 space-y-12">
       <section className="text-center py-10 bg-card rounded-xl shadow-lg">
         <Briefcase className="mx-auto h-16 w-16 text-primary mb-4" />
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-card-foreground">
-          {dict.showcaseSkills}
+          {t.showcaseSkills}
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          {dict.joinAsProIntro}
+          {t.joinAsProIntro}
         </p>
       </section>
 
@@ -52,9 +63,9 @@ export default async function JoinAsProPage({ params: { locale } }: Props) {
         <div className="md:col-span-2">
           <Card className="shadow-xl bg-background">
             <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-foreground">{dict.createProfessionalProfile}</CardTitle>
+              <CardTitle className="text-2xl font-semibold text-foreground">{t.createProfessionalProfile}</CardTitle>
               <CardDescription className="text-muted-foreground">
-                {dict.createProfileDescription}
+                {t.createProfileDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -67,28 +78,28 @@ export default async function JoinAsProPage({ params: { locale } }: Props) {
           <Card className="bg-secondary shadow-lg">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-secondary-foreground flex items-center">
-                <TrendingUp className="h-6 w-6 mr-3 text-primary" /> {dict.whyJoinKariGaar}
+                <TrendingUp className="h-6 w-6 mr-3 text-primary" /> {t.whyJoinKariGaar}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-secondary-foreground space-y-3 text-sm">
-              <p><Users className="inline h-4 w-4 mr-1 text-primary" /> <strong>{dict.widerReach}</strong> {dict.widerReachText}</p>
-              <p><MapPin className="inline h-4 w-4 mr-1 text-primary" /> <strong>{dict.localFocus}</strong> {dict.localFocusText}</p>
-              <p><Award className="inline h-4 w-4 mr-1 text-primary" /> <strong>{dict.buildReputation}</strong> {dict.buildReputationText}</p>
-              <p><ShieldCheck className="inline h-4 w-4 mr-1 text-primary" /> <strong>{dict.verifiedPlatform}</strong> {dict.verifiedPlatformText}</p>
-              <p>{dict.manageJobRequestsFuture}</p>
+              <p><Users className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.widerReach}</strong> {t.widerReachText}</p>
+              <p><MapPin className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.localFocus}</strong> {t.localFocusText}</p>
+              <p><Award className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.buildReputation}</strong> {t.buildReputationText}</p>
+              <p><ShieldCheck className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.verifiedPlatform}</strong> {t.verifiedPlatformText}</p>
+              <p>{t.manageJobRequestsFuture}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-secondary shadow-lg">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-secondary-foreground flex items-center">
-                <Briefcase className="h-6 w-6 mr-3 text-primary" /> {dict.findingJobOpportunities}
+                <Briefcase className="h-6 w-6 mr-3 text-primary" /> {t.findingJobOpportunities}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-secondary-foreground space-y-3 text-sm">
-              <p>{dict.findingJobOpportunitiesText1}</p>
-              <p>{dict.findingJobOpportunitiesText2}</p>
-              <p className="text-xs text-muted-foreground">{dict.findingJobOpportunitiesNote}</p>
+              <p>{t.findingJobOpportunitiesText1}</p>
+              <p>{t.findingJobOpportunitiesText2}</p>
+              <p className="text-xs text-muted-foreground">{t.findingJobOpportunitiesNote}</p>
             </CardContent>
           </Card>
         </div>

@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import { useCart } from "@/context/CartContext";
@@ -14,7 +13,34 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, CreditCard, DollarSign, CheckCircle, AlertTriangle } from "lucide-react";
-// No getDictionary here as it's a client component. Translations would be passed or from context.
+
+// Hardcoded English translations
+const t = {
+  jobListEmptyTitle: "Your Job List is Empty",
+  jobListEmptyDesc: "Please add professionals to your job list before proceeding to booking.",
+  addressRequiredTitle: "Address Required",
+  addressRequiredDesc: "Please enter a service address.",
+  paymentMethodRequiredTitle: "Payment Method Required",
+  paymentMethodRequiredDesc: "Please select a payment method.",
+  bookingConfirmedTitle: "Booking Confirmed (Simulated)!",
+  bookingConfirmedDesc: (names: string) => `Your request with ${names} has been submitted. You will be contacted shortly.`,
+  trackService: "Track Service",
+  jobListEmptyRedirect: "Job List Empty",
+  redirectingMessage: "Redirecting you to find professionals...",
+  confirmBookingTitle: "Confirm Your Service Booking",
+  confirmBookingDesc: "Please review your selected professionals, provide service address, and choose a payment method.",
+  selectedProfessionals: "Selected Professionals:",
+  serviceAddressLabel: "Service Address",
+  serviceAddressPlaceholder: "Enter your full address, including area and pincode",
+  serviceAddressHint: "This is where the service will be performed.",
+  paymentMethodLabel: "Payment Method",
+  cashOnDelivery: "Cash on Delivery",
+  cashOnDeliveryDesc: "Pay directly to the professional after service.",
+  onlinePayment: "Online Payment (UPI/Card)",
+  onlinePaymentDesc: "Pay securely online. (This is a simulated option)",
+  processing: "Processing...",
+  confirmAndBook: "Confirm & Book Service"
+};
 
 export default function BookingConfirmationPage() {
   const { cart, customerAddress, setCustomerAddress, clearCart } = useCart();
@@ -25,36 +51,8 @@ export default function BookingConfirmationPage() {
   const [paymentMethod, setPaymentMethod] = useState<"Cash on Delivery" | "Online Payment" | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Simplified translations for client component
-  const t = {
-    jobListEmptyTitle: "Your Job List is Empty",
-    jobListEmptyDesc: "Please add professionals to your job list before proceeding to booking.",
-    addressRequiredTitle: "Address Required",
-    addressRequiredDesc: "Please enter a service address.",
-    paymentMethodRequiredTitle: "Payment Method Required",
-    paymentMethodRequiredDesc: "Please select a payment method.",
-    bookingConfirmedTitle: "Booking Confirmed (Simulated)!",
-    bookingConfirmedDesc: (names: string) => `Your request with ${names} has been submitted. You will be contacted shortly.`,
-    trackService: "Track Service",
-    jobListEmptyRedirect: "Job List Empty",
-    redirectingMessage: "Redirecting you to find professionals...",
-    confirmBookingTitle: "Confirm Your Service Booking",
-    confirmBookingDesc: "Please review your selected professionals, provide service address, and choose a payment method.",
-    selectedProfessionals: "Selected Professionals:",
-    serviceAddressLabel: "Service Address",
-    serviceAddressPlaceholder: "Enter your full address, including area and pincode",
-    serviceAddressHint: "This is where the service will be performed.",
-    paymentMethodLabel: "Payment Method",
-    cashOnDelivery: "Cash on Delivery",
-    cashOnDeliveryDesc: "Pay directly to the professional after service.",
-    onlinePayment: "Online Payment (UPI/Card)",
-    onlinePaymentDesc: "Pay securely online. (This is a simulated option)",
-    processing: "Processing...",
-    confirmAndBook: "Confirm & Book Service"
-  };
-
   useEffect(() => {
-    if (cart.length === 0 && !isSubmitting) { // Added !isSubmitting to prevent toast on successful booking clear
+    if (cart.length === 0 && !isSubmitting) {
       toast({
         title: t.jobListEmptyTitle,
         description: t.jobListEmptyDesc,
@@ -62,7 +60,7 @@ export default function BookingConfirmationPage() {
       });
       router.push("/browse-providers");
     }
-  }, [cart, router, toast, isSubmitting, t]);
+  }, [cart, router, toast, isSubmitting]); // t removed from dependencies
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);

@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -14,32 +13,31 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Send, UserCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
-// No getDictionary here as it's a client component. Translations would be passed or from context.
+
+// Hardcoded English strings
+const t = {
+  loadingChat: "Loading chat...",
+  providerNotFound: "Provider Not Found",
+  couldNotInitiateChat: "Could not initiate chat. The provider may not exist or there was an error.",
+  backToProviders: "Back to Providers",
+  typeYourMessage: "Type your message...",
+  sendMessage: "Send message",
+  simulatedChat: "This is a simulated chat. Messages are not actually sent.",
+  initialMessage: (name: string) => `Hi there! I'm ${name}. How can I help you today?`,
+  simulatedReply: (text: string) => `Thanks for your message! I'll get back to you shortly regarding "${text.substring(0,20)}...". (This is a simulated reply)`
+};
 
 export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
   const providerId = params.providerId as string;
-  const locale = params.locale as string || 'en'; // Get locale from params
+  // const locale = params.locale as string || 'en'; // Removed locale usage
 
   const [provider, setProvider] = useState<ServiceProvider | undefined>(undefined);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoadingProvider, setIsLoadingProvider] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  // Simplified translations for client component
-  const t = {
-    loadingChat: "Loading chat...",
-    providerNotFound: "Provider Not Found",
-    couldNotInitiateChat: "Could not initiate chat. The provider may not exist or there was an error.",
-    backToProviders: "Back to Providers",
-    typeYourMessage: "Type your message...",
-    sendMessage: "Send message",
-    simulatedChat: "This is a simulated chat. Messages are not actually sent.",
-    initialMessage: (name: string) => `Hi there! I'm ${name}. How can I help you today?`,
-    simulatedReply: (text: string) => `Thanks for your message! I'll get back to you shortly regarding "${text.substring(0,20)}...". (This is a simulated reply)`
-  };
 
   useEffect(() => {
     if (providerId) {
@@ -57,7 +55,7 @@ export default function ChatPage() {
       }
       setIsLoadingProvider(false);
     }
-  }, [providerId, t]);
+  }, [providerId]); // t removed from dependencies
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -106,7 +104,7 @@ export default function ChatPage() {
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold mb-2">{t.providerNotFound}</h1>
         <p className="text-muted-foreground mb-6">{t.couldNotInitiateChat}</p>
-        <Button onClick={() => router.push(`/${locale}/browse-providers`)} variant="outline" className="text-primary border-primary">
+        <Button onClick={() => router.push(`/browse-providers`)} variant="outline" className="text-primary border-primary"> {/* Removed locale */}
           <ArrowLeft className="mr-2 h-4 w-4" /> {t.backToProviders}
         </Button>
       </div>
@@ -120,7 +118,7 @@ export default function ChatPage() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref>
+          <Link href={`/browse-providers/profile/${provider.id}`} passHref> {/* Removed locale */}
             <div className="flex items-center gap-3 cursor-pointer group">
               <Image
                 src={provider.profileImageUrl || 'https://placehold.co/40x40.png'}

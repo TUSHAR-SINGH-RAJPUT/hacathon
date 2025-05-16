@@ -1,29 +1,36 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoIcon, Users, Target, BookOpen, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getDictionary } from '@/lib/dictionaries';
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
+// Hardcoded English strings
+const t = {
+  aboutKariGaar: "About kariGaar",
+  aboutIntro: "Welcome to kariGaar, your trusted platform for connecting with skilled local service professionals. We aim to make finding reliable help for your home and business needs simple, transparent, and efficient.",
+  ourMission: "Our Mission",
+  missionText: "Our mission is to empower communities by connecting individuals and businesses with skilled local artisans (karigaars) and service providers. We strive to create a seamless experience that fosters trust, quality, and convenience for everyone involved.",
+  whoWeServe: "Who We Serve",
+  forCustomers: "For Customers:",
+  forCustomersText: "Find vetted professionals for any task, from plumbing and electrical work to painting and gardening. Get fair estimates, read reviews, and book with confidence.",
+  forProfessionals: "For Professionals:",
+  forProfessionalsText: "Grow your business by showcasing your skills to a wider audience. Receive job leads, manage your profile, and build your reputation on a trusted platform.",
+  needHelpNavigating: "Need Help Navigating kariGaar?",
+  platformGuideDescription: "Our comprehensive platform guide provides step-by-step instructions and tips for using all of kariGaar's features, whether you're looking to hire or offer services.",
+  explorePlatformGuide: "Explore Our Platform Guide"
 };
 
-export default async function AboutPage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-
+export default function AboutPage() {
   return (
     <div className="animate-in fade-in duration-500 space-y-12">
       <section className="text-center py-12 md:py-16 bg-card rounded-xl shadow-lg">
         <InfoIcon className="mx-auto h-16 w-16 text-primary mb-4" />
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-card-foreground">
-          {dict.aboutKariGaar}
+          {t.aboutKariGaar}
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-          {dict.aboutIntro}
+          {t.aboutIntro}
         </p>
       </section>
 
@@ -41,24 +48,24 @@ export default async function AboutPage({ params: { locale } }: Props) {
         <div className="space-y-6">
           <Card className="bg-background shadow-sm">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary flex items-center"><Target className="h-7 w-7 mr-3" /> {dict.ourMission}</CardTitle>
+              <CardTitle className="text-2xl text-primary flex items-center"><Target className="h-7 w-7 mr-3" /> {t.ourMission}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                {dict.missionText}
+                {t.missionText}
               </p>
             </CardContent>
           </Card>
            <Card className="bg-background shadow-sm">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary flex items-center"><Users className="h-7 w-7 mr-3" /> {dict.whoWeServe}</CardTitle>
+              <CardTitle className="text-2xl text-primary flex items-center"><Users className="h-7 w-7 mr-3" /> {t.whoWeServe}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                <strong>{dict.forCustomers}</strong> {dict.forCustomersText}
+                <strong>{t.forCustomers}</strong> {t.forCustomersText}
               </p>
               <p className="text-muted-foreground mt-2">
-                <strong>{dict.forProfessionals}</strong> {dict.forProfessionalsText}
+                <strong>{t.forProfessionals}</strong> {t.forProfessionalsText}
               </p>
             </CardContent>
           </Card>
@@ -68,14 +75,14 @@ export default async function AboutPage({ params: { locale } }: Props) {
       <section className="text-center py-10 bg-secondary rounded-xl shadow-lg">
         <BookOpen className="mx-auto h-12 w-12 text-primary mb-4" />
         <h2 className="text-3xl font-bold text-secondary-foreground mb-4">
-          {dict.needHelpNavigating}
+          {t.needHelpNavigating}
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-          {dict.platformGuideDescription}
+          {t.platformGuideDescription}
         </p>
-        <Link href={`/${locale}/about/guide`} passHref>
+        <Link href="/about/guide" passHref>
           <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            {dict.explorePlatformGuide} <ArrowRight className="ml-2 h-5 w-5" />
+            {t.explorePlatformGuide} <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </section>

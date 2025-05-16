@@ -1,11 +1,8 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListOrdered, CalendarDays, Info } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getDictionary } from '@/lib/dictionaries';
 
 // Dummy booking data
 const dummyBookings = [
@@ -13,22 +10,17 @@ const dummyBookings = [
   { id: "booking-456", service: "Garden Maintenance", provider: "Rohan Gowda", date: "2024-09-05", status: "Scheduled", link: "/track-service/dummy-booking-123"},
 ];
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
+// Hardcoded English strings
+const t = {
+  myBookings: "My Bookings",
+  viewManageBookings: "View and manage your past and upcoming service bookings.",
+  with: "With",
+  trackViewDetails: "Track / View Details",
+  noBookingsYet: "You have no bookings yet.",
+  findServices: "Find Services"
 };
-
-export default async function MyBookingsPage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-
-  const t = {
-    myBookings: dict.myBookings || "My Bookings",
-    viewManageBookings: dict.viewManageBookings || "View and manage your past and upcoming service bookings.",
-    with: dict.with || "With",
-    trackViewDetails: dict.trackViewDetails || "Track / View Details",
-    noBookingsYet: dict.noBookingsYet || "You have no bookings yet.",
-    findServices: dict.findServices || "Find Services"
-  };
   
+export default function MyBookingsPage() {
   return (
     <div className="max-w-3xl mx-auto py-8 animate-in fade-in duration-500 space-y-8">
       <Card className="shadow-xl bg-card">
@@ -58,7 +50,7 @@ export default async function MyBookingsPage({ params: { locale } }: Props) {
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${booking.status === "Completed" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
                     {booking.status}
                   </span>
-                  <Link href={`/${locale}${booking.link}` || `/${locale}/track-service/${booking.id}`} passHref>
+                  <Link href={booking.link} passHref>
                     <Button variant="link" className="text-primary text-sm p-0 h-auto">{t.trackViewDetails}</Button>
                   </Link>
                 </div>
@@ -68,7 +60,7 @@ export default async function MyBookingsPage({ params: { locale } }: Props) {
             <div className="text-center py-6">
               <Info className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
               <p className="text-muted-foreground">{t.noBookingsYet}</p>
-              <Link href={`/${locale}/browse-providers`} passHref>
+              <Link href="/browse-providers" passHref>
                 <Button variant="outline" className="mt-4 text-primary border-primary">{t.findServices}</Button>
               </Link>
             </div>

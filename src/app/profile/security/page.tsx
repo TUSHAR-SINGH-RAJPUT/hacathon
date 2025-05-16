@@ -1,7 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
-// For client components, translations should be passed as props or from context.
-// To fully internationalize, this page would need access to `dict` like other pages.
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,35 +6,28 @@ import { Label } from "@/components/ui/label";
 import { Shield, Lock, History, Bell } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { getDictionary } from '@/lib/dictionaries';
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
+// Hardcoded English strings
+const t = {
+  securitySettings: "Security Settings",
+  manageSecurityPrefs: "Manage your account security preferences.",
+  changePassword: "Change Password",
+  currentPassword: "Current Password",
+  newPassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  updatePasswordSimulated: "Update Password (Simulated)",
+  notificationSettings: "Notification Settings",
+  emailNotifications: "Email Notifications",
+  emailNotificationsDesc: "Receive updates about your bookings and platform news.",
+  smsNotifications: "SMS Notifications",
+  smsNotificationsDesc: "Get critical alerts via SMS (e.g., booking confirmations).",
+  loginActivity: "Login Activity",
+  lastLoginInfo: "Last login: August 10, 2024, 10:00 AM from Bangalore, India (Chrome on Desktop). (This is placeholder data. Actual login activity would be displayed here.)",
+  viewFullLoginHistory: "View Full Login History (Simulated)",
+  securityConcernsContact: "For any security concerns, please contact support immediately."
 };
 
-export default async function SecurityPage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-
-  const t = {
-    securitySettings: dict.securitySettings || "Security Settings",
-    manageSecurityPrefs: dict.manageSecurityPrefs || "Manage your account security preferences.",
-    changePassword: dict.changePassword || "Change Password",
-    currentPassword: dict.currentPassword || "Current Password",
-    newPassword: dict.newPassword || "New Password",
-    confirmNewPassword: dict.confirmNewPassword || "Confirm New Password",
-    updatePasswordSimulated: dict.updatePasswordSimulated || "Update Password (Simulated)",
-    notificationSettings: dict.notificationSettings || "Notification Settings",
-    emailNotifications: dict.emailNotifications || "Email Notifications",
-    emailNotificationsDesc: dict.emailNotificationsDesc || "Receive updates about your bookings and platform news.",
-    smsNotifications: dict.smsNotifications || "SMS Notifications",
-    smsNotificationsDesc: dict.smsNotificationsDesc || "Get critical alerts via SMS (e.g., booking confirmations).",
-    loginActivity: dict.loginActivity || "Login Activity",
-    lastLoginInfo: dict.lastLoginInfo || "Last login: August 10, 2024, 10:00 AM from Bangalore, India (Chrome on Desktop). (This is placeholder data. Actual login activity would be displayed here.)",
-    viewFullLoginHistory: dict.viewFullLoginHistory || "View Full Login History (Simulated)",
-    securityConcernsContact: dict.securityConcernsContact || "For any security concerns, please contact support immediately."
-  };
-
-
+export default function SecurityPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-8">
       <Card className="shadow-xl bg-card">

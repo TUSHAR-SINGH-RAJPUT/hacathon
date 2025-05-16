@@ -1,51 +1,45 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle, Mail, Phone, LifeBuoy } from "lucide-react"; 
 import Link from "next/link";
-import { getDictionary } from '@/lib/dictionaries';
 
-const createFaqItems = (dict: any) => [
+// Hardcoded English strings
+const t = {
+  customerSupportFAQ: "Customer Support & FAQ",
+  helpIntro: "We're here to help! Find answers to common questions or reach out to our support team.",
+  faqTitle: "Frequently Asked Questions",
+  contactUs: "Contact Us",
+  contactUsDescription: "Can't find an answer? Get in touch with our support team.",
+  emailSupport: "Email: support@karigaar.example.com (Simulated)",
+  phoneSupport: "Phone: +91-XXX-XXXXXXX (Simulated)",
+  supportHours: "Support hours: Mon-Fri, 9 AM - 6 PM IST.",
+  visitPlatformGuide: "Visit our Full Platform Guide"
+};
+
+const createFaqItems = () => [
   {
-    question: dict.faqPostJobQ || "How do I post a job?",
-    answer: dict.faqPostJobA || "Navigate to the 'Post a Job' page from the header. Fill in the details about your service needs, location, and urgency. The more details you provide, the better matches you'll get!"
+    question: "How do I post a job?",
+    answer: "Navigate to the 'Post a Job' page from the header. Fill in the details about your service needs, location, and urgency. The more details you provide, the better matches you'll get!"
   },
   {
-    question: dict.faqFindProviderQ || "How do I find a service provider?",
-    answer: dict.faqFindProviderA || "Go to the 'Browse Services' page. You can search by keywords, filter by service category, location, and ratings to find the perfect professional for your task."
+    question: "How do I find a service provider?",
+    answer: "Go to the 'Browse Services' page. You can search by keywords, filter by service category, location, and ratings to find the perfect professional for your task."
   },
   {
-    question: dict.faqPaymentSecureQ || "Is my payment secure?",
-    answer: dict.faqPaymentSecureA || "Currently, we support Cash on Delivery. Online payment simulation is for demonstration. In a live system, online payments would be processed through secure, encrypted gateways."
+    question: "Is my payment secure?",
+    answer: "Currently, we support Cash on Delivery. Online payment simulation is for demonstration. In a live system, online payments would be processed through secure, encrypted gateways."
   },
   {
-    question: dict.faqBecomeProviderQ || "How can I become a service provider on kariGaar?",
-    answer: dict.faqBecomeProviderA || "Click on 'Join as Pro' in the navigation. Fill out the registration form with your details and services offered. After submission and verification, your profile will be listed."
+    question: "How can I become a service provider on kariGaar?",
+    answer: "Click on 'Join as Pro' in the navigation. Fill out the registration form with your details and services offered. After submission and verification, your profile will be listed."
   },
 ];
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
-};
 
-export default async function SupportPage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-  const faqItems = createFaqItems(dict); // Pass dict to create localized FAQs
-
-  const t = {
-    customerSupportFAQ: dict.customerSupportFAQ || "Customer Support & FAQ",
-    helpIntro: dict.helpIntro || "We're here to help! Find answers to common questions or reach out to our support team.",
-    faqTitle: dict.faqTitle || "Frequently Asked Questions",
-    contactUs: dict.contactUs || "Contact Us",
-    contactUsDescription: dict.contactUsDescription || "Can't find an answer? Get in touch with our support team.",
-    emailSupport: dict.emailSupport || "Email: support@karigaar.example.com (Simulated)",
-    phoneSupport: dict.phoneSupport || "Phone: +91-XXX-XXXXXXX (Simulated)",
-    supportHours: dict.supportHours || "Support hours: Mon-Fri, 9 AM - 6 PM IST.",
-    visitPlatformGuide: dict.visitPlatformGuide || "Visit our Full Platform Guide"
-  };
+export default function SupportPage() {
+  const faqItems = createFaqItems();
 
   return (
     <div className="max-w-3xl mx-auto py-8 animate-in fade-in duration-500 space-y-10">
@@ -100,7 +94,7 @@ export default async function SupportPage({ params: { locale } }: Props) {
       </Card>
 
       <div className="text-center">
-         <Link href={`/${locale}/about/guide`} passHref>
+         <Link href="/about/guide" passHref>
           <Button variant="link" className="text-primary text-lg">
             <LifeBuoy className="mr-2 h-5 w-5" /> {t.visitPlatformGuide}
           </Button>

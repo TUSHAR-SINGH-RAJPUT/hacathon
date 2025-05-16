@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import Link from 'next/link';
@@ -11,8 +10,7 @@ import { User, Lock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-// import { getDictionary } from '@/lib/dictionaries'; // Client component, cannot use getDictionary directly
-// import type { Locale } from '@/../next.config';
+import React from 'react'; // Added React import
 
 // Dummy SVG for Google Icon
 const GoogleIcon = () => (
@@ -32,34 +30,29 @@ const FacebookIcon = () => (
   </svg>
 );
 
-// For client components, translations need to be passed as props or via context.
-// This example will use hardcoded English for simplicity as it's not a page getting `params.locale`.
-// Or, we'd fetch translations client-side if needed.
+const t = {
+  welcomeBack: "Welcome Back!",
+  loginToAccess: "Log in to access your account and manage your services.",
+  emailAddress: "Email Address",
+  emailPlaceholder: "you@example.com",
+  password: "Password",
+  passwordPlaceholder: "••••••••",
+  forgotPassword: "Forgot password?",
+  or: "OR",
+  loginWithGoogle: "Login with Google",
+  loginWithFacebook: "Login with Facebook",
+  logIn: "Log In",
+  dontHaveAccount: "Don't have an account?",
+  signUp: "Sign Up"
+};
 
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
-  // Placeholder translations, ideally pass from parent or use client-side i18n hook
-  const t = {
-    welcomeBack: "Welcome Back!",
-    loginToAccess: "Log in to access your account and manage your services.",
-    emailAddress: "Email Address",
-    emailPlaceholder: "you@example.com",
-    password: "Password",
-    passwordPlaceholder: "••••••••",
-    forgotPassword: "Forgot password?",
-    or: "OR",
-    loginWithGoogle: "Login with Google",
-    loginWithFacebook: "Login with Facebook",
-    logIn: "Log In",
-    dontHaveAccount: "Don't have an account?",
-    signUp: "Sign Up"
-  };
-
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
-    login();
+    login(); // This now redirects via AuthContext
   };
 
   return (

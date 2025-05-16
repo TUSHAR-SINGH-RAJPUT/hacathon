@@ -1,70 +1,70 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Home, PlusSquare, Search, UserCircle, Briefcase, InfoIcon, ArrowRight, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
-import { getDictionary } from '@/lib/dictionaries';
 
-// This structure assumes fixed English titles for now or would need these titles also in dict
-// For simplicity, keeping titles in English, but descriptions could be translated.
-const createGuideSections = (dict: any, locale: string) => [ 
+// Hardcoded English strings
+const t = {
+  appName: "kariGaar",
+  platformGuideTitle: "kariGaar Platform Guide",
+  platformGuideIntro: "Welcome to your comprehensive guide for using kariGaar! Whether you're a customer looking for services or a professional offering them, these guides will help you navigate our platform effectively.",
+  stillHaveQuestions: "Still Have Questions?",
+  contactSupportComingSoon: "Contact Support (Coming Soon)",
+  contactSupportDescription: "If you can't find what you're looking for in our guides, please feel free to reach out to our support team (contact details coming soon)."
+};
+
+const createGuideSections = () => [ 
   { 
     title: "Getting Started: Homepage Overview", 
     description: "Understand the main features accessible from our homepage.", 
-    link: `/${locale}/about/guide/homepage`, 
+    link: `/about/guide/homepage`, 
     icon: <Home className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Posting a New Job", 
     description: "Learn how to create effective job posts to attract the right professionals.", 
-    link: `/${locale}/about/guide/posting-a-job`, 
+    link: `/about/guide/posting-a-job`, 
     icon: <PlusSquare className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Browsing Services & Provider Profiles", 
     description: "Find out how to search for services and understand provider profiles.", 
-    link: `/${locale}/about/guide/browsing-services`, 
+    link: `/about/guide/browsing-services`, 
     icon: <Search className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Using Your Job List (Cart) & Booking", 
     description: "Manage your shortlisted providers and understand the booking process.", 
-    link: `/${locale}/about/guide/job-list-booking`, 
+    link: `/about/guide/job-list-booking`, 
     icon: <UserCircle className="h-6 w-6 text-primary" />
   },
   { 
     title: "Joining as a Professional", 
     description: "A step-by-step guide for service providers to register and get started.", 
-    link: `/${locale}/about/guide/joining-as-pro`, 
+    link: `/about/guide/joining-as-pro`, 
     icon: <Briefcase className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Managing Your Account", 
     description: "Information on login, signup, and managing your user settings (for customers and pros).", 
-    link: `/${locale}/about/guide/managing-account`, 
+    link: `/about/guide/managing-account`, 
     icon: <UserCircle className="h-6 w-6 text-primary" /> 
   },
 ];
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
-};
-
-export default async function PlatformGuidePage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale);
-  const guideSections = createGuideSections(dict, locale);
+export default function PlatformGuidePage() {
+  const guideSections = createGuideSections();
 
   return (
     <div className="animate-in fade-in duration-500 space-y-12">
       <section className="text-center py-12 md:py-16 bg-card rounded-xl shadow-lg">
         <BookOpen className="mx-auto h-16 w-16 text-primary mb-4" />
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-card-foreground">
-          {dict.appName} Platform Guide
+          {t.platformGuideTitle}
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Welcome to your comprehensive guide for using {dict.appName}! Whether you're a customer looking for services or a professional offering them, these guides will help you navigate our platform effectively.
+          {t.platformGuideIntro}
         </p>
       </section>
 
@@ -92,9 +92,9 @@ export default async function PlatformGuidePage({ params: { locale } }: Props) {
 
       <section className="text-center py-10">
         <HelpCircle className="mx-auto h-10 w-10 text-primary mb-3" />
-        <h2 className="text-2xl font-semibold text-foreground mb-2">Still Have Questions?</h2>
-        <p className="text-muted-foreground mb-4">If you can't find what you're looking for in our guides, please feel free to reach out to our support team (contact details coming soon).</p>
-        <Button variant="link" className="text-primary">Contact Support (Coming Soon)</Button>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">{t.stillHaveQuestions}</h2>
+        <p className="text-muted-foreground mb-4">{t.contactSupportDescription}</p>
+        <Button variant="link" className="text-primary">{t.contactSupportComingSoon}</Button>
       </section>
     </div>
   );

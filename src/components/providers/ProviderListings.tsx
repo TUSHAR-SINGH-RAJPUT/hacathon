@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -15,8 +14,8 @@ import { Label } from '@/components/ui/label';
 interface ProviderListingsProps {
   initialProviders: ServiceProvider[];
   serviceCategories: { value: ServiceCategory; label: string }[];
-  translations: any; // For translated texts
-  locale: string; // Added locale prop
+  translations: any; // For translated texts (now using hardcoded English)
+  locale: string; // Keep for ProviderCard, even if parent i18n removed
 }
 
 const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__"; 
@@ -79,7 +78,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
                 <SelectItem value={ALL_CATEGORIES_VALUE}>{t.allCategories}</SelectItem>
                 {serviceCategories.map(category => (
                   <SelectItem key={category.value} value={category.value}>
-                    {category.label} {/* Category labels are usually fine in one language or passed if needed */}
+                    {category.label}
                   </SelectItem>
                 ))}
               </SelectContent>

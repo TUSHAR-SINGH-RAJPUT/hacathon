@@ -1,35 +1,23 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
-// For client components, translations should be passed as props or from context.
-// For this example, we'll keep it simple.
-// To fully internationalize, this page would need access to `dict` like other pages.
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCircle, Mail, Phone } from "lucide-react";
-import { getDictionary } from '@/lib/dictionaries';
 
-type Props = {
-  params: { locale: string }; // Changed Locale to string
+// Hardcoded English strings
+const t = {
+  editYourProfile: "Edit Your Profile",
+  keepInfoUpToDate: "Keep your information up to date.",
+  fullName: "Full Name",
+  emailAddress: "Email Address",
+  phoneNumber: "Phone Number",
+  bio: "Bio",
+  saveChanges: "Save Changes (Simulated)"
 };
 
-// This page needs to be async to use getDictionary
-export default async function EditProfilePage({ params: { locale } }: Props) {
-  const dict = await getDictionary(locale); // Fetch dictionary
-
-  // Use translations from dict
-  const t = {
-    editYourProfile: dict.editProfile || "Edit Your Profile", // Fallback
-    keepInfoUpToDate: dict.keepInfoUpToDate || "Keep your information up to date.",
-    fullName: dict.fullName || "Full Name",
-    emailAddress: dict.emailAddress || "Email Address",
-    phoneNumber: dict.phoneNumber || "Phone Number",
-    bio: dict.bio || "Bio",
-    saveChanges: dict.saveChanges || "Save Changes (Simulated)"
-  };
-
+export default function EditProfilePage() {
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-8">
       <Card className="shadow-xl bg-card">

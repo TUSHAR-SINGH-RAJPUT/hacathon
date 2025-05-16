@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -8,7 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-// No getDictionary here as it's a client component. Translations would be passed or from context.
+
+// Hardcoded English strings
+const t = {
+  loadingBookingDetails: "Loading booking details...",
+  bookingNotFound: "Booking Not Found",
+  bookingNotFoundOrInvalid: "Booking not found or invalid ID.",
+  failedToLoadBooking: "Failed to load booking details.",
+  checkBookingIdContactSupport: "Please check the booking ID or contact support.",
+  backToHome: "Back to Home",
+  trackYourService: "Track Your Service",
+  bookingIdLabel: "Booking ID",
+  statusLabel: "Status",
+  estimatedArrival: "Estimated Arrival",
+  liveMapPlaceholder: "Live map tracking for India would appear here. (Feature under development)",
+  serviceAddressLabel: "Service Address",
+  callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
+  messageProvider: "Message",
+  contactOptionsSimulated: "Contact options are simulated for this demo."
+};
+
 
 const fetchBookingDetails = async (bookingId: string) => {
   console.log("Fetching booking details for:", bookingId);
@@ -40,25 +58,6 @@ export default function TrackServicePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Simplified translations for client component
-  const t = {
-    loadingBookingDetails: "Loading booking details...",
-    bookingNotFound: "Booking Not Found",
-    bookingNotFoundOrInvalid: "Booking not found or invalid ID.",
-    failedToLoadBooking: "Failed to load booking details.",
-    checkBookingIdContactSupport: "Please check the booking ID or contact support.",
-    backToHome: "Back to Home",
-    trackYourService: "Track Your Service",
-    bookingIdLabel: "Booking ID",
-    statusLabel: "Status",
-    estimatedArrival: "Estimated Arrival",
-    liveMapPlaceholder: "Live map tracking for India would appear here. (Feature under development)",
-    serviceAddressLabel: "Service Address",
-    callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
-    messageProvider: "Message",
-    contactOptionsSimulated: "Contact options are simulated for this demo."
-  };
-
   useEffect(() => {
     if (bookingId) {
       fetchBookingDetails(bookingId)
@@ -75,10 +74,10 @@ export default function TrackServicePage() {
         })
         .finally(() => setLoading(false));
     } else {
-      setError(t.bookingNotFoundOrInvalid); // Or a specific "No ID" message
+      setError(t.bookingNotFoundOrInvalid);
       setLoading(false);
     }
-  }, [bookingId, t]);
+  }, [bookingId]); // t removed from dependencies
 
   if (loading) {
     return (

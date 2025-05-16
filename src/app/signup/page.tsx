@@ -1,5 +1,4 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
+
 "use client";
 
 import Link from 'next/link';
@@ -10,32 +9,31 @@ import { Label } from '@/components/ui/label';
 import { User, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import React from 'react'; // Added React import
 
-// For client components, translations need to be passed as props or via context.
-// This example will use hardcoded English for simplicity.
+
+const t = {
+  createYourAccount: "Create Your Account",
+  joinKariGaar: "Join kariGaar today to connect with service providers or offer your skills.",
+  fullName: "Full Name",
+  fullNamePlaceholder: "Priya Sharma",
+  emailAddress: "Email Address",
+  emailPlaceholder: "priya.sharma@example.com",
+  password: "Password",
+  passwordPlaceholder: "••••••••",
+  confirmPassword: "Confirm Password",
+  signUp: "Sign Up",
+  alreadyHaveAccount: "Already have an account?",
+  logIn: "Log In"
+};
+
 export default function SignUpPage() {
   const { login } = useAuth(); 
   const router = useRouter();
 
-  const t = {
-    createYourAccount: "Create Your Account",
-    joinKariGaar: "Join kariGaar today to connect with service providers or offer your skills.",
-    fullName: "Full Name",
-    fullNamePlaceholder: "Priya Sharma",
-    emailAddress: "Email Address",
-    emailPlaceholder: "priya.sharma@example.com",
-    password: "Password",
-    passwordPlaceholder: "••••••••",
-    confirmPassword: "Confirm Password",
-    signUp: "Sign Up",
-    alreadyHaveAccount: "Already have an account?",
-    logIn: "Log In"
-  };
-
-
   const handleSignUp = (event: React.FormEvent) => {
     event.preventDefault(); 
-    login(); 
+    login(); // Simulate login and redirect
   };
 
   return (

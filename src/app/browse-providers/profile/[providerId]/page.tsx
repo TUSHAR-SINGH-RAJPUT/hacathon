@@ -1,6 +1,4 @@
 
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -19,10 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import React, { useState, useEffect, useRef } from 'react';
 import { Separator } from '@/components/ui/separator';
-import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon'; // Updated import
-
-// Client component, translations would be passed or from context.
-// For now, using hardcoded English text where translations aren't easily available.
+import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
 
 const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
   return (
@@ -40,12 +35,47 @@ const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (ra
   );
 };
 
+// Hardcoded English strings
+const t = {
+  providerNotFound: "Provider not found",
+  providerNotFoundDesc: "The provider you are looking for does not exist or may have been removed.",
+  backToProviders: "Back to Providers",
+  addedToJobList: (name: string) => `${name} added to your Job List!`,
+  viewYourList: "You can view your list from the header.",
+  alreadyInJobList: (name: string) => `${name} is already in your Job List.`,
+  ratingRequired: "Rating Required",
+  selectStarRating: "Please select a star rating.",
+  reviewCommentRequired: "Review Comment Required",
+  writeCommentForReview: "Please write a comment for your review.",
+  reviewSubmitted: "Review Submitted!",
+  thankYouFeedback: "Thank you for your feedback.",
+  aboutProvider: (name: string) => `About ${name}`,
+  servicesOffered: "Services Offered",
+  portfolioPastWork: "Portfolio / Past Work",
+  quickInfo: "Quick Info",
+  yearsExperience: (years: number) => `${years} years of experience`,
+  hourlyRateApprox: (rate: string) => `₹${rate} /hr (approx)`,
+  inYourJobList: "In Your Job List",
+  addToJobList: "Add to Job List",
+  messageProvider: (name: string) => `Message ${name.split(' ')[0]}`,
+  customerReviewsRatings: "Customer Reviews & Ratings",
+  seeWhatOthersSaying: (name: string) => `See what others are saying about ${name}.`,
+  loadingReview: "Loading review...",
+  noReviewsYet: (name: string) => `No reviews yet for ${name}. Be the first to add one!`,
+  leaveAReviewFor: (name: string) => `Leave a Review for ${name}`,
+  yourRating: "Your Rating",
+  yourReview: "Your Review",
+  shareYourExperience: (name: string) => `Share your experience with ${name}...`,
+  submitting: "Submitting...",
+  submitReview: "Submit Review",
+  recommendedProfessionals: "Recommended Professionals"
+};
 
 export default function ProviderProfilePage() {
   const params = useParams();
   const router = useRouter();
   const providerId = params.providerId as string;
-  const locale = params.locale as string || 'en'; // Get locale from params
+  // const locale = params.locale as string || 'en'; // Removed locale usage
 
   const { addToCart, cart } = useCart();
   const { toast } = useToast();
@@ -58,43 +88,6 @@ export default function ProviderProfilePage() {
   const [isHoveringReviews, setIsHoveringReviews] = useState(false);
   const reviewIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Simplified translations for client component
-  const t = {
-    providerNotFound: "Provider not found",
-    providerNotFoundDesc: "The provider you are looking for does not exist or may have been removed.",
-    backToProviders: "Back to Providers",
-    addedToJobList: (name: string) => `${name} added to your Job List!`,
-    viewYourList: "You can view your list from the header.",
-    alreadyInJobList: (name: string) => `${name} is already in your Job List.`,
-    ratingRequired: "Rating Required",
-    selectStarRating: "Please select a star rating.",
-    reviewCommentRequired: "Review Comment Required",
-    writeCommentForReview: "Please write a comment for your review.",
-    reviewSubmitted: "Review Submitted!",
-    thankYouFeedback: "Thank you for your feedback.",
-    aboutProvider: (name: string) => `About ${name}`,
-    servicesOffered: "Services Offered",
-    portfolioPastWork: "Portfolio / Past Work",
-    quickInfo: "Quick Info",
-    yearsExperience: (years: number) => `${years} years of experience`,
-    hourlyRateApprox: (rate: string) => `₹${rate} /hr (approx)`,
-    inYourJobList: "In Your Job List",
-    addToJobList: "Add to Job List",
-    messageProvider: (name: string) => `Message ${name.split(' ')[0]}`,
-    customerReviewsRatings: "Customer Reviews & Ratings",
-    seeWhatOthersSaying: (name: string) => `See what others are saying about ${name}.`,
-    loadingReview: "Loading review...",
-    noReviewsYet: (name: string) => `No reviews yet for ${name}. Be the first to add one!`,
-    leaveAReviewFor: (name: string) => `Leave a Review for ${name}`,
-    yourRating: "Your Rating",
-    yourReview: "Your Review",
-    shareYourExperience: (name: string) => `Share your experience with ${name}...`,
-    submitting: "Submitting...",
-    submitReview: "Submit Review",
-    recommendedProfessionals: "Recommended Professionals"
-  };
-
-
   useEffect(() => {
     const foundProvider = dummyProviders.find(p => p.id === providerId);
     setProvider(foundProvider);
@@ -117,7 +110,7 @@ export default function ProviderProfilePage() {
     if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
       reviewIntervalRef.current = setInterval(() => {
         handleNextReview();
-      }, 5000); // Auto-scroll every 5 seconds
+      }, 5000); 
     } else {
       if (reviewIntervalRef.current) {
         clearInterval(reviewIntervalRef.current);
@@ -138,7 +131,7 @@ export default function ProviderProfilePage() {
         <UsersIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h1 className="text-2xl font-semibold">{t.providerNotFound}</h1>
         <p className="text-muted-foreground mt-2">{t.providerNotFoundDesc}</p>
-        <Button className="mt-6" onClick={() => router.push(`/${locale}/browse-providers`)}>{t.backToProviders}</Button>
+        <Button className="mt-6" onClick={() => router.push(`/browse-providers`)}>{t.backToProviders}</Button> {/* Removed locale from router.push */}
       </div>
     );
   }
@@ -282,7 +275,7 @@ export default function ProviderProfilePage() {
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                 {isProviderInCart ? t.inYourJobList : t.addToJobList}
               </Button>
-              <Link href={`/${locale}/chat/${provider.id}`} passHref>
+              <Link href={`/chat/${provider.id}`} passHref> {/* Removed locale */}
                 <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                   <MessageCircle className="mr-2 h-5 w-5" /> {t.messageProvider(provider.name)}
                 </Button>
@@ -384,7 +377,7 @@ export default function ProviderProfilePage() {
           <h2 className="text-2xl font-bold text-center mb-8 text-foreground">{t.recommendedProfessionals}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedProviders.map(recProvider => (
-              <ProviderCard key={recProvider.id} provider={recProvider} locale={locale} />
+              <ProviderCard key={recProvider.id} provider={recProvider} locale={"en"} /> {/* Passing "en" as default locale */}
             ))}
           </div>
         </section>
