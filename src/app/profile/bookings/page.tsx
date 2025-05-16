@@ -2,17 +2,29 @@
 "use client"; 
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ListOrdered, CalendarDays, Info, MessageCircle, Star } from "lucide-react"; 
+import { ListOrdered, CalendarDays, Info, MessageCircle, Star, Send } from "lucide-react"; 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast"; // Added useToast
+import { useToast } from "@/hooks/use-toast";
+import React, { useState } from 'react'; // Import useState
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 // Dummy booking data - slightly adjusted for provider info
 const dummyBookings = [
   { 
     id: "dummy-booking-123", 
     service: "House Painting", 
-    provider: { name: "Priya Sharma", phone: "9876543210", id: "1" }, // Added provider ID
+    provider: { name: "Priya Sharma", phone: "9876543210", id: "1" },
     date: "2024-08-15", 
     status: "Completed", 
     link: "/track-service/dummy-booking-123" 
@@ -20,18 +32,18 @@ const dummyBookings = [
   { 
     id: "booking-456", 
     service: "Garden Maintenance", 
-    provider: { name: "Rohan Gowda", phone: "9876543211", id: "2" }, // Added provider ID
+    provider: { name: "Rohan Gowda", phone: "9876543211", id: "2" },
     date: "2024-09-05", 
     status: "Scheduled", 
-    link: "/track-service/dummy-booking-123" // Should ideally be a different link or dynamic
+    link: "/track-service/dummy-booking-123"
   },
   { 
     id: "booking-789", 
     service: "Plumbing Repair", 
-    provider: { name: "Ananya Reddy", phone: "9876543212", id: "3" }, // Added provider ID
+    provider: { name: "Ananya Reddy", phone: "9876543212", id: "3" },
     date: "2024-07-20", 
     status: "Completed", 
-    link: "/track-service/dummy-booking-123" // Should ideally be a different link or dynamic
+    link: "/track-service/dummy-booking-123"
   },
 ];
   
@@ -46,25 +58,76 @@ const t = {
   contactOnWhatsApp: "WhatsApp",
   rateExperience: "Rate Experience",
   ratingSubmittedTitle: "Rating Submitted (Simulated)",
-  ratingSubmittedDesc: (service: string) => `Thank you for rating your experience for ${service}!`
+  ratingSubmittedDesc: (service: string, provider: string) => `Thank you for rating your experience for ${service} with ${provider}!`,
+  // Dialog specific translations
+  rateYourServiceTitle: "Rate Your Service",
+  rateYourServiceDescription: (service: string, provider: string) => `Share your feedback for the ${service} provided by ${provider}.`,
+  yourRating: "Your Rating",
+  yourComments: "Your Comments (Optional)",
+  yourCommentsPlaceholder: "Tell us more about your experience...",
+  submitReview: "Submit Review",
+  close: "Close",
+};
+
+// Simple StarRatingInput component for the dialog
+const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
+  return (
+    <div className="flex items-center space-x-1 py-2">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-7 w-7 cursor-pointer transition-colors ${
+            star <= rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground hover:text-amber-300'
+          }`}
+          onClick={() => setRating(star)}
+        />
+      ))}
+    </div>
+  );
 };
   
 export default function MyBookingsPage() {
   const { toast } = useToast();
+  const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
+  const [currentBookingForRating, setCurrentBookingForRating] = useState<any>(null);
+  const [currentRating, setCurrentRating] = useState(0);
+  const [currentComment, setCurrentComment] = useState("");
 
   const handleWhatsAppClick = (providerName: string, providerPhone: string) => {
-    // In a real app, construct a WhatsApp link: `https://wa.me/${providerPhone.replace(/\D/g, '')}?text=Hello%20${providerName}`
     alert(`Simulating WhatsApp chat with ${providerName}. In a real app, this would open WhatsApp.`);
   };
 
-  const handleRateExperience = (bookingService: string, providerName: string) => {
-    // In a real app, this would navigate to a review/rating page or open a modal
-    // For example: router.push(`/profile/rate-service/${booking.id}`)
+  const handleOpenRatingDialog = (booking: any) => {
+    setCurrentBookingForRating(booking);
+    setCurrentRating(0); // Reset rating
+    setCurrentComment(""); // Reset comment
+    setIsRatingDialogOpen(true);
+  };
+
+  const handleReviewSubmit = () => {
+    if (!currentBookingForRating) return;
+    if (currentRating === 0) {
+      toast({
+        title: "Rating Required",
+        description: "Please select a star rating.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log("Review Submitted (Simulated):", {
+      bookingId: currentBookingForRating.id,
+      service: currentBookingForRating.service,
+      provider: currentBookingForRating.provider.name,
+      rating: currentRating,
+      comment: currentComment,
+    });
+
     toast({
       title: t.ratingSubmittedTitle,
-      description: t.ratingSubmittedDesc(bookingService),
+      description: t.ratingSubmittedDesc(currentBookingForRating.service, currentBookingForRating.provider.name),
     });
-    console.log(`Simulating rating for service: ${bookingService} with provider: ${providerName}`);
+    setIsRatingDialogOpen(false);
   };
 
   return (
@@ -113,7 +176,7 @@ export default function MyBookingsPage() {
                         variant="outline"
                         size="sm"
                         className="text-amber-600 border-amber-600 hover:bg-amber-600 hover:text-white dark:text-amber-400 dark:border-amber-400 dark:hover:bg-amber-500 dark:hover:text-card"
-                        onClick={() => handleRateExperience(booking.service, booking.provider.name)}
+                        onClick={() => handleOpenRatingDialog(booking)}
                       >
                         <Star className="mr-2 h-4 w-4" /> {t.rateExperience}
                       </Button>
@@ -133,6 +196,51 @@ export default function MyBookingsPage() {
           )}
         </CardContent>
       </Card>
+
+      {currentBookingForRating && (
+        <Dialog open={isRatingDialogOpen} onOpenChange={setIsRatingDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-card text-card-foreground">
+            <DialogHeader>
+              <DialogTitle className="text-xl">
+                {t.rateYourServiceTitle}
+              </DialogTitle>
+              <DialogDescription>
+                {t.rateYourServiceDescription(currentBookingForRating.service, currentBookingForRating.provider.name)}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div>
+                <Label htmlFor="rating" className="block text-sm font-medium text-card-foreground">
+                  {t.yourRating}
+                </Label>
+                <StarRatingInput rating={currentRating} setRating={setCurrentRating} />
+              </div>
+              <div>
+                <Label htmlFor="comment" className="block text-sm font-medium text-card-foreground">
+                  {t.yourComments}
+                </Label>
+                <Textarea
+                  id="comment"
+                  placeholder={t.yourCommentsPlaceholder}
+                  value={currentComment}
+                  onChange={(e) => setCurrentComment(e.target.value)}
+                  className="min-h-[100px] bg-background text-foreground"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <DialogClose asChild>
+                <Button type="button" variant="outline" className="text-muted-foreground border-muted-foreground/50 hover:bg-muted/20">
+                  {t.close}
+                </Button>
+              </DialogClose>
+              <Button type="button" onClick={handleReviewSubmit} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Send className="mr-2 h-4 w-4" /> {t.submitReview}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
