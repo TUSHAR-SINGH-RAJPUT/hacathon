@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // No longer need useParams if providerId is passed as prop
 import Image from 'next/image';
 import Link from 'next/link';
 import { dummyProviders } from '@/components/providers/dummyData';
@@ -8,13 +9,13 @@ import type { ServiceProvider, Review } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users as UsersIcon, ShoppingCart, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, MessageSquare, Users as UsersIcon, ShoppingCart, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react'; // Added useCallback
 import { Separator } from '@/components/ui/separator';
 import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
 
@@ -35,12 +36,13 @@ const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (ra
 };
 
 interface ProviderProfilePageContentProps {
-  t: any;
+  tProfilePage: any; // Translations for this page's specific content
+  tProviderCard: any; // Translations for the ProviderCard component
   locale: string;
   providerId: string;
 }
 
-export default function ProviderProfilePageContent({ t, locale, providerId }: ProviderProfilePageContentProps) {
+export default function ProviderProfilePageContent({ tProfilePage: t, tProviderCard, locale, providerId }: ProviderProfilePageContentProps) {
   const router = useRouter();
   const { addToCart, cart } = useCart();
   const { toast } = useToast();
@@ -59,7 +61,7 @@ export default function ProviderProfilePageContent({ t, locale, providerId }: Pr
     setCurrentReviewIndex(0); 
   }, [providerId]);
 
-  const handleNextReview = useCallback(() => { // Added useCallback
+  const handleNextReview = useCallback(() => {
     if (provider && provider.reviews && provider.reviews.length > 0) {
       setCurrentReviewIndex((prevIndex) => (prevIndex + 1) % provider.reviews!.length);
     }
@@ -86,7 +88,7 @@ export default function ProviderProfilePageContent({ t, locale, providerId }: Pr
         clearInterval(reviewIntervalRef.current);
       }
     };
-  }, [provider, isHoveringReviews, provider?.reviews?.length, handleNextReview]); // Added handleNextReview to dependencies
+  }, [provider, isHoveringReviews, handleNextReview]);
 
 
   if (!provider) {
@@ -341,7 +343,7 @@ export default function ProviderProfilePageContent({ t, locale, providerId }: Pr
           <h2 className="text-2xl font-bold text-center mb-8 text-foreground">{t.recommendedProfessionals || "Recommended Professionals"}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedProviders.map(recProvider => (
-              <ProviderCard key={recProvider.id} provider={recProvider} locale={locale} translations={t.ProviderCard || {}} />
+              <ProviderCard key={recProvider.id} provider={recProvider} locale={locale} translations={tProviderCard} />
             ))}
           </div>
         </section>
@@ -349,3 +351,5 @@ export default function ProviderProfilePageContent({ t, locale, providerId }: Pr
     </div>
   );
 }
+
+    

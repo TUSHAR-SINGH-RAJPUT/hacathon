@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -13,13 +14,14 @@ import { Label } from '@/components/ui/label';
 interface ProviderListingsProps {
   initialProviders: ServiceProvider[];
   serviceCategories: { value: ServiceCategory; label: string }[];
-  translations: any; 
+  filterTranslations: any; // Translations for filter controls
+  providerCardTranslations: any; // Translations for ProviderCard
   locale: string;
 }
 
 const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__"; 
 
-export default function ProviderListings({ initialProviders, serviceCategories, translations: t, locale }: ProviderListingsProps) {
+export default function ProviderListings({ initialProviders, serviceCategories, filterTranslations: t, providerCardTranslations, locale }: ProviderListingsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [minRating, setMinRating] = useState<number>(0);
@@ -71,7 +73,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
                 <SelectItem value={ALL_CATEGORIES_VALUE}>{t.allCategories || "All Categories"}</SelectItem>
                 {serviceCategories.map(category => (
                   <SelectItem key={category.value} value={category.value}>
-                    {category.label} {/* These labels are English from dummyData, consider passing translated labels if needed */}
+                    {category.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -114,7 +116,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
       {filteredProviders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProviders.map(provider => (
-            <ProviderCard key={provider.id} provider={provider} locale={locale} translations={t.ProviderCard || {}}/>
+            <ProviderCard key={provider.id} provider={provider} locale={locale} translations={providerCardTranslations} />
           ))}
         </div>
       ) : (
@@ -127,3 +129,5 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     </div>
   );
 }
+
+    

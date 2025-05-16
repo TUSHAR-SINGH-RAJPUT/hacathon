@@ -1,10 +1,13 @@
+
 import { getDictionary } from '@/lib/dictionaries';
 import ProviderProfilePageContent from './ProviderProfilePageContent';
 
 export default async function ProviderProfilePage({ params: { locale, providerId } }: { params: { locale: string, providerId: string } }) {
   const dict = await getDictionary(locale);
-  // Assuming you'll have a ProviderProfilePage section in your common.json
-  const t = dict.ProviderProfilePage || {}; 
+  const tProfilePage = dict.ProviderProfilePage || {}; 
+  const tProviderCard = dict.ProviderCard || {}; // For recommended provider cards
   
-  return <ProviderProfilePageContent t={t} locale={locale} providerId={providerId} />;
+  return <ProviderProfilePageContent tProfilePage={tProfilePage} tProviderCard={tProviderCard} locale={locale} providerId={providerId} />;
 }
+
+    
