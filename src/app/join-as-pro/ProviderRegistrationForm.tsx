@@ -106,7 +106,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
           setIsSubmitting(false);
           return;
         }
-        resumeFileName = result.fileName; // Store the filename from the successful mock upload
+        resumeFileName = result.fileName; 
         toast({
           title: "Resume Uploaded (Mock)",
           description: `${result.fileName} processed.`,
@@ -125,8 +125,8 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
 
     const dataToStore = {
       ...values,
-      resume: undefined, // Don't store the FileList in session storage
-      resumeFileName: resumeFileName, // Store the name of the (mock) uploaded file
+      resume: undefined, 
+      resumeFileName: resumeFileName, 
     };
     
     if (typeof window !== "undefined") {
@@ -138,20 +138,22 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
         
-        <Card className="bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-xl">{t.basicInformation || "Basic Information"}</CardTitle>
+        <Card className="bg-card/70 shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-semibold text-card-foreground flex items-center gap-2">
+              <User className="text-primary"/>{t.basicInformation || "Basic Information"}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <CardContent className="space-y-6 pt-2">
+            <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
                 control={form.control}
                 name="fullName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><User className="h-4 w-4 mr-2 text-primary" />{t.fullName || "Full Name"}</FormLabel>
+                    <FormLabel className="flex items-center"><User className="h-4 w-4 mr-2 opacity-70" />{t.fullName || "Full Name"}</FormLabel>
                     <FormControl>
                       <Input placeholder={t.fullNamePlaceholder || "e.g., Priya Sharma"} {...field} />
                     </FormControl>
@@ -164,7 +166,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><Mail className="h-4 w-4 mr-2 text-primary" />{t.emailAddress || "Email Address"}</FormLabel>
+                    <FormLabel className="flex items-center"><Mail className="h-4 w-4 mr-2 opacity-70" />{t.emailAddress || "Email Address"}</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder={t.emailPlaceholder || "e.g., priya.sharma@example.com"} {...field} />
                     </FormControl>
@@ -174,13 +176,13 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
                 control={form.control}
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><Phone className="h-4 w-4 mr-2 text-primary" />{t.phoneNumberOptional || "Phone Number (Optional)"}</FormLabel>
+                    <FormLabel className="flex items-center"><Phone className="h-4 w-4 mr-2 opacity-70" />{t.phoneNumberOptional || "Phone Number (Optional)"}</FormLabel>
                     <FormControl>
                       <Input type="tel" placeholder={t.phoneNumberPlaceholder || "e.g., +91 XXXXXXXXXX"} {...field} />
                     </FormControl>
@@ -193,7 +195,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><MapPinIcon className="h-4 w-4 mr-2 text-primary" />{t.primaryServiceLocation || "Primary Service Location"}</FormLabel>
+                    <FormLabel className="flex items-center"><MapPinIcon className="h-4 w-4 mr-2 opacity-70" />{t.primaryServiceLocation || "Primary Service Location"}</FormLabel>
                     <FormControl>
                       <Input placeholder={t.locationPlaceholder || "e.g., Bangalore, Karnataka"} {...field} />
                     </FormControl>
@@ -206,17 +208,19 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
           </CardContent>
         </Card>
         
-        <Card className="bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-xl">{t.serviceDetails || "Service Details"}</CardTitle>
+        <Card className="bg-card/70 shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-semibold text-card-foreground flex items-center gap-2">
+              <Settings className="text-primary"/>{t.serviceDetails || "Service Details"}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-2">
             <FormField
               control={form.control}
               name="serviceTypes"
               render={() => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><Settings className="h-4 w-4 mr-2 text-primary" />{t.servicesYouOffer || "Services You Offer"}</FormLabel>
+                  <FormLabel className="flex items-center text-base"><Settings className="h-4 w-4 mr-2 opacity-70" />{t.servicesYouOffer || "Services You Offer"}</FormLabel>
                   <FormDescription>{t.servicesDescription || "Select all services you are proficient in."}</FormDescription>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
                     {serviceCategories.map((service) => (
@@ -228,7 +232,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                           return (
                             <FormItem
                               key={service.value}
-                              className="flex flex-row items-center space-x-3 space-y-0 p-3 bg-secondary/30 rounded-md"
+                              className="flex flex-row items-center space-x-3 space-y-0 p-3 bg-secondary/50 rounded-md border border-border hover:bg-secondary/70 transition-colors"
                             >
                               <FormControl>
                                 <Checkbox
@@ -244,7 +248,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel className="font-normal text-sm text-foreground">
+                              <FormLabel className="font-normal text-sm text-foreground cursor-pointer">
                                 {service.label}
                               </FormLabel>
                             </FormItem>
@@ -258,13 +262,13 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
               )}
             />
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">
               <FormField
                 control={form.control}
                 name="experienceYears"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><Briefcase className="h-4 w-4 mr-2 text-primary" />{t.yearsOfExperience || "Years of Experience"}</FormLabel>
+                    <FormLabel className="flex items-center"><Briefcase className="h-4 w-4 mr-2 opacity-70" />{t.yearsOfExperience || "Years of Experience"}</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder={t.experiencePlaceholder || "e.g., 5"} {...field} />
                     </FormControl>
@@ -277,7 +281,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                 name="hourlyRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="flex items-center"><DollarSign className="h-4 w-4 mr-2 text-primary" />{t.typicalHourlyRateOptional || "Typical Hourly Rate (Optional)"}</FormLabel>
+                    <FormLabel className="flex items-center"><DollarSign className="h-4 w-4 mr-2 opacity-70" />{t.typicalHourlyRateOptional || "Typical Hourly Rate (Optional)"}</FormLabel>
                     <FormControl>
                       <Input placeholder={t.ratePlaceholder || "e.g., ₹300-₹500 or 'Contact for quote'"} {...field} />
                     </FormControl>
@@ -293,11 +297,11 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
               name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><Info className="h-4 w-4 mr-2 text-primary" />{t.aboutYouServices || "About You / Your Services"}</FormLabel>
+                  <FormLabel className="flex items-center"><Info className="h-4 w-4 mr-2 opacity-70" />{t.aboutYouServices || "About You / Your Services"}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={t.bioPlaceholder || "Describe your skills, experience, and what makes your service stand out."}
-                      className="resize-y min-h-[100px]"
+                      className="resize-y min-h-[120px]"
                       {...field}
                     />
                   </FormControl>
@@ -311,7 +315,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
               name="profileImageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><ImageIcon className="h-4 w-4 mr-2 text-primary" />{t.profileImageUrlOptional || "Profile Image URL (Optional)"}</FormLabel>
+                  <FormLabel className="flex items-center"><ImageIcon className="h-4 w-4 mr-2 opacity-70" />{t.profileImageUrlOptional || "Profile Image URL (Optional)"}</FormLabel>
                   <FormControl>
                     <Input placeholder={t.profileImageUrlPlaceholder || "https://example.com/your-image.png or https://placehold.co/..."} {...field} />
                   </FormControl>
@@ -323,15 +327,16 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
             <FormField
               control={form.control}
               name="resume"
-              render={({ field: { onChange, value, ...restField } }) => ( // Correctly destructure field
+              render={({ field: { onChange, value, ...restField } }) => ( 
                 <FormItem>
-                  <FormLabel className="flex items-center"><FileUp className="h-4 w-4 mr-2 text-primary" />{t.resumeOptionalPDF || "Resume (Optional, PDF only, max 5MB)"}</FormLabel>
+                  <FormLabel className="flex items-center"><FileUp className="h-4 w-4 mr-2 opacity-70" />{t.resumeOptionalPDF || "Resume (Optional, PDF only, max 5MB)"}</FormLabel>
                   <FormControl>
                     <Input 
                       type="file" 
                       accept=".pdf"
                       onChange={(e) => onChange(e.target.files)} 
                       {...restField}
+                      className="pt-2"
                     />
                   </FormControl>
                   <FormDescription>{t.resumeDescription || "Upload your resume to showcase your qualifications."}</FormDescription>
@@ -342,7 +347,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
           </CardContent>
         </Card>
         
-        <div className="pt-6">
+        <div className="pt-8 flex justify-end">
           <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSubmitting}>
             {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
             {t.nextDocumentVerification || "Next: Document Verification"}

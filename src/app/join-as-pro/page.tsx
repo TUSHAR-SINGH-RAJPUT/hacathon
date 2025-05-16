@@ -69,45 +69,45 @@ const formTranslations = {
 
 export default function JoinAsProPage() {
   return (
-    <div className="animate-in fade-in duration-500 space-y-12">
-      <section className="text-center py-10 bg-card rounded-xl shadow-lg">
+    <div className="animate-in fade-in duration-500 space-y-16 py-4">
+      <section className="text-center py-10 md:py-12 bg-card rounded-xl shadow-xl">
         <Briefcase className="mx-auto h-16 w-16 text-primary mb-4" />
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-card-foreground">
           {t.showcaseSkills}
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto px-4">
           {t.joinAsProIntro}
         </p>
       </section>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid md:grid-cols-3 gap-10">
         <div className="md:col-span-2">
           <Card className="shadow-xl bg-background">
-            <CardHeader>
+            <CardHeader className="px-6 pt-6 pb-4 md:px-8 md:pt-8 md:pb-6">
               <CardTitle className="text-2xl font-semibold text-foreground">{t.createProfessionalProfile}</CardTitle>
-              <CardDescription className="text-muted-foreground">
+              <CardDescription className="text-muted-foreground pt-1">
                 {t.createProfileDescription}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-6 pb-6 md:px-8 md:pb-8">
               <ProviderRegistrationForm translations={formTranslations} />
             </CardContent>
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <aside className="space-y-8">
           <Card className="bg-secondary shadow-lg">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-secondary-foreground flex items-center">
                 <TrendingUp className="h-6 w-6 mr-3 text-primary" /> {t.whyJoinKariGaar}
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-secondary-foreground space-y-3 text-sm">
-              <p><Users className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.widerReach}</strong> {t.widerReachText}</p>
-              <p><MapPin className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.localFocus}</strong> {t.localFocusText}</p>
-              <p><Award className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.buildReputation}</strong> {t.buildReputationText}</p>
-              <p><ShieldCheck className="inline h-4 w-4 mr-1 text-primary" /> <strong>{t.verifiedPlatform}</strong> {t.verifiedPlatformText}</p>
-              <p>{t.manageJobRequestsFuture}</p>
+            <CardContent className="text-secondary-foreground space-y-4 text-sm">
+              <p><Users className="inline h-4 w-4 mr-1.5 text-primary" /> <strong>{t.widerReach}</strong> {t.widerReachText}</p>
+              <p><MapPin className="inline h-4 w-4 mr-1.5 text-primary" /> <strong>{t.localFocus}</strong> {t.localFocusText}</p>
+              <p><Award className="inline h-4 w-4 mr-1.5 text-primary" /> <strong>{t.buildReputation}</strong> {t.buildReputationText}</p>
+              <p><ShieldCheck className="inline h-4 w-4 mr-1.5 text-primary" /> <strong>{t.verifiedPlatform}</strong> {t.verifiedPlatformText}</p>
+              <p className="pt-1">{t.manageJobRequestsFuture}</p>
             </CardContent>
           </Card>
 
@@ -117,13 +117,13 @@ export default function JoinAsProPage() {
                 <Briefcase className="h-6 w-6 mr-3 text-primary" /> {t.findingJobOpportunities}
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-secondary-foreground space-y-3 text-sm">
+            <CardContent className="text-secondary-foreground space-y-4 text-sm">
               <p>{t.findingJobOpportunitiesText1}</p>
               <p>{t.findingJobOpportunitiesText2}</p>
-              <p className="text-xs text-muted-foreground">{t.findingJobOpportunitiesNote}</p>
+              <p className="text-xs text-muted-foreground pt-1">{t.findingJobOpportunitiesNote}</p>
             </CardContent>
           </Card>
-        </div>
+        </aside>
       </div>
     </div>
   );
