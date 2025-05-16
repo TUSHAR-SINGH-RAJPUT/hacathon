@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client"; // This is now the Client Component
@@ -9,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, CheckCircle, Users, Briefcase, Paintbrush, Sprout, Wrench, Sparkles, Zap, PieChart, UserCheck } from 'lucide-react';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import { Pie, Cell, ResponsiveContainer as RechartsResponsiveContainer } from "recharts";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const serviceCategories = [
   { name: 'Painting', icon: <Paintbrush className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "painting wall", bgColor: "bg-red-500/10", hoverBgColor: "hover:bg-red-500/20", iconColor: "text-red-500" },
@@ -44,6 +45,11 @@ interface PlatformHomeContentProps {
 }
 
 export default function PlatformHomeContent({ dict, locale }: PlatformHomeContentProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const featureCards = [
     {
@@ -137,50 +143,61 @@ export default function PlatformHomeContent({ dict, locale }: PlatformHomeConten
       </section>
 
       {/* Platform Metrics Section */}
-      <section className="w-full py-12 md:py-16 bg-secondary rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-secondary-foreground">{dict.ourImpact}</h2>
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
-          <Card className="bg-background">
-            <CardHeader className="items-center">
-              <PieChart className="h-10 w-10 text-primary" />
-              <CardTitle className="text-xl text-foreground">{dict.customerGrowth}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-                <RechartsResponsiveContainer width="100%" height="100%">
-                  <Pie data={customerData} dataKey="value" nameKey="name" label>
-                    {customerData.map((entry) => (
-                      <Cell key={entry.name} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                </RechartsResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card className="bg-background">
-            <CardHeader className="items-center">
-              <UserCheck className="h-10 w-10 text-primary" />
-              <CardTitle className="text-xl text-foreground">{dict.jobConnections}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-                 <RechartsResponsiveContainer width="100%" height="100%">
-                  <Pie data={jobsData} dataKey="value" nameKey="name" label>
-                    {jobsData.map((entry) => (
-                      <Cell key={entry.name} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                </RechartsResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
-        <p className="text-center text-muted-foreground mt-8 text-sm">(Numbers are illustrative)</p>
-      </section>
+      {isClient ? (
+        <section className="w-full py-12 md:py-16 bg-secondary rounded-xl shadow-lg">
+          <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-secondary-foreground">{dict.ourImpact}</h2>
+          <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+            <Card className="bg-background">
+              <CardHeader className="items-center">
+                <PieChart className="h-10 w-10 text-primary" />
+                <CardTitle className="text-xl text-foreground">{dict.customerGrowth}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+                  <RechartsResponsiveContainer width="100%" height="100%">
+                    <Pie data={customerData} dataKey="value" nameKey="name" label>
+                      {customerData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                  </RechartsResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+            <Card className="bg-background">
+              <CardHeader className="items-center">
+                <UserCheck className="h-10 w-10 text-primary" />
+                <CardTitle className="text-xl text-foreground">{dict.jobConnections}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+                   <RechartsResponsiveContainer width="100%" height="100%">
+                    <Pie data={jobsData} dataKey="value" nameKey="name" label>
+                      {jobsData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                  </RechartsResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+          <p className="text-center text-muted-foreground mt-8 text-sm">(Numbers are illustrative)</p>
+        </section>
+      ) : (
+        <section className="w-full py-12 md:py-16 bg-secondary rounded-xl shadow-lg">
+           <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-secondary-foreground">{dict.ourImpact}</h2>
+           <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+            <div className="bg-background rounded-lg shadow p-6 aspect-square flex items-center justify-center text-muted-foreground min-h-[250px]">Loading chart...</div>
+            <div className="bg-background rounded-lg shadow p-6 aspect-square flex items-center justify-center text-muted-foreground min-h-[250px]">Loading chart...</div>
+           </div>
+           <p className="text-center text-muted-foreground mt-8 text-sm">(Numbers are illustrative)</p>
+        </section>
+      )}
 
 
       {/* Testimonial/Placeholder Section */}
@@ -203,3 +220,4 @@ export default function PlatformHomeContent({ dict, locale }: PlatformHomeConten
     </div>
   );
 }
+
