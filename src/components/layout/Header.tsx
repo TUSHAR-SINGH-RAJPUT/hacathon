@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Globe } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Globe, Menu } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -24,55 +24,73 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"; // Removed Sub, SubTrigger, SubContent, Portal
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
-import { Menu } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation'; // Removed usePathname
-import React, { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from "@/lib/utils";
 
-const NavLink = ({ href, children, icon, onClick, className }: { href?: string; children: React.ReactNode; icon?: React.ReactNode; onClick?: () => void, className?: string }) => {
+interface NavLinkProps {
+  href?: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  currentPath: string;
+  locale: string;
+}
+
+const NavLink = ({ href, children, icon, onClick, className, currentPath, locale }: NavLinkProps) => {
+  const isActive = href ? currentPath === `/${locale}${href === '/' ? '' : href}` || currentPath === href : false;
+  
   const content = (
     <Button 
-      variant="ghost" 
-      className={cn("text-sm font-medium text-foreground hover:text-primary hover:bg-primary/10 flex items-center gap-2", className)}
+      variant={isActive ? "secondary" : "ghost"}
+      className={cn(
+        "text-sm font-medium flex items-center gap-2 w-full justify-start py-3 text-lg md:text-sm md:justify-center md:py-2 md:text-base",
+        isActive ? "text-primary font-semibold bg-primary/10" : "text-foreground hover:text-primary hover:bg-primary/10",
+        className
+      )}
       onClick={onClick}
     >
       {icon}
       {children}
     </Button>
   );
-  return href ? <Link href={href} passHref>{content}</Link> : content;
+  return href ? <Link href={`/${locale}${href === '/' ? '' : href}`} passHref>{content}</Link> : content;
 };
 
-// Hardcoded English translations for header
-const t = {
-  navHome: "Home", navPostJob: "Post a Job", navBrowseServices: "Browse Services",
-  navJoinAsPro: "Join as Pro", navAboutUs: "About Us", navLogin: "Login",
-  navSignUp: "Sign Up", navLogout: "Logout", myAccount: "My Account",
-  editProfile: "Edit Profile", myBookings: "My Bookings", customerSupport: "Customer Support",
-  feedbacks: "Feedbacks", security: "Security", language: "Language", // Kept for structure, but switcher removed
-  jobList: "Your Job List",
-  jobListEmpty: "Your job list is empty. Add providers!", serviceAddressOptional: "Service Address (Optional)",
-  enterAddressPlaceholder: "Enter your address or area", proceedToBooking: "Proceed to Booking"
-};
 
-export default function Header() {
+interface HeaderProps {
+  locale: string;
+  dict: any; // Dictionary for Header translations
+}
+
+export default function Header({ locale, dict: t }: HeaderProps) {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
   const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname(); // Gets the current path *without* locale
+  
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false); 
 
   useEffect(() => {
     setIsClient(true); 
   }, []);
+
+  const pathWithoutLocale = pathname.startsWith(`/${locale}`) ? pathname.substring(`/${locale}`.length) || '/' : pathname;
+
 
   const navItems = [
     { href: `/platform-home`, label: t.navHome, icon: <Home size={18} /> }, 
@@ -84,7 +102,7 @@ export default function Header() {
 
   const handleProceedToBooking = () => {
     if (cart.length > 0) {
-      router.push(`/booking-confirmation`);
+      router.push(`/${locale}/booking-confirmation`);
     }
   };
   
@@ -99,13 +117,13 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href={isLoggedIn ? `/platform-home` : `/`} passHref>
+        <Link href={isLoggedIn ? `/${locale}/platform-home` : `/${locale}/`} passHref>
           <Logo size="medium" />
         </Link>
         
         <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
           {navItems.map(item => (
-            <NavLink key={item.href} href={item.href} icon={item.icon}>
+            <NavLink key={item.href} href={item.href} icon={item.icon} currentPath={pathname} locale={locale}>
               {item.label}
             </NavLink>
           ))}
@@ -190,10 +208,25 @@ export default function Header() {
                   <DropdownMenuLabel>{t.myAccount}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {profileNavItems.map(item => (
-                     <DropdownMenuItem key={item.href} asChild><Link href={item.href} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link></DropdownMenuItem>
+                     <DropdownMenuItem key={item.href} asChild><Link href={`/${locale}${item.href}`} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link></DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  {/* Language Switcher Removed */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2 w-full cursor-pointer">
+                      <Globe size={16} /> {t.language}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem asChild>
+                          <Link href={pathWithoutLocale} locale="en" className="flex items-center gap-2 w-full">{t.english}</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={pathWithoutLocale} locale="kn" className="flex items-center gap-2 w-full">{t.kannada}</Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout}
                   </DropdownMenuItem>
@@ -201,12 +234,12 @@ export default function Header() {
               </DropdownMenu>
             ) : isClient ? (
               <>
-                <Link href={`/login`} passHref>
+                <Link href={`/${locale}/login`} passHref>
                   <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                     {t.navLogin}
                   </Button>
                 </Link>
-                <Link href={`/signup`} passHref>
+                <Link href={`/${locale}/signup`} passHref>
                   <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                     {t.navSignUp}
                   </Button>
@@ -238,7 +271,7 @@ export default function Header() {
               <div className="flex flex-col space-y-2">
                 {navItems.map(item => (
                     <SheetClose asChild key={item.href}>
-                        <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3">
+                        <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
                         {item.label}
                         </NavLink>
                     </SheetClose>
@@ -248,13 +281,28 @@ export default function Header() {
                   <>
                     {profileNavItems.map(item => (
                         <SheetClose asChild key={item.href}>
-                            <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3">
+                            <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={pathname} locale={locale}>
                             {item.label}
                             </NavLink>
                         </SheetClose>
                     ))}
                     <Separator className="my-3 bg-border" />
-                    {/* Language Switcher Removed from Mobile Menu */}
+                     <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language}</p>
+                      <Link href={pathWithoutLocale} locale="en" passHref>
+                        <SheetClose asChild>
+                            <Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">
+                            {t.english}
+                            </Button>
+                        </SheetClose>
+                      </Link>
+                      <Link href={pathWithoutLocale} locale="kn" passHref>
+                        <SheetClose asChild>
+                            <Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">
+                            {t.kannada}
+                            </Button>
+                        </SheetClose>
+                      </Link>
+                    <Separator className="my-3 bg-border" />
                     <SheetClose asChild>
                         <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
                         <LogOut size={20} /> {t.navLogout}
@@ -264,14 +312,14 @@ export default function Header() {
                 ) : isClient ? (
                   <>
                     <SheetClose asChild>
-                        <Link href={`/login`} passHref>
+                        <Link href={`/${locale}/login`} passHref>
                         <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                             <UserCircle size={20} /> {t.navLogin}
                         </Button>
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
-                        <Link href={`/signup`} passHref>
+                        <Link href={`/${locale}/signup`} passHref>
                         <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
                             {t.navSignUp}
                         </Button>

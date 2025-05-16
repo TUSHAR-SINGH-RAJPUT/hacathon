@@ -1,18 +1,25 @@
-
 import Image from 'next/image';
 import type { ServiceProvider } from '@/types';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Briefcase, MessageSquare, User } from 'lucide-react';
 import Link from 'next/link';
 import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
 
+// Assuming ProviderCard texts are simple and might not need full dictionary keys for now
+// Or, these could be passed as props if needed.
+const viewProfileText = "View Profile"; 
+const messageText = "Message";
+const reviewsText = "reviews";
+const experienceSuffix = "years experience";
+const hourlyRateSuffix = "/hr (approx)";
+
 export default function ProviderCard({ provider, locale }: { provider: ServiceProvider, locale: string }) {
   return (
     <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden transform hover:-translate-y-1">
       <CardHeader className="p-0">
-        <Link href={`/browse-providers/profile/${provider.id}`} passHref> {/* Removed locale from Link */}
+        <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref>
           <div className="relative w-full h-48 cursor-pointer group">
             <Image
               src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
@@ -25,14 +32,14 @@ export default function ProviderCard({ provider, locale }: { provider: ServicePr
           </div>
         </Link>
         <div className="p-4">
-          <Link href={`/browse-providers/profile/${provider.id}`} passHref> {/* Removed locale from Link */}
+          <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref>
             <CardTitle className="text-xl font-semibold mb-1 hover:text-primary cursor-pointer">{provider.name}</CardTitle>
           </Link>
           <div className="flex items-center text-sm text-amber-500 mb-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className={`h-5 w-5 ${i < Math.round(provider.rating) ? 'fill-current' : 'text-muted-foreground/50'}`} />
             ))}
-            <span className="ml-2 text-muted-foreground">({provider.reviewsCount} reviews)</span>
+            <span className="ml-2 text-muted-foreground">({provider.reviewsCount} {reviewsText})</span>
           </div>
         </div>
       </CardHeader>
@@ -42,11 +49,11 @@ export default function ProviderCard({ provider, locale }: { provider: ServicePr
             <MapPin className="h-4 w-4 mr-2 text-primary" /> {provider.location}
           </div>
           <div className="flex items-center">
-            <Briefcase className="h-4 w-4 mr-2 text-primary" /> {provider.experienceYears} years experience
+            <Briefcase className="h-4 w-4 mr-2 text-primary" /> {provider.experienceYears} {experienceSuffix}
           </div>
           {provider.hourlyRate && (
              <div className="flex items-center">
-                <span className="font-bold text-lg text-primary mr-1">₹{provider.hourlyRate}</span> /hr (approx)
+                <span className="font-bold text-lg text-primary mr-1">₹{provider.hourlyRate}</span> {hourlyRateSuffix}
             </div>
           )}
         </div>
@@ -64,15 +71,15 @@ export default function ProviderCard({ provider, locale }: { provider: ServicePr
       </CardContent>
       <CardFooter className="p-4 border-t">
         <div className="flex w-full gap-2">
-        <Link href={`/browse-providers/profile/${provider.id}`} passHref className="flex-1"> {/* Removed locale from Link */}
+        <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref className="flex-1">
           <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
             <User size={16} className="mr-2"/>
-            View Profile
+            {viewProfileText}
           </Button>
         </Link>
-        <Link href={`/chat/${provider.id}`} passHref className="flex-1"> {/* Removed locale from Link */}
+        <Link href={`/${locale}/chat/${provider.id}`} passHref className="flex-1">
           <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-            <MessageSquare size={16} className="mr-2" /> Message
+            <MessageSquare size={16} className="mr-2" /> {messageText}
           </Button>
         </Link>
         </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -14,8 +13,8 @@ import { Label } from '@/components/ui/label';
 interface ProviderListingsProps {
   initialProviders: ServiceProvider[];
   serviceCategories: { value: ServiceCategory; label: string }[];
-  translations: any; // For translated texts (now using hardcoded English)
-  locale: string; // Keep for ProviderCard, even if parent i18n removed
+  translations: any; 
+  locale: string;
 }
 
 const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__"; 
@@ -78,7 +77,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
                 <SelectItem value={ALL_CATEGORIES_VALUE}>{t.allCategories}</SelectItem>
                 {serviceCategories.map(category => (
                   <SelectItem key={category.value} value={category.value}>
-                    {category.label}
+                    {category.label} {/* These labels are English from dummyData */}
                   </SelectItem>
                 ))}
               </SelectContent>

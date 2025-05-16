@@ -1,15 +1,16 @@
-// @ts-nocheck comment to disable all type checking in a file
-// Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 // src/lib/dictionaries.ts
 import 'server-only';
 
-const dictionaries: Record<string, () => Promise<any>> = {
+// Define a type for the dictionary structure if it becomes complex.
+// For now, 'any' is used for simplicity.
+type Dictionary = Record<string, any>;
+
+const dictionaries: Record<string, () => Promise<Dictionary>> = {
   en: () => import('@/locales/en/common.json').then((module) => module.default),
-  hi: () => import('@/locales/hi/common.json').then((module) => module.default),
   kn: () => import('@/locales/kn/common.json').then((module) => module.default),
 };
 
-export const getDictionary = async (locale: string) => {
+export const getDictionary = async (locale: string): Promise<Dictionary> => {
   const loadDictionary = dictionaries[locale] || dictionaries.en;
   if (!dictionaries[locale]) {
     console.warn(`Dictionary for locale "${locale}" not found, falling back to "en".`);
