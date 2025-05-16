@@ -1,13 +1,27 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ListOrdered, CalendarDays, Info } from "lucide-react";
+import { ListOrdered, CalendarDays, Info, MessageCircle } from "lucide-react"; // Using MessageCircle for WhatsApp
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-// Dummy booking data
+// Dummy booking data - slightly adjusted for provider info
 const dummyBookings = [
-  { id: "dummy-booking-123", service: "House Painting", provider: "Priya Sharma", date: "2024-08-15", status: "Completed", link: "/track-service/dummy-booking-123"},
-  { id: "booking-456", service: "Garden Maintenance", provider: "Rohan Gowda", date: "2024-09-05", status: "Scheduled", link: "/track-service/dummy-booking-123"},
+  { 
+    id: "dummy-booking-123", 
+    service: "House Painting", 
+    provider: { name: "Priya Sharma", phone: "9876543210" }, // Example phone
+    date: "2024-08-15", 
+    status: "Completed", 
+    link: "/track-service/dummy-booking-123"
+  },
+  { 
+    id: "booking-456", 
+    service: "Garden Maintenance", 
+    provider: { name: "Rohan Gowda", phone: "9876543211" }, // Example phone
+    date: "2024-09-05", 
+    status: "Scheduled", 
+    link: "/track-service/dummy-booking-123" // Assuming track service page can handle different bookings
+  },
 ];
 
 // Hardcoded English strings
@@ -17,10 +31,18 @@ const t = {
   with: "With",
   trackViewDetails: "Track / View Details",
   noBookingsYet: "You have no bookings yet.",
-  findServices: "Find Services"
+  findServices: "Find Services",
+  contactOnWhatsApp: "WhatsApp" // New string
 };
   
 export default function MyBookingsPage() {
+  const handleWhatsAppClick = (providerName: string, providerPhone: string) => {
+    // In a real app, you'd construct a WhatsApp link:
+    // const whatsappLink = `https://wa.me/${providerPhone}?text=Hello%20${providerName},%20I%20have%20a%20query%20regarding%20my%20booking.`;
+    // window.open(whatsappLink, '_blank');
+    alert(`Simulating WhatsApp chat with ${providerName}. In a real app, this would open WhatsApp.`);
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-8 animate-in fade-in duration-500 space-y-8">
       <Card className="shadow-xl bg-card">
@@ -40,19 +62,29 @@ export default function MyBookingsPage() {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground">{booking.service}</h3>
-                    <p className="text-sm text-muted-foreground">{t.with}: {booking.provider}</p>
+                    <p className="text-sm text-muted-foreground">{t.with}: {booking.provider.name}</p>
                   </div>
                   <div className="text-sm text-muted-foreground flex items-center gap-2">
                     <CalendarDays className="h-4 w-4"/> {new Date(booking.date).toLocaleDateString()}
                   </div>
                 </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${booking.status === "Completed" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
+                <div className="mt-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full self-start ${booking.status === "Completed" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
                     {booking.status}
                   </span>
-                  <Link href={booking.link} passHref>
-                    <Button variant="link" className="text-primary text-sm p-0 h-auto">{t.trackViewDetails}</Button>
-                  </Link>
+                  <div className="flex gap-2 flex-wrap">
+                    <Link href={booking.link} passHref>
+                      <Button variant="link" className="text-primary text-sm p-0 h-auto">{t.trackViewDetails}</Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
+                      onClick={() => handleWhatsAppClick(booking.provider.name, booking.provider.phone)}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" /> {t.contactOnWhatsApp}
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))

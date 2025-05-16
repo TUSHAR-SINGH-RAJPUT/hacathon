@@ -41,6 +41,8 @@ const formTranslations = {
     bioPlaceholder: "Describe your skills, experience, and what makes your service stand out.",
     profileImageUrlOptional: "Profile Image URL (Optional)",
     profileImageDescription: "Link to your professional photo. If blank, a placeholder will be used.",
+    resumeOptionalPDF: "Resume (Optional, PDF only, max 5MB)", // New string
+    resumeDescription: "Upload your resume to showcase your qualifications.", // New string
     nextDocumentVerification: "Next: Document Verification",
     basicInformation: "Basic Information",
     serviceDetails: "Service Details",

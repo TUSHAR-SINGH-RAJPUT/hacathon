@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
@@ -21,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { serviceCategories } from '@/components/providers/dummyData';
 import type { ServiceCategory } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, Image as ImageIcon, Info } from "lucide-react";
+import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, ImageIcon, Info, FileUp } from "lucide-react";
 import { useRouter } from 'next/navigation';
 
 const providerFormSchema = z.object({
@@ -36,6 +37,16 @@ const providerFormSchema = z.object({
   profileImageUrl: z.string().optional().refine(val => !val || z.string().url().safeParse(val).success || val.startsWith('https://placehold.co'), {
     message: "Please enter a valid URL for profile image or leave blank for placeholder.",
   }),
+  resume: z.custom<FileList | undefined>((val) => val === undefined || val instanceof FileList, "Resume must be a FileList")
+    .refine(
+      (files) => files === undefined || files.length === 0 || (files.length === 1 && files[0].type === "application/pdf"),
+      "Please upload a single PDF file."
+    )
+    .refine(
+        (files) => files === undefined || files.length === 0 || files[0].size <= 5 * 1024 * 1024, // 5MB
+        `Resume file size should be less than 5MB.`
+    )
+    .optional(),
 });
 
 export type ProviderRegistrationData = z.infer<typeof providerFormSchema>;
@@ -58,12 +69,24 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
       bio: "",
       hourlyRate: "",
       profileImageUrl: "",
+      resume: undefined,
     },
   });
 
   function onSubmit(values: ProviderRegistrationData) {
+    let resumeFileName: string | undefined = undefined;
+    if (values.resume && values.resume.length > 0) {
+      resumeFileName = values.resume[0].name;
+    }
+
+    const dataToStore = {
+      ...values,
+      resume: undefined, // We don't store the FileList object
+      resumeFileName: resumeFileName,
+    };
+    
     if (typeof window !== "undefined") {
-      sessionStorage.setItem('providerRegistrationData', JSON.stringify(values));
+      sessionStorage.setItem('providerRegistrationData', JSON.stringify(dataToStore));
     }
     router.push('/join-as-pro/verify-documents');
   }
@@ -248,6 +271,25 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                     <Input placeholder="https://example.com/your-image.png or https://placehold.co/..." {...field} />
                   </FormControl>
                   <FormDescription>{t.profileImageDescription || "Link to your professional photo. If blank, a placeholder will be used."}</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="resume"
+              render={({ field: { onChange, value, ...restField } }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center"><FileUp className="h-4 w-4 mr-2 text-primary" />{t.resumeOptionalPDF || "Resume (Optional, PDF only, max 5MB)"}</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={(e) => onChange(e.target.files)} 
+                      {...restField}
+                    />
+                  </FormControl>
+                  <FormDescription>{t.resumeDescription || "Upload your resume to showcase your qualifications."}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

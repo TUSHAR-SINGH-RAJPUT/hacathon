@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
@@ -20,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card";
 import { ShieldCheck, FileText } from "lucide-react";
-import type { ProviderRegistrationData } from './ProviderRegistrationForm';
+import type { ProviderRegistrationData } from './ProviderRegistrationForm'; // Ensure this type is compatible
 import { useRouter } from 'next/navigation';
 
 const documentVerificationSchema = z.object({
@@ -41,6 +42,10 @@ interface DocumentVerificationFormProps {
   translations: any;
 }
 
+interface StoredProviderData extends Omit<ProviderRegistrationData, 'resume'> { // Omit FileList
+  resumeFileName?: string;
+}
+
 export default function DocumentVerificationForm({ translations: t }: DocumentVerificationFormProps) {
   const { toast } = useToast();
   const router = useRouter();
@@ -55,11 +60,11 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
   });
 
   function onSubmit(values: z.infer<typeof documentVerificationSchema>) {
-    let initialData: ProviderRegistrationData | null = null;
+    let initialData: StoredProviderData | null = null;
     if (typeof window !== "undefined") {
       const storedData = sessionStorage.getItem('providerRegistrationData');
       if (storedData) {
-        initialData = JSON.parse(storedData);
+        initialData = JSON.parse(storedData) as StoredProviderData;
       }
     }
 
@@ -74,7 +79,7 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
     }
 
     const completeRegistrationData = {
-      ...initialData,
+      ...initialData, // This includes resumeFileName if it was stored
       ...values,
     };
 
