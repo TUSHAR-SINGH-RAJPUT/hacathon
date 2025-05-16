@@ -16,36 +16,42 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<CartItem[]>(() => {
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [customerAddress, setCustomerAddress] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false); // To track if data has been loaded from localStorage
+
+  // Load cart and address from localStorage on initial client-side mount
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const localCart = localStorage.getItem('kariGaarCart');
-      return localCart ? JSON.parse(localCart) : [];
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+      const localAddress = localStorage.getItem('kariGaarCustomerAddress');
+      if (localAddress) {
+        setCustomerAddress(localAddress);
+      }
+      setIsLoaded(true); // Mark as loaded
     }
-    return [];
-  });
+  }, []);
 
-  const [customerAddress, setCustomerAddress] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('kariGaarCustomerAddress') || null;
-    }
-    return null;
-  });
-
+  // Persist cart to localStorage whenever it changes, but only after initial load
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && isLoaded) {
       localStorage.setItem('kariGaarCart', JSON.stringify(cart));
     }
-  }, [cart]);
+  }, [cart, isLoaded]);
 
+  // Persist customerAddress to localStorage whenever it changes, but only after initial load
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && isLoaded) {
       if (customerAddress) {
         localStorage.setItem('kariGaarCustomerAddress', customerAddress);
       } else {
         localStorage.removeItem('kariGaarCustomerAddress');
       }
     }
-  }, [customerAddress]);
+  }, [customerAddress, isLoaded]);
 
 
   const addToCart = (provider: ServiceProvider) => {
@@ -80,3 +86,4 @@ export const useCart = () => {
   }
   return context;
 };
+
