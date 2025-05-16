@@ -9,13 +9,13 @@ import type { ServiceProvider, Review } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react'; // Added Loader2, ArrowLeft, ArrowRight
+import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Separator } from '@/components/ui/separator';
 
 const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
@@ -61,11 +61,13 @@ export default function ProviderProfilePage() {
   const [userRating, setUserRating] = useState(0);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  const [isHoveringReviews, setIsHoveringReviews] = useState(false);
+  const reviewIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const foundProvider = dummyProviders.find(p => p.id === providerId);
     setProvider(foundProvider);
-    setCurrentReviewIndex(0); // Reset index when provider changes
+    setCurrentReviewIndex(0); 
   }, [providerId]);
 
   const handleNextReview = () => {
@@ -79,6 +81,23 @@ export default function ProviderProfilePage() {
       setCurrentReviewIndex((prevIndex) => (prevIndex - 1 + provider.reviews!.length) % provider.reviews!.length);
     }
   };
+
+  useEffect(() => {
+    if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
+      reviewIntervalRef.current = setInterval(() => {
+        handleNextReview();
+      }, 5000); // Change slide every 5 seconds
+    } else {
+      if (reviewIntervalRef.current) {
+        clearInterval(reviewIntervalRef.current);
+      }
+    }
+    return () => {
+      if (reviewIntervalRef.current) {
+        clearInterval(reviewIntervalRef.current);
+      }
+    };
+  }, [provider, isHoveringReviews, provider?.reviews?.length]);
 
 
   if (!provider) {
@@ -129,7 +148,7 @@ export default function ProviderProfilePage() {
     }
     setIsSubmittingReview(true);
     console.log("Submitting review:", { providerId: provider.id, rating: userRating, comment: userReview });
-    // Simulate API call
+    
     setTimeout(() => {
       const newReview: Review = {
         id: `review-${Date.now()}`,
@@ -141,7 +160,6 @@ export default function ProviderProfilePage() {
       setProvider(prev => {
         if (!prev) return undefined;
         const updatedReviews = [newReview, ...(prev.reviews || [])];
-        // Reset slideshow to show the new review first
         setCurrentReviewIndex(0); 
         return { ...prev, reviews: updatedReviews, reviewsCount: (prev.reviewsCount || 0) + 1 };
       });
@@ -250,7 +268,11 @@ export default function ProviderProfilePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {provider.reviews && provider.reviews.length > 0 ? (
-            <div className="relative">
+            <div 
+              className="relative group"
+              onMouseEnter={() => setIsHoveringReviews(true)}
+              onMouseLeave={() => setIsHoveringReviews(false)}
+            >
               <Card className="bg-background p-4 shadow-sm min-h-[150px] flex flex-col justify-center transition-opacity duration-300 ease-in-out">
                 {currentReview ? (
                   <>
@@ -268,18 +290,30 @@ export default function ProviderProfilePage() {
                 )}
               </Card>
               {provider.reviews.length > 1 && (
-                <div className="flex justify-between items-center mt-4">
-                  <Button variant="outline" onClick={handlePrevReview} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                    <ArrowLeft className="h-4 w-4 mr-2" /> Previous
+                <div className={`absolute inset-0 flex justify-between items-center transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0'}`}>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handlePrevReview} 
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background text-primary border-primary hover:text-primary-foreground"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
                   </Button>
-                  <span className="text-sm text-muted-foreground">
-                    {currentReviewIndex + 1} of {provider.reviews.length}
-                  </span>
-                  <Button variant="outline" onClick={handleNextReview} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                    Next <ArrowRight className="h-4 w-4 ml-2" />
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handleNextReview} 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background text-primary border-primary hover:text-primary-foreground"
+                  >
+                    <ArrowRight className="h-5 w-5" />
                   </Button>
                 </div>
               )}
+               {provider.reviews.length > 1 && (
+                 <div className={`text-center text-xs text-muted-foreground mt-2 transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                    {currentReviewIndex + 1} of {provider.reviews.length}
+                  </div>
+               )}
             </div>
           ) : (
             <p className="text-muted-foreground">No reviews yet for {provider.name}. Be the first to add one!</p>
@@ -325,3 +359,4 @@ export default function ProviderProfilePage() {
     </div>
   );
 }
+
