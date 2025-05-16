@@ -1,29 +1,15 @@
 
-"use client"; // Add "use client" because we are using useState and event handlers
+"use client";
 
-import type {Metadata} from 'next';
-// import { GeistSans } from 'geist/font/sans'; // Assuming Geist is set up correctly
-// import { GeistMono } from 'geist/font/mono'; // Assuming Geist is set up correctly
 import './globals.css';
 import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { cn } from "@/lib/utils";
-import React, { useState } from 'react'; // Import useState
-import Script from 'next/script'; // Import Script
-import { MessageCircle, X as CloseIcon } from 'lucide-react'; // Import icons
-
-// If you are using Geist font, uncomment the imports above and the variables below
-// const geistSansVariable = GeistSans.variable;
-// const geistMonoVariable = GeistMono.variable;
-
-// Metadata should be defined outside the component for static export
-// export const metadata: Metadata = { // This will cause issues in a "use client" component.
-//   title: 'kariGaar - Your Local Service Solution',
-//   description: 'Find reliable local service professionals for all your needs.',
-// };
-// For client components, handle title/description via Head or dynamically if needed
+import React, { useState, useEffect } from 'react';
+import Script from 'next/script';
+import { MessageCircle, X as CloseIcon } from 'lucide-react';
 
 export default function RootLayout({
   children,
@@ -32,26 +18,41 @@ export default function RootLayout({
 }>) {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Define hardcoded text for the chat UI, as layout doesn't fetch dictionaries directly
   const tLayout = {
     chatWithUsTitle: "Chat with Our Assistant",
     chatWithUs: "Chat with Us",
     closeChat: "Close Chat"
   };
 
+  // Function to initialize Google Translate Element
+  // This needs to be globally accessible for the Google script's callback
+  useEffect(() => {
+    const existingScript = document.getElementById('google-translate-api');
+    if (!existingScript) {
+      const addScript = document.createElement('script');
+      addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit');
+      addScript.setAttribute('id', 'google-translate-api');
+      document.body.appendChild(addScript);
+    }
+    
+    if (!(window as any).googleTranslateElementInit) {
+        (window as any).googleTranslateElementInit = () => {
+        new (window as any).google.translate.TranslateElement(
+          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE },
+          'google_translate_element'
+        );
+      };
+    }
+  }, []);
+
+
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        {/* For "use client" layouts, metadata export is not directly supported.
-            You can use <Head> from 'next/head' inside the return if needed,
-            or manage title/description via other means.
-            For simplicity, I'm commenting out the static metadata export here.
-            If you need dynamic titles per page, you'd handle that in page components.
-        */}
         <title>kariGaar - Your Local Service Solution</title>
         <meta name="description" content="Find reliable local service professionals for all your needs." />
       </head>
-      <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}> {/* Fallback font-sans if Geist is not used */}
+      <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
           <CartProvider>
             <Header />
@@ -60,12 +61,12 @@ export default function RootLayout({
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
+              <div id="google_translate_element" className="mb-4"></div>
               © {new Date().getFullYear()} kariGaar. All rights reserved.
             </footer>
           </CartProvider>
         </AuthProvider>
 
-        {/* Floating Chat Button & Panel */}
         {!isChatOpen && (
           <button
             onClick={() => setIsChatOpen(true)}
@@ -104,7 +105,7 @@ export default function RootLayout({
                 style={{
                   minWidth: '100%',
                   maxWidth: '100%',
-                  height: '100%', // Changed to 100% to fill container
+                  height: '100%',
                   border: 'none',
                   width: '100%',
                 }}
@@ -117,7 +118,7 @@ export default function RootLayout({
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">
           {`
-            if (typeof window !== 'undefined') { // Ensure window is defined
+            if (typeof window !== 'undefined') { 
               if (window.jotformEmbedHandler) {
                 window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
               } else {
