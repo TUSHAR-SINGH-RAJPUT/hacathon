@@ -24,8 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Removed className="dark" to default to light theme defined in :root
-    <html lang="en" suppressHydrationWarning> 
+    <html lang="en" className="dark" suppressHydrationWarning> {/* Ensure "dark" class is here */}
       <body className={`${geistSans.variable} antialiased flex flex-col min-h-screen bg-background`}>
         <AuthProvider>
           <CartProvider> 

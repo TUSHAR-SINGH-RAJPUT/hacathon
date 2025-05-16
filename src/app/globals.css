@@ -5,24 +5,24 @@
 
 @layer base {
   :root {
-    /* Light Theme (New Default) */
-    --background: 210 17% 98%; /* Page BG - Light Gray #F9FAFB */
-    --foreground: 0 0% 13%; /* Near Black/Very Dark Gray - for main body text */
+    /* Default Light Theme (fallback, based on original app style before dark themes) */
+    --background: 210 17% 98%; /* Light Gray #F9FAFB */
+    --foreground: 0 0% 13%; /* Near Black */
 
-    --card: 0 0% 100%; /* Card BG - White #FFFFFF */
-    --card-foreground: 0 0% 13%; /* Near Black/Very Dark Gray on cards */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
 
-    --primary: 259 87% 61%; /* Primary Purple #7B47F1 */
+    --primary: 259 87% 61%; /* Original Primary Purple */
     --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    --secondary: 260 87% 95%; /* CTA Background - Light Lavender #EFE6FD */
-    --secondary-foreground: 269 53% 37%; /* Text on CTA - Rich Purple #5C2D91 */
+    --secondary: 260 87% 95%; /* Light Lavender for CTA type backgrounds */
+    --secondary-foreground: 269 53% 37%; /* Rich Purple Text on secondary */
 
     --muted: 210 17% 92%; /* Muted BG - slightly darker light gray */
-    --muted-foreground: 220 6% 49%; /* Secondary Text Gray #6B7280 for descriptive text */
+    --muted-foreground: 220 6% 49%; /* Secondary Text Gray */
 
     --accent: 259 60% 75%; /* A Lighter Purple - for general accents */
     --accent-foreground: 0 0% 100%; /* White text for these accents */
@@ -36,68 +36,71 @@
 
     --radius: 0.5rem;
 
-    --chart-1: 259 87% 61%; /* Primary Purple */
-    --chart-2: 259 60% 75%; /* Lighter Purple */
-    --chart-3: 330 70% 65%; /* Pink/Magenta */
-    --chart-4: 269 53% 55%; /* Muted Rich Purple */
-    --chart-5: 240 60% 70%; /* Blue/Indigo */
+    --chart-1: 259 87% 61%;
+    --chart-2: 259 60% 75%;
+    --chart-3: 330 70% 65%;
+    --chart-4: 269 53% 55%;
+    --chart-5: 240 60% 70%;
 
     /* Sidebar variables for light theme */
     --sidebar-background: 210 17% 95%;
     --sidebar-foreground: 0 0% 13%;
     --sidebar-primary: 259 87% 61%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 87% 95%; 
+    --sidebar-accent: 260 87% 95%;
     --sidebar-accent-foreground: 269 53% 37%;
     --sidebar-border: 210 17% 88%;
     --sidebar-ring: 259 87% 61%;
   }
 
   .dark {
-    /* Dark Theme */
-    --background: 260 20% 10%; 
-    --foreground: 210 20% 95%; 
+    /* Dark Teal Theme */
+    --background: 222 47% 11%; /* Dark Navy Blue e.g., #111827 */
+    --foreground: 210 40% 98%; /* Almost White e.g., #f9fafb */
 
-    --card: 260 20% 15%; 
-    --card-foreground: 210 20% 95%;
+    --card: 222 47% 15%; /* Slightly Lighter Navy for cards e.g., #1f2937 */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 260 20% 10%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 222 47% 11%; /* Popover BG */
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 259 80% 70%; 
-    --primary-foreground: 260 80% 15%; 
+    --primary: 173 80% 40%;  /* Vibrant Teal e.g., #14B8A6 */
+    --primary-foreground: 180 100% 5%; /* Very dark, almost black, for text on Teal */
 
-    --secondary: 269 53% 25%; 
-    --secondary-foreground: 260 87% 90%;
+    --secondary: 215 28% 25%; /* Muted Dark Blue/Slate for secondary elements e.g., #2d3748 */
+    --secondary-foreground: 210 40% 96%; /* Light text on secondary */
 
-    --muted: 260 20% 22%; 
-    --muted-foreground: 220 10% 65%; 
+    --muted: 215 28% 17%; /* Even darker muted for less emphasis e.g., #1a202c */
+    --muted-foreground: 215 20% 65%; /* Muted text e.g., #a0aec0 */
 
-    --accent: 259 70% 60%; 
-    --accent-foreground: 210 20% 95%; 
+    --accent: 180 70% 55%; /* Brighter Cyan/Teal for accents e.g., #2dd4bf */
+    --accent-foreground: 180 100% 5%; /* Dark text for accents */
 
-    --destructive: 0 65% 55%; 
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 65% 55%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
 
-    --border: 260 20% 25%;
-    --input: 260 20% 18%;
-    --ring: 259 80% 70%;
-    
-    --chart-1: 259 80% 70%;
-    --chart-2: 259 70% 60%;
-    --chart-3: 330 70% 65%; 
-    --chart-4: 269 40% 45%;
-    --chart-5: 240 60% 70%;
+    --border: 215 28% 20%; /* Borders e.g., #293140 */
+    --input: 215 28% 17%; /* Input background */
+    --ring: 173 70% 50%; /* Teal for focus rings (slightly lighter for visibility) */
+
+    --radius: 0.5rem;
+
+    /* Dark Theme Chart Colors - Teal based */
+    --chart-1: 173 80% 40%; /* Primary Teal */
+    --chart-2: 180 70% 55%; /* Accent Teal/Cyan */
+    --chart-3: 173 60% 60%; /* Lighter Teal */
+    --chart-4: 215 28% 45%; /* Muted Blue for contrast */
+    --chart-5: 173 40% 70%; /* Desaturated Teal */
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 260 20% 12%;
-    --sidebar-foreground: 210 20% 95%;
-    --sidebar-primary: 259 80% 70%;
-    --sidebar-primary-foreground: 260 80% 15%;
-    --sidebar-accent: 259 50% 35%;
-    --sidebar-accent-foreground: 260 20% 90%;
-    --sidebar-border: 260 20% 25%;
-    --sidebar-ring: 259 80% 70%;
+    --sidebar-background: 222 47% 9%; /* Slightly darker than main dark bg */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 173 80% 40%; /* Teal */
+    --sidebar-primary-foreground: 180 100% 5%;
+    --sidebar-accent: 215 28% 20%; /* Muted Blue for sidebar accents */
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 215 28% 15%;
+    --sidebar-ring: 173 70% 50%;
   }
 }
 
@@ -109,13 +112,14 @@
     @apply bg-background text-foreground;
     font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
-  /* Ensure headings use the specified black text color in light mode, and main foreground in dark mode */
   h1, h2, h3, h4, h5, h6 {
-    @apply text-foreground; /* Default to main foreground */
+    @apply text-foreground;
   }
-  :root h1, :root h2, :root h3, :root h4, :root h5, :root h6 {
+  /* Headings for light theme (if :root is light and no .dark class) */
+  :root:not(.dark) h1, :root:not(.dark) h2, :root:not(.dark) h3, :root:not(.dark) h4, :root:not(.dark) h5, :root:not(.dark) h6 {
      color: #000000; /* Main headings Text Black for light theme */
   }
+   /* Headings for dark theme */
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
      color: hsl(var(--foreground)); /* Use dark theme foreground for headings */
   }
