@@ -1,12 +1,12 @@
-// This file was part of the [locale] routing structure for i18n.
-// As i18n is being reverted, this file is no longer needed.
-// Its logic has been merged back into /src/app/loading.tsx.
+// This file was part of the [locale] routing structure for i18n, specifically for the login route.
+// As i18n is being reverted, this file (and the entire /src/app/[locale] directory) is no longer needed.
+// A general loading.tsx at /src/app/loading.tsx should suffice.
 // Please delete the /src/app/[locale] directory.
 
 import React from 'react';
 import Logo from '@/components/Logo';
 
-export default function ObsoleteLoadingForLocale() {
+export default function ObsoleteLoginLoadingForLocale() {
   // This is a minimal loading component to satisfy Next.js if it's looking for it.
   // It should be deleted if the [locale] directory is removed.
   return (
@@ -14,7 +14,7 @@ export default function ObsoleteLoadingForLocale() {
       <div className="animate-pulse">
         <Logo size="xlarge" />
       </div>
-      <p className="mt-4 text-lg text-muted-foreground">Loading...</p>
+      <p className="mt-4 text-lg text-muted-foreground">Loading Login...</p>
     </div>
   );
 }
