@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
@@ -10,7 +11,7 @@ import type { ServiceProvider, Review } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users as UsersIcon, ShoppingCart, Paintbrush, Sprout, Wrench, Sparkles, Zap, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users as UsersIcon, ShoppingCart, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
@@ -18,23 +19,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import React, { useState, useEffect, useRef } from 'react';
 import { Separator } from '@/components/ui/separator';
+import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon'; // Updated import
 
 // Client component, translations would be passed or from context.
 // For now, using hardcoded English text where translations aren't easily available.
-
-const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
-  const icons: Record<ServiceProvider['serviceTypes'][0], React.ReactNode> = {
-    Painting: <Paintbrush className="h-5 w-5 mr-2 text-primary" />,
-    Gardening: <Sprout className="h-5 w-5 mr-2 text-primary" />,
-    Plumbing: <Wrench className="h-5 w-5 mr-2 text-primary" />,
-    Cleaning: <Sparkles className="h-5 w-5 mr-2 text-primary" />,
-    Electrical: <Zap className="h-5 w-5 mr-2 text-primary" />,
-    Handyman: <UsersIcon className="h-5 w-5 mr-2 text-primary" />, 
-    Landscaping: <Sprout className="h-5 w-5 mr-2 text-primary" />,
-    Other: <Briefcase className="h-5 w-5 mr-2 text-primary" />,
-  };
-  return icons[type] || <Briefcase className="h-5 w-5 mr-2 text-primary" />;
-};
 
 const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
   return (
@@ -129,7 +117,7 @@ export default function ProviderProfilePage() {
     if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
       reviewIntervalRef.current = setInterval(() => {
         handleNextReview();
-      }, 5000);
+      }, 5000); // Auto-scroll every 5 seconds
     } else {
       if (reviewIntervalRef.current) {
         clearInterval(reviewIntervalRef.current);
@@ -254,7 +242,7 @@ export default function ProviderProfilePage() {
                 <div className="flex flex-wrap gap-3">
                   {provider.serviceTypes.map(service => (
                     <Badge key={service} variant="secondary" className="text-sm py-1 px-3 bg-secondary text-secondary-foreground flex items-center shadow-sm">
-                      <ServiceTypeIcon type={service} />
+                      <ServiceTypeIcon type={service} className="h-5 w-5 mr-2 text-primary" /> 
                       {service}
                     </Badge>
                   ))}

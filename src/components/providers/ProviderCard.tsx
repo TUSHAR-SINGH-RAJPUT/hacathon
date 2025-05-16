@@ -6,21 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Briefcase, MessageSquare, User } from 'lucide-react';
 import Link from 'next/link';
-import { Paintbrush, Sprout, Wrench, Sparkles, Zap, Users as UsersIcon } from 'lucide-react'; // Renamed Users to UsersIcon
-
-const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] }) => {
-  const icons: Record<ServiceProvider['serviceTypes'][0], React.ReactNode> = {
-    Painting: <Paintbrush className="h-4 w-4 mr-1 inline-block" />,
-    Gardening: <Sprout className="h-4 w-4 mr-1 inline-block" />,
-    Plumbing: <Wrench className="h-4 w-4 mr-1 inline-block" />,
-    Cleaning: <Sparkles className="h-4 w-4 mr-1 inline-block" />,
-    Electrical: <Zap className="h-4 w-4 mr-1 inline-block" />,
-    Handyman: <UsersIcon className="h-4 w-4 mr-1 inline-block" />, // Used UsersIcon
-    Landscaping: <Sprout className="h-4 w-4 mr-1 inline-block" />,
-    Other: <Briefcase className="h-4 w-4 mr-1 inline-block" />,
-  };
-  return icons[type] || <Briefcase className="h-4 w-4 mr-1 inline-block" />;
-};
+import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon'; // Updated import
 
 export default function ProviderCard({ provider, locale }: { provider: ServiceProvider, locale: string }) {
   return (
@@ -69,7 +55,7 @@ export default function ProviderCard({ provider, locale }: { provider: ServicePr
           <div className="flex flex-wrap gap-2">
             {provider.serviceTypes.slice(0, 3).map((type) => (
               <Badge key={type} variant="secondary" className="bg-secondary text-secondary-foreground flex items-center">
-                <ServiceTypeIcon type={type} /> {type}
+                <ServiceTypeIcon type={type} className="h-4 w-4 mr-1 inline-block" /> {type}
               </Badge>
             ))}
             {provider.serviceTypes.length > 3 && <Badge variant="outline">+{provider.serviceTypes.length - 3} more</Badge>}

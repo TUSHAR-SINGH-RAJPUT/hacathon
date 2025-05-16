@@ -1,3 +1,4 @@
+
 // @ts-nocheck comment to disable all type checking in a file
 // Remove the @ts-nocheck comment above after you have fixed all the type errors in this file
 "use client";
@@ -31,17 +32,7 @@ import { Loader2, Wand2, Users, Briefcase, MessageSquare, MapPin, Clock, Calenda
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card";
 import type { ServiceCategory } from "@/types";
-
-const serviceCategories: { value: ServiceCategory; label: string }[] = [
-  { value: "Painting", label: "Painting" },
-  { value: "Gardening", label: "Gardening" },
-  { value: "Plumbing", label: "Plumbing" },
-  { value: "Cleaning", label: "Cleaning" },
-  { value: "Electrical", label: "Electrical" },
-  { value: "Handyman", label: "General Handyman" },
-  { value: "Landscaping", label: "Landscaping" },
-  { value: "Other", label: "Other" },
-];
+import { serviceCategories as allServiceCategories } from '@/components/providers/dummyData'; // Import from dummyData
 
 const urgencyLevels = ["Urgent (ASAP)", "Within a week", "Flexible (within a month)"];
 const jobSizes = ["Small (e.g., minor repair, single room)", "Medium (e.g., multiple rooms, larger task)", "Large (e.g., full renovation, extensive work)"];
@@ -49,7 +40,7 @@ const jobSizes = ["Small (e.g., minor repair, single room)", "Medium (e.g., mult
 const formSchema = z.object({
   jobTitle: z.string().min(5, { message: "Job title must be at least 5 characters." }).max(100),
   jobDescription: z.string().min(20, { message: "Description must be at least 20 characters." }).max(1000),
-  serviceType: z.enum(serviceCategories.map(sc => sc.value) as [ServiceCategory, ...ServiceCategory[]], {
+  serviceType: z.enum(allServiceCategories.map(sc => sc.value) as [ServiceCategory, ...ServiceCategory[]], { // Use imported categories
     errorMap: () => ({ message: "Please select a service type." }),
   }),
   location: z.string().min(3, { message: "Location is required." }).max(100),
@@ -186,7 +177,7 @@ export default function JobPostingForm({ translations: t }: JobPostingFormProps)
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {serviceCategories.map(category => (
+                      {allServiceCategories.map(category => ( // Use imported categories
                         <SelectItem key={category.value} value={category.value}>
                           {category.label}
                         </SelectItem>
