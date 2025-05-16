@@ -100,7 +100,7 @@ export default function Header() {
     customerSupport: "Customer Support",
     feedbacks: "Feedbacks",
     security: "Security",
-    language: "Language",
+    language: "Language", // Kept for potential future use, but switcher logic is removed
     english: "English",
     hindi: "Hindi",
     kannada: "Kannada",
@@ -234,6 +234,7 @@ export default function Header() {
                      </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
+                  {/* Removed Language Submenu */}
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout}
                   </DropdownMenuItem>
@@ -320,6 +321,7 @@ export default function Header() {
                     </SheetClose>
                   </>
                 ) : null }
+                {/* Removed Mobile Language Switcher Section */}
               </div>
             </SheetContent>
           </Sheet>
