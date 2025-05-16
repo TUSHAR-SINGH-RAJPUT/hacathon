@@ -1,13 +1,14 @@
 
-"use client"; // This page uses styled-jsx and client-side animations/interactions
+"use client"; 
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
+import { ArrowRight, Zap, Lightbulb, Users, Target, MessageCircle } from 'lucide-react';
 import Logo from '@/components/Logo';
 import Script from 'next/script';
-import React from 'react';
+import React, { useState } from 'react'; // Added useState
+import { X as CloseIcon } from 'lucide-react'; // For close button
 
 // Hardcoded English strings since i18n was reverted
 const t = {
@@ -27,9 +28,13 @@ const t = {
   readyToSimplify: "Ready to Simplify Your Service Needs?",
   joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes.",
   chatWithUs: "Chat with Our Assistant",
+  chatWithUsTitle: "Chat with Our Assistant",
+  closeChat: "Close Chat"
 };
 
 export default function LandingPage() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
   return (
     <div className="flex flex-col min-h-screen animate-in fade-in duration-700">
       {/* Hero Section */}
@@ -111,7 +116,7 @@ export default function LandingPage() {
         </div>
       </section>
       
-      {/* Chatbot Section - Restored direct embed */}
+      {/* Chatbot Section - Restored direct embed
       <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">{t.chatWithUs}</h2>
@@ -120,7 +125,6 @@ export default function LandingPage() {
               id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
               title="Tyrone: Job Application Assistant"
               onLoad={(e: any) => {
-                // Simpler onLoad: try to scroll parent if available
                 if (e.target && e.target.contentWindow && e.target.contentWindow.parent) {
                    try {
                     e.target.contentWindow.parent.scrollTo(0, 0);
@@ -129,7 +133,7 @@ export default function LandingPage() {
                    }
                 }
               }}
-              allowtransparency="true" // Corrected casing
+              allowtransparency="true"
               allow="geolocation; microphone; camera; fullscreen"
               src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
               frameBorder="0"
@@ -145,6 +149,69 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      */}
+      
+      <section className="py-16 md:py-20 text-center bg-secondary">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">{t.readyToSimplify}</h2>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10">
+            {t.joinCommunityText}
+          </p>
+          <Link href="/platform-home" passHref>
+            <Button size="lg" className="px-10 py-6 text-lg transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
+              {t.explorePlatform} <ArrowRight className="ml-3 h-6 w-6" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Floating Chat Button */}
+      {!isChatOpen && (
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-6 right-6 bg-primary text-primary-foreground p-4 rounded-full shadow-xl hover:bg-primary/90 transition-all duration-300 z-[9999]"
+          aria-label={t.chatWithUs}
+        >
+          <MessageCircle size={28} />
+        </button>
+      )}
+
+      {/* Chat Panel */}
+      {isChatOpen && (
+        <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full h-full sm:w-[400px] sm:h-[700px] bg-card text-card-foreground shadow-2xl rounded-t-lg sm:rounded-lg flex flex-col z-[10000] overflow-hidden">
+          <div className="flex items-center justify-between p-3 border-b bg-secondary text-secondary-foreground">
+            <h3 className="font-semibold text-lg">{t.chatWithUsTitle}</h3>
+            <button onClick={() => setIsChatOpen(false)} className="p-1 rounded-md hover:bg-secondary/80" aria-label={t.closeChat}>
+              <CloseIcon size={20} />
+            </button>
+          </div>
+          <div className="flex-grow overflow-hidden">
+            <iframe
+              id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
+              title="Tyrone: Job Application Assistant"
+              onLoad={(e: any) => {
+                 if (e.target && e.target.contentWindow && e.target.contentWindow.parent) {
+                   try {
+                    e.target.contentWindow.parent.scrollTo(0, 0);
+                   } catch (err) {
+                    console.warn("Could not scroll parent window from iframe onload:", err);
+                   }
+                }
+              }}
+              allowtransparency="true"
+              allow="geolocation; microphone; camera; fullscreen"
+              src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
+              frameBorder="0"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              scrolling="no"
+            ></iframe>
+          </div>
+        </div>
+      )}
       
       <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
       <Script id="jotform-init" strategy="lazyOnload">
@@ -164,20 +231,6 @@ export default function LandingPage() {
           }
         `}
       </Script>
-
-      <section className="py-16 md:py-20 text-center bg-secondary">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-6">{t.readyToSimplify}</h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10">
-            {t.joinCommunityText}
-          </p>
-          <Link href="/platform-home" passHref>
-            <Button size="lg" className="px-10 py-6 text-lg transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
-              {t.explorePlatform} <ArrowRight className="ml-3 h-6 w-6" />
-            </Button>
-          </Link>
-        </div>
-      </section>
       
       <style jsx global>{`
         .animate-bounce-slow {
