@@ -1,17 +1,17 @@
 
 import type {Metadata} from 'next';
-// import { Geist } from 'next/font/google'; // Temporarily removed for diagnostics
+// import { GeistSans } from 'geist/font/sans'; // Assuming Geist is set up correctly
+// import { GeistMono } from 'geist/font/mono'; // Assuming Geist is set up correctly
 import './globals.css';
 import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
-// import { cn } from "@/lib/utils"; // cn was only used for geistSans.variable
+import { cn } from "@/lib/utils";
 
-// const geistSans = Geist({ // Temporarily removed for diagnostics
-//   subsets: ['latin'],
-//   variable: '--font-geist-sans',
-// });
+// If you are using Geist font, uncomment the imports above and the variables below
+// const geistSansVariable = GeistSans.variable;
+// const geistMonoVariable = GeistMono.variable;
 
 export const metadata: Metadata = {
   title: 'kariGaar - Your Local Service Solution',
@@ -25,8 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      {/* <body className={cn(geistSans.variable, "antialiased flex flex-col min-h-screen bg-background")}> */}
-      <body className={`antialiased flex flex-col min-h-screen bg-background`}> {/* Simplified body class, removed geistSans.variable */}
+      {/* Ensure no whitespace or invalid elements are direct children of <html> here */}
+      {/* <body className={cn(geistSansVariable, geistMonoVariable, "antialiased flex flex-col min-h-screen bg-background")}> */}
+      <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}> {/* Fallback font-sans if Geist is not used */}
         <AuthProvider>
           <CartProvider>
             <Header />
@@ -43,7 +44,7 @@ export default function RootLayout({
           Reminder: If you've added the Botpress script or any other third-party scripts,
           ensure they are placed INSIDE the <body> tag, ideally just before the closing </body> tag.
           Incorrect placement (e.g., directly under <html> or after </body>)
-          can cause hydration errors like the one you're seeing.
+          can cause hydration errors.
         */}
       </body>
     </html>
