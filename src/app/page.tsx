@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
 import Logo from '@/components/Logo';
+import Script from 'next/script'; // Import the Script component
 
 // Hardcoded English strings since i18n was reverted
 const t = {
@@ -23,7 +24,8 @@ const t = {
   trust: "Trust",
   trustText: "Building a platform where quality service and reliability are paramount.",
   readyToSimplify: "Ready to Simplify Your Service Needs?",
-  joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes."
+  joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes.",
+  chatWithUs: "Chat with Our Assistant"
 };
 
 // Content from LandingPageContent.tsx is now directly here
@@ -31,7 +33,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen animate-in fade-in duration-700">
       {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center flex-grow text-center py-16 md:py-24 px-4 bg-gradient-to-br from-background via-card/30 to-background overflow-hidden">
+      <section className="relative flex flex-col items-center justify-center text-center py-16 md:py-24 px-4 bg-gradient-to-br from-background via-card/30 to-background overflow-hidden">
         <Image
           src="https://placehold.co/200x200.png"
           alt="Service Professional"
@@ -108,6 +110,51 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Jotform Chatbot Section */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">{t.chatWithUs}</h2>
+          <div className="max-w-3xl mx-auto bg-card p-4 sm:p-6 rounded-xl shadow-2xl">
+            <iframe
+              id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
+              title="Tyrone: Job Application Assistant"
+              onLoad={(e: any) => e.target.parentElement.scrollTo(0, 0)}
+              allowTransparency={true}
+              allow="geolocation; microphone; camera; fullscreen"
+              src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
+              frameBorder="0"
+              style={{
+                minWidth: '100%',
+                maxWidth: '100%',
+                height: '688px',
+                border: 'none',
+                width: '100%',
+              }}
+              scrolling="no"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+      <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
+      <Script id="jotform-init" strategy="lazyOnload">
+        {`
+          if (window.jotformEmbedHandler) {
+            window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
+          } else {
+            // Fallback or retry mechanism if handler isn't ready immediately
+            const iframe = document.getElementById('JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e');
+            if (iframe) {
+              const checkHandler = setInterval(() => {
+                if (window.jotformEmbedHandler) {
+                  clearInterval(checkHandler);
+                  window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
+                }
+              }, 100);
+            }
+          }
+        `}
+      </Script>
 
       <section className="py-16 md:py-20 text-center bg-secondary">
         <div className="container mx-auto px-4">
