@@ -1,103 +1,103 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Default to Dark Theme with Teal as Primary */
-    --background: 220 15% 12%; /* Dark Cool Gray */
-    --foreground: 0 0% 98%; /* Off-white */
+    /* Light Theme (New Default) */
+    --background: 210 17% 98%; /* Page BG - Light Gray #F9FAFB */
+    --foreground: 0 0% 13%; /* Near Black/Very Dark Gray - for main body text */
 
-    --card: 220 15% 18%; /* Slightly Lighter Dark Cool Gray for cards */
-    --card-foreground: 0 0% 98%; /* Off-white */
+    --card: 0 0% 100%; /* Card BG - White #FFFFFF */
+    --card-foreground: 0 0% 13%; /* Near Black/Very Dark Gray on cards */
 
-    --popover: 220 15% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 175 65% 48%; /* Vibrant Teal */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 259 87% 61%; /* Primary Purple #7B47F1 */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    --secondary: 210 30% 35%; /* Muted Blue */
-    --secondary-foreground: 0 0% 90%; /* Light text on dark secondary */
+    --secondary: 260 87% 95%; /* CTA Background - Light Lavender #EFE6FD */
+    --secondary-foreground: 269 53% 37%; /* Text on CTA - Rich Purple #5C2D91 */
 
-    --muted: 220 10% 25%; /* Muted Dark Gray */
-    --muted-foreground: 220 10% 65%; /* Lighter Muted text gray */
+    --muted: 210 17% 92%; /* Muted BG - slightly darker light gray */
+    --muted-foreground: 220 6% 49%; /* Secondary Text Gray #6B7280 for descriptive text */
 
-    --accent: 175 65% 48%; /* Vibrant Teal, same as primary */
-    --accent-foreground: 0 0% 100%; /* White */
+    --accent: 259 60% 75%; /* A Lighter Purple - for general accents */
+    --accent-foreground: 0 0% 100%; /* White text for these accents */
 
-    --destructive: 0 65% 55%; /* A brighter red that works on dark backgrounds */
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%; /* Red */
+    --destructive-foreground: 0 0% 98%; /* White on red */
 
-    --border: 220 15% 30%; /* Darker border */
-    --input: 220 15% 22%; /* Slightly lighter input for dark mode */
-    --ring: 175 65% 48%; /* Vibrant Teal for rings */
+    --border: 210 17% 88%; /* Light gray border */
+    --input: 0 0% 100%; /* White input BG */
+    --ring: 259 87% 61%; /* Primary Purple for focus rings */
 
     --radius: 0.5rem;
 
-    --chart-1: 175 65% 55%; /* Teal variant 1 */
-    --chart-2: 190 60% 50%; /* Teal/Blue variant */
-    --chart-3: 230 60% 75%; /* Existing Blue - good contrast */
-    --chart-4: 160 50% 60%; /* Greener Teal variant */
-    --chart-5: 300 65% 65%; /* Existing Magenta/Pink - good contrast */
+    --chart-1: 259 87% 61%; /* Primary Purple */
+    --chart-2: 259 60% 75%; /* Lighter Purple */
+    --chart-3: 330 70% 65%; /* Pink/Magenta */
+    --chart-4: 269 53% 55%; /* Muted Rich Purple */
+    --chart-5: 240 60% 70%; /* Blue/Indigo */
 
-
-    /* Sidebar variables for dark theme (as default) */
-    --sidebar-background: 200 15% 15%; /* Darker Cyan/Blue-Gray for sidebar */
-    --sidebar-foreground: 0 0% 90%; /* Light text for sidebar */
-    --sidebar-primary: 175 65% 48%; /* Vibrant Teal */
-    --sidebar-primary-foreground: 0 0% 100%; /* White */
-    --sidebar-accent: 175 70% 55%; /* Lighter/Brighter Teal for hover */
-    --sidebar-accent-foreground: 0 0% 100%; /* White */
-    --sidebar-border: 200 15% 25%;
-    --sidebar-ring: 175 65% 48%;
+    /* Sidebar variables for light theme */
+    --sidebar-background: 210 17% 95%;
+    --sidebar-foreground: 0 0% 13%;
+    --sidebar-primary: 259 87% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 87% 95%; 
+    --sidebar-accent-foreground: 269 53% 37%;
+    --sidebar-border: 210 17% 88%;
+    --sidebar-ring: 259 87% 61%;
   }
 
   .dark {
-    /* Ensure .dark class explicitly uses the same dark theme variables */
-    --background: 220 15% 12%;
-    --foreground: 0 0% 98%;
+    /* Dark Theme */
+    --background: 260 20% 10%; 
+    --foreground: 210 20% 95%; 
 
-    --card: 220 15% 18%;
-    --card-foreground: 0 0% 98%;
+    --card: 260 20% 15%; 
+    --card-foreground: 210 20% 95%;
 
-    --popover: 220 15% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 260 20% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 175 65% 48%; /* Vibrant Teal */
-    --primary-foreground: 0 0% 100%;
+    --primary: 259 80% 70%; 
+    --primary-foreground: 260 80% 15%; 
 
-    --secondary: 210 30% 35%; /* Muted Blue */
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 269 53% 25%; 
+    --secondary-foreground: 260 87% 90%;
 
-    --muted: 220 10% 25%;
-    --muted-foreground: 220 10% 65%;
+    --muted: 260 20% 22%; 
+    --muted-foreground: 220 10% 65%; 
 
-    --accent: 175 65% 48%; /* Vibrant Teal */
-    --accent-foreground: 0 0% 100%;
+    --accent: 259 70% 60%; 
+    --accent-foreground: 210 20% 95%; 
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 65% 55%; 
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 30%;
-    --input: 220 15% 22%;
-    --ring: 175 65% 48%;
+    --border: 260 20% 25%;
+    --input: 260 20% 18%;
+    --ring: 259 80% 70%;
     
-    --chart-1: 175 65% 55%;
-    --chart-2: 190 60% 50%;
-    --chart-3: 230 60% 75%;
-    --chart-4: 160 50% 60%;
-    --chart-5: 300 65% 65%;
+    --chart-1: 259 80% 70%;
+    --chart-2: 259 70% 60%;
+    --chart-3: 330 70% 65%; 
+    --chart-4: 269 40% 45%;
+    --chart-5: 240 60% 70%;
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 200 15% 15%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 175 65% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 175 70% 55%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 200 15% 25%;
-    --sidebar-ring: 175 65% 48%;
+    --sidebar-background: 260 20% 12%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 259 80% 70%;
+    --sidebar-primary-foreground: 260 80% 15%;
+    --sidebar-accent: 259 50% 35%;
+    --sidebar-accent-foreground: 260 20% 90%;
+    --sidebar-border: 260 20% 25%;
+    --sidebar-ring: 259 80% 70%;
   }
 }
 
@@ -108,5 +108,15 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+  /* Ensure headings use the specified black text color in light mode, and main foreground in dark mode */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground; /* Default to main foreground */
+  }
+  :root h1, :root h2, :root h3, :root h4, :root h5, :root h6 {
+     color: #000000; /* Main headings Text Black for light theme */
+  }
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+     color: hsl(var(--foreground)); /* Use dark theme foreground for headings */
   }
 }

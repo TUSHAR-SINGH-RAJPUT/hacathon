@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
-import Script from 'next/script'; // Import the Next.js Script component
+import Script from 'next/script'; 
 
 const geistSans = Geist({ 
   subsets: ['latin'],
@@ -24,17 +24,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    // Removed className="dark" to default to light theme defined in :root
+    <html lang="en" suppressHydrationWarning> 
       <body className={`${geistSans.variable} antialiased flex flex-col min-h-screen bg-background`}>
         <AuthProvider>
           <CartProvider> 
-            <Header /> {/* Removed locale and dict props */}
+            <Header /> 
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
               {children}
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              © {new Date().getFullYear()} kariGaar. All rights reserved. {/* Hardcoded footer */}
+              © {new Date().getFullYear()} kariGaar. All rights reserved. 
             </footer>
           </CartProvider>
         </AuthProvider>
