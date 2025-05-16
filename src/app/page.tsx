@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
 import Logo from '@/components/Logo';
 import Script from 'next/script';
-import React from 'react'; // Removed useState as it's no longer needed for chat toggle
+import React from 'react';
 
 // Hardcoded English strings since i18n was reverted
 const t = {
@@ -30,8 +30,6 @@ const t = {
 };
 
 export default function LandingPage() {
-  // Removed isChatOpen state and related handlers
-
   return (
     <div className="flex flex-col min-h-screen animate-in fade-in duration-700">
       {/* Hero Section */}
@@ -122,11 +120,16 @@ export default function LandingPage() {
               id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
               title="Tyrone: Job Application Assistant"
               onLoad={(e: any) => {
-                if (e.target && e.target.parentElement) {
-                  e.target.parentElement.scrollTo(0, 0);
+                // Simpler onLoad: try to scroll parent if available
+                if (e.target && e.target.contentWindow && e.target.contentWindow.parent) {
+                   try {
+                    e.target.contentWindow.parent.scrollTo(0, 0);
+                   } catch (err) {
+                    console.warn("Could not scroll parent window from iframe onload:", err);
+                   }
                 }
               }}
-              allowtransparency="true"
+              allowtransparency="true" // Corrected casing
               allow="geolocation; microphone; camera; fullscreen"
               src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
               frameBorder="0"
