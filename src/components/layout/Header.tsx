@@ -42,7 +42,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter, usePathname } from 'next/navigation';
 import React, { useState, useEffect, useCallback } from 'react';
-import { cn } from "@/lib/utils"; // Ensure this import is present
+import { cn } from "@/lib/utils";
 
 const i18nConfig = {
   locales: ['en', 'hi', 'kn'],
@@ -114,16 +114,16 @@ export default function Header({ locale }: HeaderProps) {
   }, []);
 
   const navItems = [
-    { href: '/platform-home', label: t.navHome, icon: <Home size={18} /> }, 
-    { href: '/post-job', label: t.navPostJob, icon: <PlusSquare size={18} /> },
-    { href: '/browse-providers', label: t.navBrowseServices, icon: <Search size={18} /> },
-    { href: '/join-as-pro', label: t.navJoinAsPro, icon: <Briefcase size={18} /> },
-    { href: '/about', label: t.navAboutUs, icon: <InfoIcon size={18} /> },
+    { href: `/${locale}/platform-home`, label: t.navHome, icon: <Home size={18} /> }, 
+    { href: `/${locale}/post-job`, label: t.navPostJob, icon: <PlusSquare size={18} /> },
+    { href: `/${locale}/browse-providers`, label: t.navBrowseServices, icon: <Search size={18} /> },
+    { href: `/${locale}/join-as-pro`, label: t.navJoinAsPro, icon: <Briefcase size={18} /> },
+    { href: `/${locale}/about`, label: t.navAboutUs, icon: <InfoIcon size={18} /> },
   ];
 
   const handleProceedToBooking = () => {
     if (cart.length > 0) {
-      router.push('/booking-confirmation');
+      router.push(`/${locale}/booking-confirmation`);
     }
   };
   
@@ -132,25 +132,25 @@ export default function Header({ locale }: HeaderProps) {
     const segments = pathname.split('/');
     if (segments.length > 1 && locales.includes(segments[1])) {
       const path = '/' + segments.slice(2).join('/');
-      return path === '//' ? '/' : path; 
+      return path === '//' ? '/' : (path || '/'); 
     }
-    return pathname;
+    return pathname || '/';
   }, []);
 
   const pathWithoutLocale = getPathWithoutLocale(currentPathname);
 
   const profileNavItems = [
-    { href: "/profile/edit", label: t.editProfile, icon: <Edit3 size={16}/> },
-    { href: "/profile/bookings", label: t.myBookings, icon: <ListOrdered size={16}/> },
-    { href: "/support", label: t.customerSupport, icon: <HelpCircle size={16}/> },
-    { href: "/profile/feedback", label: t.feedbacks, icon: <StarIcon size={16}/> },
-    { href: "/profile/security", label: t.security, icon: <Shield size={16}/> },
+    { href: `/${locale}/profile/edit`, label: t.editProfile, icon: <Edit3 size={16}/> },
+    { href: `/${locale}/profile/bookings`, label: t.myBookings, icon: <ListOrdered size={16}/> },
+    { href: `/${locale}/support`, label: t.customerSupport, icon: <HelpCircle size={16}/> },
+    { href: `/${locale}/profile/feedback`, label: t.feedbacks, icon: <StarIcon size={16}/> },
+    { href: `/${locale}/profile/security`, label: t.security, icon: <Shield size={16}/> },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href={isLoggedIn ? "/platform-home" : "/"} passHref>
+        <Link href={isLoggedIn ? `/${locale}/platform-home` : `/${locale}`} passHref>
           <Logo size="medium" />
         </Link>
         
@@ -262,12 +262,12 @@ export default function Header({ locale }: HeaderProps) {
               </DropdownMenu>
             ) : isClient ? (
               <>
-                <Link href="/login" passHref>
+                <Link href={`/${locale}/login`} passHref>
                   <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                     {t.navLogin}
                   </Button>
                 </Link>
-                <Link href="/signup" passHref>
+                <Link href={`/${locale}/signup`} passHref>
                   <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                     {t.navSignUp}
                   </Button>
@@ -316,9 +316,23 @@ export default function Header({ locale }: HeaderProps) {
                     ))}
                     <Separator className="my-3 bg-border" />
                     <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language}</p>
-                    <SheetClose asChild><Link href={pathWithoutLocale} locale="en" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.english}</Button></Link></SheetClose>
-                    <SheetClose asChild><Link href={pathWithoutLocale} locale="hi" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.hindi}</Button></Link></SheetClose>
-                    <SheetClose asChild><Link href={pathWithoutLocale} locale="kn" passHref><Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.kannada}</Button></Link></SheetClose>
+                    
+                    <Link href={pathWithoutLocale} locale="en" passHref>
+                      <SheetClose asChild>
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.english}</Button>
+                      </SheetClose>
+                    </Link>
+                    <Link href={pathWithoutLocale} locale="hi" passHref>
+                      <SheetClose asChild>
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.hindi}</Button>
+                      </SheetClose>
+                    </Link>
+                    <Link href={pathWithoutLocale} locale="kn" passHref>
+                      <SheetClose asChild>
+                        <Button variant="ghost" className="w-full justify-start text-lg py-3 gap-3">{t.kannada}</Button>
+                      </SheetClose>
+                    </Link>
+
                     <Separator className="my-3 bg-border" />
                     <SheetClose asChild>
                         <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
@@ -329,14 +343,14 @@ export default function Header({ locale }: HeaderProps) {
                 ) : isClient ? (
                   <>
                     <SheetClose asChild>
-                        <Link href="/login" passHref>
+                        <Link href={`/${locale}/login`} passHref>
                         <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                             <UserCircle size={20} /> {t.navLogin}
                         </Button>
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
-                        <Link href="/signup" passHref>
+                        <Link href={`/${locale}/signup`} passHref>
                         <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
                             {t.navSignUp}
                         </Button>
@@ -352,3 +366,4 @@ export default function Header({ locale }: HeaderProps) {
     </header>
   );
 }
+
