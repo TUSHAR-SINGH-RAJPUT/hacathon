@@ -76,7 +76,7 @@ NavLink.displayName = 'NavLink';
 
 interface HeaderProps {
   locale: string;
-  fullDict: any;
+  fullDict: Record<string, any>; // Expecting the full dictionary object
 }
 
 export default function Header({ locale, fullDict }: HeaderProps) {
@@ -92,7 +92,12 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     setIsClient(true);
   }, []);
 
-  const t = useMemo(() => (fullDict?.Header) || {}, [fullDict]);
+  const t = useMemo(() => {
+    if (fullDict && typeof fullDict === 'object' && fullDict.Header && typeof fullDict.Header === 'object') {
+      return fullDict.Header;
+    }
+    return {}; // Default to empty object if any check fails
+  }, [fullDict]);
 
   const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
@@ -128,14 +133,14 @@ export default function Header({ locale, fullDict }: HeaderProps) {
 
   const handleLanguageChange = useCallback((newLocale: string) => {
     router.push(pathWithoutLocale, { locale: newLocale });
-    setIsSheetOpen(false);
+    setIsSheetOpen(false); // Close mobile sheet if open
   }, [router, pathWithoutLocale]);
 
-  const languageOptions = [
+  const languageOptions = useMemo(() => [
     { locale: 'en', label: t.english || "English" },
     { locale: 'hi', label: t.hindi || "Hindi" },
     { locale: 'kn', label: t.kannada || "Kannada" },
-  ];
+  ], [t]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -153,27 +158,6 @@ export default function Header({ locale, fullDict }: HeaderProps) {
         </nav>
 
         <div className="flex items-center space-x-2">
-          {/* Language Switcher - Desktop */}
-          <div className="hidden md:block">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10">
-                  <Globe size={20} />
-                  <span className="sr-only">{t.language || "Language"}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-card text-card-foreground">
-                <DropdownMenuLabel>{t.language || "Language"}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {languageOptions.map(lang => (
-                  <DropdownMenuItem key={lang.locale} onClick={() => handleLanguageChange(lang.locale)}>
-                    {lang.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
           {isClient && isLoggedIn && (
             <Popover>
               <PopoverTrigger asChild>
@@ -257,6 +241,22 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                      </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
+                  {/* Language Submenu for Desktop Logged In Users */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2 w-full cursor-pointer">
+                      <Globe size={16} /> {t.language || "Language"}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className="bg-card text-card-foreground">
+                        {languageOptions.map(lang => (
+                          <DropdownMenuItem key={lang.locale} onClick={() => handleLanguageChange(lang.locale)} className="cursor-pointer">
+                            {lang.label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
                     <LogOut size={16} /> {t.navLogout || "Logout"}
                   </DropdownMenuItem>
@@ -314,13 +314,11 @@ export default function Header({ locale, fullDict }: HeaderProps) {
                 {/* Language Switcher - Mobile */}
                 <p className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">{t.language || "Language"}</p>
                 {languageOptions.map(lang => (
-                  <Link key={lang.locale} href={pathWithoutLocale} locale={lang.locale} passHref>
-                    <SheetClose asChild>
-                      <Button variant="ghost" onClick={() => handleLanguageChange(lang.locale)} className="w-full justify-start text-lg py-3 gap-3">
-                        {lang.label}
-                      </Button>
-                    </SheetClose>
-                  </Link>
+                  <SheetClose asChild key={lang.locale}>
+                    <Button variant="ghost" onClick={() => handleLanguageChange(lang.locale)} className="w-full justify-start text-lg py-3 gap-3">
+                      {lang.label}
+                    </Button>
+                  </SheetClose>
                 ))}
                 <Separator className="my-3 bg-border" />
 
@@ -368,3 +366,4 @@ export default function Header({ locale, fullDict }: HeaderProps) {
     </header>
   );
 }
+
