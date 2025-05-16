@@ -1,3 +1,4 @@
+
 "use client"; // This page uses client-side charts and interactions
 
 import Link from 'next/link';
@@ -19,7 +20,8 @@ const dict = {
   howItWorks: "How kariGaar Works",
   postYourJobEasily: "Post Your Job Easily",
   postJobDescription: "Describe your task, set your location, and let skilled professionals come to you.",
-  navBrowseServices: "Browse Services",
+  navBrowseServices: "Browse Services", // Used for linkText
+  findProsDescription: "Browse a directory of vetted service providers for any job, big or small.", // Added for feature card
   qualityGuaranteed: "Quality Guaranteed",
   qualityDescription: "Connect with reliable experts committed to delivering top-notch service.",
   learnMore: "Learn More",
@@ -32,7 +34,7 @@ const dict = {
   readyToTackle: "Ready to tackle your to-do list or find your next gig? kariGaar makes it simple."
 };
 
-const serviceCategories = [
+const serviceCategoriesData = [ // Renamed from serviceCategories to avoid conflict
   { name: 'Painting', icon: <Paintbrush className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "painting wall", bgColor: "bg-red-500/10", hoverBgColor: "hover:bg-red-500/20", iconColor: "text-red-500" },
   { name: 'Gardening', icon: <Sprout className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "gardening tools", bgColor: "bg-green-500/10", hoverBgColor: "hover:bg-green-500/20", iconColor: "text-green-500" },
   { name: 'Plumbing', icon: <Wrench className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "plumbing pipes", bgColor: "bg-blue-500/10", hoverBgColor: "hover:bg-blue-500/20", iconColor: "text-blue-500" },
@@ -40,6 +42,7 @@ const serviceCategories = [
   { name: 'Electrical', icon: <Zap className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "electrical wires", bgColor: "bg-purple-500/10", hoverBgColor: "hover:bg-purple-500/20", iconColor: "text-purple-500" },
   { name: 'Handyman', icon: <Users className="h-10 w-10 mx-auto group-hover:text-primary/80 transition-colors" />, dataAiHint: "tools toolbox", bgColor: "bg-orange-500/10", hoverBgColor: "hover:bg-orange-500/20", iconColor: "text-orange-500" },
 ];
+
 
 const customerData = [
   { name: "Satisfied Customers", value: 1250, fill: "hsl(var(--primary))" },
@@ -145,7 +148,7 @@ export default function PlatformHomePage() {
       <section className="w-full py-12 md:py-16">
         <h2 className="text-3xl font-bold text-center mb-10 md:mb-12 text-foreground">{dict.explorePopularServices}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {serviceCategories.map((service) => (
+          {serviceCategoriesData.map((service) => (
             <Link key={service.name} href={`/browse-providers?service=${encodeURIComponent(service.name)}`} passHref>
               <Card className={`group text-center p-4 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer bg-background hover:bg-secondary/70 aspect-square flex flex-col justify-center items-center transform hover:scale-105`}>
                 <div className={`mb-3 p-4 inline-block rounded-full ${service.bgColor} group-hover:scale-110 ${service.hoverBgColor} transition-all duration-300`}>

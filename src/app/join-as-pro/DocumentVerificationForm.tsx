@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,19 +22,22 @@ import { ShieldCheck, FileText } from "lucide-react";
 import type { ProviderRegistrationData } from './ProviderRegistrationForm'; 
 import { useRouter } from 'next/navigation';
 
-const documentVerificationSchema = z.object({
-  aadhaarNumber: z.string()
-    .min(1, { message: "Aadhaar number is required." })
-    .refine(val => /^\d{4}\s?\d{4}\s?\d{4}$/.test(val) || /^\d{12}$/.test(val), {
-      message: "Enter a valid 12-digit Aadhaar number (e.g., XXXX XXXX XXXX or XXXXXXXXXXXX)."
-  }),
-  panNumber: z.string()
-    .min(1, { message: "PAN card number is required." })
-    .refine(val => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val.toUpperCase()), {
-      message: "Enter a valid PAN card number (e.g., ABCDE1234F)."
-  }),
-  otherDocumentsDetails: z.string().max(500, { message: "Details too long, max 500 characters."}).optional(),
-});
+const createDocumentVerificationSchema = (translations: any) => {
+  const t = translations.validationMessages || {};
+  return z.object({
+    aadhaarNumber: z.string()
+      .min(1, { message: t.aadhaarRequired || "Aadhaar number is required." })
+      .refine(val => /^\d{4}\s?\d{4}\s?\d{4}$/.test(val) || /^\d{12}$/.test(val), {
+        message: t.aadhaarInvalid || "Enter a valid 12-digit Aadhaar number (e.g., XXXX XXXX XXXX or XXXXXXXXXXXX)."
+    }),
+    panNumber: z.string()
+      .min(1, { message: t.panRequired || "PAN card number is required." })
+      .refine(val => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val.toUpperCase()), {
+        message: t.panInvalid || "Enter a valid PAN card number (e.g., ABCDE1234F)."
+    }),
+    otherDocumentsDetails: z.string().max(500, { message: t.otherDocumentsTooLong || "Details too long, max 500 characters."}).optional(),
+  });
+};
 
 interface DocumentVerificationFormProps {
   translations: any;
@@ -46,6 +50,7 @@ interface StoredProviderData extends Omit<ProviderRegistrationData, 'resume'> {
 export default function DocumentVerificationForm({ translations: t }: DocumentVerificationFormProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const documentVerificationSchema = createDocumentVerificationSchema(t);
 
   const form = useForm<z.infer<typeof documentVerificationSchema>>({
     resolver: zodResolver(documentVerificationSchema),
@@ -67,8 +72,8 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
 
     if (!initialData) {
       toast({
-        title: t.error,
-        description: t.couldNotRetrieveInitialData,
+        title: t.error || "Error",
+        description: t.couldNotRetrieveInitialData || "Could not retrieve initial data.",
         variant: "destructive",
       });
       router.push(`/join-as-pro`); 
@@ -82,8 +87,8 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
 
     console.log("Complete Provider Registration Data:", completeRegistrationData);
     toast({
-      title: t.registrationSubmittedSuccessfully,
-      description: t.profileWillBeReviewed,
+      title: t.registrationSubmittedSuccessfully || "Registration Submitted!",
+      description: t.profileWillBeReviewed || "Profile will be reviewed.",
     });
     
     if (typeof window !== "undefined") {
@@ -98,9 +103,9 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <Card className="bg-card/50">
           <CardHeader>
-            <CardTitle className="text-xl">{t.requiredDocuments}</CardTitle>
+            <CardTitle className="text-xl">{t.requiredDocuments || "Required Documents"}</CardTitle>
             <UiCardDescription className="text-muted-foreground">
-              {t.documentUploadNote}
+              {t.documentUploadNote || "Actual document upload would be part of a full backend."}
             </UiCardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -109,11 +114,11 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
               name="aadhaarNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />{t.aadhaarNumber}</FormLabel>
+                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />{t.aadhaarNumber || "Aadhaar Number"}</FormLabel>
                   <FormControl>
                     <Input placeholder="XXXX XXXX XXXX or XXXXXXXXXXXX" {...field} onChange={(e) => field.onChange(e.target.value.replace(/\s/g, ''))} />
                   </FormControl>
-                  <FormDescription>{t.aadhaarDescription}</FormDescription>
+                  <FormDescription>{t.aadhaarDescription || "Enter 12-digit Aadhaar."}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -123,11 +128,11 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
               name="panNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />{t.panNumber}</FormLabel>
+                  <FormLabel className="flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary" />{t.panNumber || "PAN Number"}</FormLabel>
                   <FormControl>
                     <Input placeholder="ABCDE1234F" {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
                   </FormControl>
-                  <FormDescription>{t.panDescription}</FormDescription>
+                  <FormDescription>{t.panDescription || "Enter 10-character PAN."}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -137,16 +142,16 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
               name="otherDocumentsDetails"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><FileText className="h-4 w-4 mr-2 text-primary" />{t.otherDocumentsDetails}</FormLabel>
+                  <FormLabel className="flex items-center"><FileText className="h-4 w-4 mr-2 text-primary" />{t.otherDocumentsDetails || "Other Documents (Optional)"}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={t.otherDocumentsPlaceholder || "e.g., Trade license details, previous work certifications, etc. List any documents you can provide for verification."}
+                      placeholder={t.otherDocumentsPlaceholder || "e.g., Trade license details..."}
                       className="resize-y min-h-[80px]"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    {t.otherDocumentsDescription}
+                    {t.otherDocumentsDescription || "List other relevant documents."}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -157,7 +162,7 @@ export default function DocumentVerificationForm({ translations: t }: DocumentVe
         
         <div className="pt-6">
           <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-            {t.completeRegistration}
+            {t.completeRegistration || "Complete Registration"}
           </Button>
         </div>
       </form>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -30,7 +31,6 @@ export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
   const providerId = params.providerId as string;
-  // const locale = params.locale as string || 'en'; // Removed locale usage
 
   const [provider, setProvider] = useState<ServiceProvider | undefined>(undefined);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -54,7 +54,7 @@ export default function ChatPage() {
       }
       setIsLoadingProvider(false);
     }
-  }, [providerId]); // t removed from dependencies
+  }, [providerId]); 
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -103,7 +103,7 @@ export default function ChatPage() {
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold mb-2">{t.providerNotFound}</h1>
         <p className="text-muted-foreground mb-6">{t.couldNotInitiateChat}</p>
-        <Button onClick={() => router.push(`/browse-providers`)} variant="outline" className="text-primary border-primary"> {/* Removed locale */}
+        <Button onClick={() => router.push(`/browse-providers`)} variant="outline" className="text-primary border-primary">
           <ArrowLeft className="mr-2 h-4 w-4" /> {t.backToProviders}
         </Button>
       </div>
@@ -117,7 +117,7 @@ export default function ChatPage() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <Link href={`/browse-providers/profile/${provider.id}`} passHref> {/* Removed locale */}
+          <Link href={`/browse-providers/profile/${provider.id}`} passHref>
             <div className="flex items-center gap-3 cursor-pointer group">
               <Image
                 src={provider.profileImageUrl || 'https://placehold.co/40x40.png'}

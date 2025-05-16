@@ -1,10 +1,4 @@
-import { getDictionary } from '@/lib/dictionaries';
-import ChatPageContent from './ChatPageContent';
-
-export default async function ChatPage({ params: { locale, providerId } }: { params: { locale: string, providerId: string } }) {
-  const dict = await getDictionary(locale);
-  // Assuming you'll have a ChatPage section in your common.json
-  const t = dict.ChatPage || {}; 
-  
-  return <ChatPageContent t={t} locale={locale} providerId={providerId} />;
-}
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/chat/[providerId]/page.tsx.
+// Please delete the /src/app/[locale] directory.

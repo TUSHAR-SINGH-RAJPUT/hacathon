@@ -129,5 +129,3 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     </div>
   );
 }
-
-    

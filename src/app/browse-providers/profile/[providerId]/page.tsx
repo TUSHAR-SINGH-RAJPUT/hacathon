@@ -5,35 +5,17 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { dummyProviders } from '@/components/providers/dummyData';
-import type { ServiceProvider, Review } from '@/types';
+import type { ServiceProvider } from '@/types'; 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, CheckCircle, MessageSquare, Users as UsersIcon, ShoppingCart, Send, MessageCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, ShoppingCart, MessageCircle, Users as UsersIcon, ArrowLeft } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
 import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
-
-const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
-  return (
-    <div className="flex items-center space-x-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`h-6 w-6 cursor-pointer transition-colors ${
-            star <= rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground hover:text-amber-300'
-          }`}
-          onClick={() => setRating(star)}
-        />
-      ))}
-    </div>
-  );
-};
 
 // Hardcoded English strings
 const t = {
@@ -43,12 +25,6 @@ const t = {
   addedToJobList: (name: string) => `${name} added to your Job List!`,
   viewYourList: "You can view your list from the header.",
   alreadyInJobList: (name: string) => `${name} is already in your Job List.`,
-  ratingRequired: "Rating Required",
-  selectStarRating: "Please select a star rating.",
-  reviewCommentRequired: "Review Comment Required",
-  writeCommentForReview: "Please write a comment for your review.",
-  reviewSubmitted: "Review Submitted!",
-  thankYouFeedback: "Thank you for your feedback.",
   aboutProvider: (name: string) => `About ${name}`,
   servicesOffered: "Services Offered",
   portfolioPastWork: "Portfolio / Past Work",
@@ -58,17 +34,19 @@ const t = {
   inYourJobList: "In Your Job List",
   addToJobList: "Add to Job List",
   messageProvider: (name: string) => `Message ${name.split(' ')[0]}`,
-  customerReviewsRatings: "Customer Reviews & Ratings",
-  seeWhatOthersSaying: (name: string) => `See what others are saying about ${name}.`,
-  loadingReview: "Loading review...",
-  noReviewsYet: (name: string) => `No reviews yet for ${name}. Be the first to add one!`,
-  leaveAReviewFor: (name: string) => `Leave a Review for ${name}`,
-  yourRating: "Your Rating",
-  yourReview: "Your Review",
-  shareYourExperience: (name: string) => `Share your experience with ${name}...`,
-  submitting: "Submitting...",
-  submitReview: "Submit Review",
-  recommendedProfessionals: "Recommended Professionals"
+  recommendedProfessionals: "Recommended Professionals",
+  reviews: "reviews" // For rating display
+};
+
+// Hardcoded English strings for ProviderCard, as this page renders it
+const providerCardTranslations = {
+  reviewsText: "reviews",
+  experienceSuffix: "years experience",
+  hourlyRateSuffix: "/hr (approx)",
+  servicesLabel: "Services:",
+  more: "more",
+  viewProfileText: "View Profile",
+  messageText: "Message"
 };
 
 export default function ProviderProfilePage() {
@@ -80,48 +58,11 @@ export default function ProviderProfilePage() {
   const { toast } = useToast();
 
   const [provider, setProvider] = useState<ServiceProvider | undefined>(undefined);
-  const [userReview, setUserReview] = useState('');
-  const [userRating, setUserRating] = useState(0);
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
-  const [isHoveringReviews, setIsHoveringReviews] = useState(false);
-  const reviewIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     const foundProvider = dummyProviders.find(p => p.id === providerId);
     setProvider(foundProvider);
-    setCurrentReviewIndex(0); 
   }, [providerId]);
-
-  const handleNextReview = () => {
-    if (provider && provider.reviews && provider.reviews.length > 0) {
-      setCurrentReviewIndex((prevIndex) => (prevIndex + 1) % provider.reviews!.length);
-    }
-  };
-
-  const handlePrevReview = () => {
-    if (provider && provider.reviews && provider.reviews.length > 0) {
-      setCurrentReviewIndex((prevIndex) => (prevIndex - 1 + provider.reviews!.length) % provider.reviews!.length);
-    }
-  };
-
-  useEffect(() => {
-    if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
-      reviewIntervalRef.current = setInterval(() => {
-        handleNextReview();
-      }, 5000); 
-    } else {
-      if (reviewIntervalRef.current) {
-        clearInterval(reviewIntervalRef.current);
-      }
-    }
-    return () => {
-      if (reviewIntervalRef.current) {
-        clearInterval(reviewIntervalRef.current);
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [provider, isHoveringReviews, provider?.reviews?.length]);
 
 
   if (!provider) {
@@ -130,7 +71,7 @@ export default function ProviderProfilePage() {
         <UsersIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
         <h1 className="text-2xl font-semibold">{t.providerNotFound}</h1>
         <p className="text-muted-foreground mt-2">{t.providerNotFoundDesc}</p>
-        <Button className="mt-6" onClick={() => router.push(`/browse-providers`)}>{t.backToProviders}</Button>
+        <Button className="mt-6" onClick={() => router.push(`/browse-providers`)}><ArrowLeft className="mr-2 h-4 w-4"/>{t.backToProviders}</Button>
       </div>
     );
   }
@@ -160,43 +101,6 @@ export default function ProviderProfilePage() {
     }
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userRating === 0) {
-      toast({ title: t.ratingRequired, description: t.selectStarRating, variant: "destructive" });
-      return;
-    }
-    if (!userReview.trim()) {
-      toast({ title: t.reviewCommentRequired, description: t.writeCommentForReview, variant: "destructive" });
-      return;
-    }
-    setIsSubmittingReview(true);
-    console.log("Submitting review:", { providerId: provider.id, rating: userRating, comment: userReview });
-    
-    setTimeout(() => {
-      const newReview: Review = {
-        id: `review-${Date.now()}`,
-        reviewerName: "You (Demo User)", 
-        rating: userRating,
-        comment: userReview,
-        date: new Date().toISOString(),
-      };
-      setProvider(prev => {
-        if (!prev) return undefined;
-        const updatedReviews = [newReview, ...(prev.reviews || [])];
-        setCurrentReviewIndex(0); 
-        return { ...prev, reviews: updatedReviews, reviewsCount: (prev.reviewsCount || 0) + 1 };
-      });
-      
-      toast({ title: t.reviewSubmitted, description: t.thankYouFeedback });
-      setUserReview('');
-      setUserRating(0);
-      setIsSubmittingReview(false);
-    }, 1000);
-  };
-
-  const currentReview = provider.reviews && provider.reviews.length > 0 ? provider.reviews[currentReviewIndex] : null;
-
   return (
     <div className="container mx-auto py-8 px-4 space-y-12 animate-in fade-in duration-500">
       <Card className="overflow-hidden shadow-xl bg-card">
@@ -217,7 +121,7 @@ export default function ProviderProfilePage() {
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className={`h-6 w-6 ${i < Math.round(provider.rating) ? 'fill-current' : 'text-white/50'}`} />
                 ))}
-                <span className="ml-2 text-white">({provider.reviewsCount} reviews)</span>
+                <span className="ml-2 text-white">({provider.reviewsCount} {t.reviews})</span>
               </div>
             </div>
           </div>
@@ -284,99 +188,17 @@ export default function ProviderProfilePage() {
         </CardContent>
       </Card>
 
-      <Separator />
-
-      <Card className="shadow-lg bg-card">
-        <CardHeader>
-          <CardTitle className="text-2xl text-card-foreground">{t.customerReviewsRatings}</CardTitle>
-          <UiCardDescription className="text-muted-foreground">{t.seeWhatOthersSaying(provider.name)}</UiCardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {provider.reviews && provider.reviews.length > 0 ? (
-            <div 
-              className="relative group"
-              onMouseEnter={() => setIsHoveringReviews(true)}
-              onMouseLeave={() => setIsHoveringReviews(false)}
-            >
-              <Card className="bg-background p-4 shadow-sm min-h-[150px] flex flex-col justify-center transition-opacity duration-300 ease-in-out">
-                {currentReview ? (
-                  <>
-                    <div className="flex items-center mb-2">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className={`h-5 w-5 ${i < currentReview.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
-                      ))}
-                      <span className="ml-auto text-xs text-muted-foreground">{new Date(currentReview.date).toLocaleDateString()}</span>
-                    </div>
-                    <p className="text-sm text-foreground mb-1 font-medium">{currentReview.reviewerName}</p>
-                    <p className="text-sm text-muted-foreground whitespace-pre-line">{currentReview.comment}</p>
-                  </>
-                ) : (
-                  <p className="text-muted-foreground text-center">{t.loadingReview}</p>
-                )}
-              </Card>
-              {provider.reviews.length > 1 && (
-                <div className={`absolute inset-0 flex justify-between items-center transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    onClick={handlePrevReview} 
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background text-primary border-primary hover:text-primary-foreground"
-                  >
-                    <ArrowLeft className="h-5 w-5" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    onClick={handleNextReview} 
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background text-primary border-primary hover:text-primary-foreground"
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </div>
-              )}
-               {provider.reviews.length > 1 && (
-                 <div className={`text-center text-xs text-muted-foreground mt-2 transition-opacity duration-300 ${isHoveringReviews ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                    {currentReviewIndex + 1} of {provider.reviews.length}
-                  </div>
-               )}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">{t.noReviewsYet(provider.name)}</p>
-          )}
-
-          <Separator className="my-6" />
-
-          <div>
-            <h3 className="text-xl font-semibold text-card-foreground mb-3">{t.leaveAReviewFor(provider.name)}</h3>
-            <form onSubmit={handleSubmitReview} className="space-y-4">
-              <div>
-                <Label htmlFor="user-rating" className="mb-1 block font-medium">{t.yourRating}</Label>
-                <StarRatingInput rating={userRating} setRating={setUserRating} />
-              </div>
-              <div>
-                <Label htmlFor="user-review" className="mb-1 block font-medium">{t.yourReview}</Label>
-                <Textarea
-                  id="user-review"
-                  placeholder={t.shareYourExperience(provider.name)}
-                  value={userReview}
-                  onChange={(e) => setUserReview(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-              <Button type="submit" disabled={isSubmittingReview} className="bg-primary text-primary-foreground">
-                {isSubmittingReview ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t.submitting}</> : <><Send className="mr-2 h-4 w-4" /> {t.submitReview}</>}
-              </Button>
-            </form>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Review Section Removed */}
+      {/* <Separator /> */}
+      {/* <Card className="shadow-lg bg-card"> ... </Card> */}
 
       {recommendedProviders.length > 0 && (
-        <section>
+        <section className="pt-8">
+          <Separator className="mb-8" />
           <h2 className="text-2xl font-bold text-center mb-8 text-foreground">{t.recommendedProfessionals}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedProviders.map(recProvider => (
-              <ProviderCard key={recProvider.id} provider={recProvider} locale={"en"} />
+              <ProviderCard key={recProvider.id} provider={recProvider} locale={"en"} translations={providerCardTranslations} />
             ))}
           </div>
         </section>
@@ -384,5 +206,3 @@ export default function ProviderProfilePage() {
     </div>
   );
 }
-
-    

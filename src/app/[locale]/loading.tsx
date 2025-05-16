@@ -1,13 +1,4 @@
-import Logo from '@/components/Logo';
-// No dictionary needed here as it's a very simple loading state
-
-export default function Loading() {
-  return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-background z-[100]">
-      <div className="animate-pulse">
-        <Logo size="xlarge" />
-      </div>
-      <p className="mt-4 text-lg text-muted-foreground">Loading your experience...</p>
-    </div>
-  );
-}
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/loading.tsx.
+// Please delete the /src/app/[locale] directory.

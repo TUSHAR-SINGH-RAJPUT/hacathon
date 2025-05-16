@@ -1,7 +1,4 @@
-import { getDictionary } from '@/lib/dictionaries';
-import LandingPageContent from './LandingPageContent'; // Client component
-
-export default async function LandingPage({ params: { locale } }: { params: { locale: string } }) {
-  const dict = await getDictionary(locale);
-  return <LandingPageContent dict={dict.LandingPage || {}} locale={locale} />;
-}
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/page.tsx.
+// Please delete the /src/app/[locale] directory.

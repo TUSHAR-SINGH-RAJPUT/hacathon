@@ -1,7 +1,8 @@
-"use client"; // Add this directive
+
+"use client"; 
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ListOrdered, CalendarDays, Info, MessageCircle } from "lucide-react"; // Using MessageCircle for WhatsApp
+import { ListOrdered, CalendarDays, Info, MessageCircle } from "lucide-react"; 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +11,7 @@ const dummyBookings = [
   { 
     id: "dummy-booking-123", 
     service: "House Painting", 
-    provider: { name: "Priya Sharma", phone: "9876543210" }, // Example phone
+    provider: { name: "Priya Sharma", phone: "9876543210" }, 
     date: "2024-08-15", 
     status: "Completed", 
     link: "/track-service/dummy-booking-123" 
@@ -18,13 +19,13 @@ const dummyBookings = [
   { 
     id: "booking-456", 
     service: "Garden Maintenance", 
-    provider: { name: "Rohan Gowda", phone: "9876543211" }, // Example phone
+    provider: { name: "Rohan Gowda", phone: "9876543211" }, 
     date: "2024-09-05", 
     status: "Scheduled", 
-    link: "/track-service/dummy-booking-123" // Assuming track service page can handle different bookings
+    link: "/track-service/dummy-booking-123" 
   },
 ];
-
+  
 // Hardcoded English strings
 const t = {
   myBookings: "My Bookings",
@@ -33,14 +34,11 @@ const t = {
   trackViewDetails: "Track / View Details",
   noBookingsYet: "You have no bookings yet.",
   findServices: "Find Services",
-  contactOnWhatsApp: "WhatsApp" // New string
+  contactOnWhatsApp: "WhatsApp" 
 };
   
 export default function MyBookingsPage() {
   const handleWhatsAppClick = (providerName: string, providerPhone: string) => {
-    // In a real app, you'd construct a WhatsApp link:
-    // const whatsappLink = `https://wa.me/${providerPhone}?text=Hello%20${providerName},%20I%20have%20a%20query%20regarding%20my%20booking.`;
-    // window.open(whatsappLink, '_blank');
     alert(`Simulating WhatsApp chat with ${providerName}. In a real app, this would open WhatsApp.`);
   };
 

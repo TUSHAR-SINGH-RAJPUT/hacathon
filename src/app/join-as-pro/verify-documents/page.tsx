@@ -15,6 +15,7 @@ const formTranslations = {
     otherDocumentsDetails: "Other Relevant Documents (Optional)",
     aadhaarDescription: "Enter your 12-digit Aadhaar number. It will be stored without spaces.",
     panDescription: "Enter your 10-character PAN number. It will be stored in uppercase.",
+    otherDocumentsPlaceholder: "e.g., Trade license details, previous work certifications, etc. List any documents you can provide for verification.",
     otherDocumentsDescription: "List any other documents or certifications that can help verify your profile.",
     completeRegistration: "Complete Registration & Submit for Verification",
     requiredDocuments: "Required Documents",

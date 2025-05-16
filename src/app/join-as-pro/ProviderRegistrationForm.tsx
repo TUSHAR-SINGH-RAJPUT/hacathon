@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,38 +23,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Mail, Phone, MapPinIcon, Briefcase, Settings, DollarSign, ImageIcon, Info, FileUp } from "lucide-react";
 import { useRouter } from 'next/navigation';
 
-const providerFormSchema = z.object({
-  fullName: z.string().min(3, { message: "Full name must be at least 3 characters." }).max(100),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  phoneNumber: z.string().optional(),
-  location: z.string().min(3, { message: "Location is required." }).max(100),
-  serviceTypes: z.array(z.string()).min(1, { message: "Please select at least one service type." }),
-  experienceYears: z.coerce.number().min(0, { message: "Experience must be a positive number." }).max(50),
-  bio: z.string().min(20, { message: "Bio must be at least 20 characters." }).max(1000),
-  hourlyRate: z.string().optional(),
-  profileImageUrl: z.string().optional().refine(val => !val || z.string().url().safeParse(val).success || val.startsWith('https://placehold.co'), {
-    message: "Please enter a valid URL for profile image or leave blank for placeholder.",
-  }),
-  resume: z.custom<FileList | undefined>((val) => val === undefined || val instanceof FileList, "Resume must be a FileList")
-    .refine(
-      (files) => files === undefined || files.length === 0 || (files.length === 1 && files[0].type === "application/pdf"),
-      "Please upload a single PDF file."
-    )
-    .refine(
-        (files) => files === undefined || files.length === 0 || files[0].size <= 5 * 1024 * 1024, // 5MB
-        `Resume file size should be less than 5MB.`
-    )
-    .optional(),
-});
+const createProviderFormSchema = (t: any) => {
+  const validation = t.validationMessages || {};
+  return z.object({
+    fullName: z.string().min(3, { message: validation.fullNameMin || "Full name must be at least 3 characters." }).max(100),
+    email: z.string().email({ message: validation.emailInvalid || "Please enter a valid email address." }),
+    phoneNumber: z.string().optional(),
+    location: z.string().min(3, { message: validation.locationRequired || "Location is required." }).max(100),
+    serviceTypes: z.array(z.string()).min(1, { message: validation.serviceTypeRequired || "Please select at least one service type." }),
+    experienceYears: z.coerce.number().min(0, { message: validation.experiencePositive || "Experience must be a positive number." }).max(50),
+    bio: z.string().min(20, { message: validation.bioMin || "Bio must be at least 20 characters." }).max(1000),
+    hourlyRate: z.string().optional(),
+    profileImageUrl: z.string().optional().refine(val => !val || z.string().url().safeParse(val).success || val.startsWith('https://placehold.co'), {
+      message: validation.profileImageInvalidUrl || "Please enter a valid URL for profile image or leave blank for placeholder.",
+    }),
+    resume: z.custom<FileList | undefined>((val) => val === undefined || val instanceof FileList, validation.resumeMustBeFileList || "Resume must be a FileList")
+      .refine(
+        (files) => files === undefined || files.length === 0 || (files.length === 1 && files[0].type === "application/pdf"),
+        validation.resumeSinglePDF || "Please upload a single PDF file."
+      )
+      .refine(
+          (files) => files === undefined || files.length === 0 || files[0].size <= 5 * 1024 * 1024, // 5MB
+          validation.resumeMaxSize || `Resume file size should be less than 5MB.`
+      )
+      .optional(),
+  });
+};
 
-export type ProviderRegistrationData = z.infer<typeof providerFormSchema>;
+export type ProviderRegistrationData = z.infer<ReturnType<typeof createProviderFormSchema>>;
 
 interface ProviderRegistrationFormProps {
-  translations: any; // Simplified for this example
+  translations: any;
 }
 
 export default function ProviderRegistrationForm({ translations: t }: ProviderRegistrationFormProps) {
   const router = useRouter();
+  const providerFormSchema = createProviderFormSchema(t);
+  
   const form = useForm<ProviderRegistrationData>({
     resolver: zodResolver(providerFormSchema),
     defaultValues: {
@@ -78,14 +84,14 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
 
     const dataToStore = {
       ...values,
-      resume: undefined, // We don't store the FileList object
+      resume: undefined, 
       resumeFileName: resumeFileName,
     };
     
     if (typeof window !== "undefined") {
       sessionStorage.setItem('providerRegistrationData', JSON.stringify(dataToStore));
     }
-    router.push('/join-as-pro/verify-documents');
+    router.push(`/join-as-pro/verify-documents`);
   }
 
   return (
@@ -105,7 +111,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><User className="h-4 w-4 mr-2 text-primary" />{t.fullName || "Full Name"}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Priya Sharma" {...field} />
+                      <Input placeholder={t.fullNamePlaceholder || "e.g., Priya Sharma"} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,7 +124,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><Mail className="h-4 w-4 mr-2 text-primary" />{t.emailAddress || "Email Address"}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="e.g., priya.sharma@example.com" {...field} />
+                      <Input type="email" placeholder={t.emailPlaceholder || "e.g., priya.sharma@example.com"} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -134,7 +140,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><Phone className="h-4 w-4 mr-2 text-primary" />{t.phoneNumberOptional || "Phone Number (Optional)"}</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="e.g., +91 XXXXXXXXXX" {...field} />
+                      <Input type="tel" placeholder={t.phoneNumberPlaceholder || "e.g., +91 XXXXXXXXXX"} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,7 +153,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><MapPinIcon className="h-4 w-4 mr-2 text-primary" />{t.primaryServiceLocation || "Primary Service Location"}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Bangalore, Karnataka" {...field} />
+                      <Input placeholder={t.locationPlaceholder || "e.g., Bangalore, Karnataka"} {...field} />
                     </FormControl>
                     <FormDescription>{t.locationDescription || "City, State where you primarily offer services."}</FormDescription>
                     <FormMessage />
@@ -218,7 +224,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><Briefcase className="h-4 w-4 mr-2 text-primary" />{t.yearsOfExperience || "Years of Experience"}</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="e.g., 5" {...field} />
+                      <Input type="number" placeholder={t.experiencePlaceholder || "e.g., 5"} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,7 +237,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                   <FormItem>
                     <FormLabel className="flex items-center"><DollarSign className="h-4 w-4 mr-2 text-primary" />{t.typicalHourlyRateOptional || "Typical Hourly Rate (Optional)"}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., ₹300-₹500 or 'Contact for quote'" {...field} />
+                      <Input placeholder={t.ratePlaceholder || "e.g., ₹300-₹500 or 'Contact for quote'"} {...field} />
                     </FormControl>
                     <FormDescription>{t.rateDescription || "Provide a range or indicate custom quotes."}</FormDescription>
                     <FormMessage />
@@ -265,7 +271,7 @@ export default function ProviderRegistrationForm({ translations: t }: ProviderRe
                 <FormItem>
                   <FormLabel className="flex items-center"><ImageIcon className="h-4 w-4 mr-2 text-primary" />{t.profileImageUrlOptional || "Profile Image URL (Optional)"}</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/your-image.png or https://placehold.co/..." {...field} />
+                    <Input placeholder={t.profileImageUrlPlaceholder || "https://example.com/your-image.png or https://placehold.co/..."} {...field} />
                   </FormControl>
                   <FormDescription>{t.profileImageDescription || "Link to your professional photo. If blank, a placeholder will be used."}</FormDescription>
                   <FormMessage />

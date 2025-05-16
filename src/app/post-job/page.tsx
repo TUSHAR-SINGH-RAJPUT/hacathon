@@ -59,7 +59,17 @@ const formTranslations = {
     priceEstimated: "Price Estimated!",
     estimationFailed: "Estimation Failed",
     jobPostedSimulated: "Job Posted (Simulated)",
-    jobPostedSimulatedDesc: "Your job request has been successfully submitted. Professionals will be notified."
+    jobPostedSimulatedDesc: "Your job request has been successfully submitted. Professionals will be notified.",
+    validationMessages: { // Add this nested object for validation strings
+        jobTitleMin: "Job title must be at least 5 characters.",
+        jobDescriptionMin: "Description must be at least 20 characters.",
+        serviceTypeRequired: "Please select a service type.",
+        locationMin: "Location is required.",
+        urgencyRequired: "Please select an urgency level.",
+        sizeRequired: "Please select the job size.",
+        numberOfPeopleMin: "At least 1 person required",
+        numberOfPeopleRequiredForMediumLarge: "Number of people is required for medium or large jobs."
+    }
 };
 
 export default function PostJobPage() {

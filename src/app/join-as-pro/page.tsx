@@ -28,24 +28,43 @@ const t = {
 // Form translations (hardcoded English)
 const formTranslations = {
     fullName: "Full Name",
+    fullNamePlaceholder: "e.g., Priya Sharma",
     emailAddress: "Email Address",
+    emailPlaceholder: "e.g., priya.sharma@example.com",
     phoneNumberOptional: "Phone Number (Optional)",
+    phoneNumberPlaceholder: "e.g., +91 XXXXXXXXXX",
     primaryServiceLocation: "Primary Service Location",
+    locationPlaceholder: "e.g., Bangalore, Karnataka",
     locationDescription: "City, State where you primarily offer services.",
     servicesYouOffer: "Services You Offer",
     servicesDescription: "Select all services you are proficient in.",
     yearsOfExperience: "Years of Experience",
-    typicalHourlyRateOptional: "Typical Hourly Rate (Optional)",
+    experiencePlaceholder: "e.g., 5",
+    typicalHourlyRateOptional: "Typical Hourly Rate (Optional, INR)",
+    ratePlaceholder: "e.g., ₹300-₹500 or 'Contact for quote'",
     rateDescription: "Provide a range or indicate custom quotes.",
     aboutYouServices: "About You / Your Services",
     bioPlaceholder: "Describe your skills, experience, and what makes your service stand out.",
     profileImageUrlOptional: "Profile Image URL (Optional)",
+    profileImageUrlPlaceholder: "https://example.com/your-image.png or https://placehold.co/...",
     profileImageDescription: "Link to your professional photo. If blank, a placeholder will be used.",
-    resumeOptionalPDF: "Resume (Optional, PDF only, max 5MB)", // New string
-    resumeDescription: "Upload your resume to showcase your qualifications.", // New string
+    resumeOptionalPDF: "Resume (Optional, PDF only, max 5MB)",
+    resumeDescription: "Upload your resume to showcase your qualifications.",
     nextDocumentVerification: "Next: Document Verification",
     basicInformation: "Basic Information",
     serviceDetails: "Service Details",
+    validationMessages: {
+        fullNameMin: "Full name must be at least 3 characters.",
+        emailInvalid: "Please enter a valid email address.",
+        locationRequired: "Location is required.",
+        serviceTypeRequired: "Please select at least one service type.",
+        experiencePositive: "Experience must be a positive number.",
+        bioMin: "Bio must be at least 20 characters.",
+        profileImageInvalidUrl: "Please enter a valid URL for profile image or leave blank for placeholder.",
+        resumeMustBeFileList: "Resume must be a FileList",
+        resumeSinglePDF: "Please upload a single PDF file.",
+        resumeMaxSize: "Resume file size should be less than 5MB."
+    }
 };
 
 export default function JoinAsProPage() {

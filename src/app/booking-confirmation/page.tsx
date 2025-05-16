@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useCart } from "@/context/CartContext";
@@ -59,7 +60,7 @@ export default function BookingConfirmationPage() {
       });
       router.push("/browse-providers");
     }
-  }, [cart, router, toast, isSubmitting]); // t removed from dependencies
+  }, [cart, router, toast, isSubmitting]);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);

@@ -16,6 +16,17 @@ const providerListingsTranslations = {
   tryAdjustingFilters: "Try adjusting your filters or check back later."
 };
 
+const providerCardTranslations = { // Added this for ProviderCard
+  reviewsText: "reviews",
+  experienceSuffix: "years experience",
+  hourlyRateSuffix: "/hr (approx)",
+  servicesLabel: "Services:",
+  more: "more",
+  viewProfileText: "View Profile",
+  messageText: "Message"
+};
+
+
 const t = {
   findYourPerfectPro: "Find Your Perfect Pro",
   exploreSkilledProfessionals: "Explore skilled professionals for any service you need. Filter by category, location, and more."
@@ -36,7 +47,8 @@ export default function BrowseProvidersPage() {
       <ProviderListings 
         initialProviders={dummyProviders} 
         serviceCategories={serviceCategories} 
-        translations={providerListingsTranslations}
+        filterTranslations={providerListingsTranslations}
+        providerCardTranslations={providerCardTranslations} // Pass ProviderCard translations
         locale="en" // Defaulting to 'en' as i18n is removed
       />
     </div>

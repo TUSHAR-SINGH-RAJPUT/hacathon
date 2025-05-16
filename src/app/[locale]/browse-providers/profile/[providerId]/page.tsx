@@ -1,13 +1,4 @@
-
-import { getDictionary } from '@/lib/dictionaries';
-import ProviderProfilePageContent from './ProviderProfilePageContent';
-
-export default async function ProviderProfilePage({ params: { locale, providerId } }: { params: { locale: string, providerId: string } }) {
-  const dict = await getDictionary(locale);
-  const tProfilePage = dict.ProviderProfilePage || {}; 
-  const tProviderCard = dict.ProviderCard || {}; // For recommended provider cards
-  
-  return <ProviderProfilePageContent tProfilePage={tProfilePage} tProviderCard={tProviderCard} locale={locale} providerId={providerId} />;
-}
-
-    
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/browse-providers/profile/[providerId]/page.tsx.
+// Please delete the /src/app/[locale] directory.

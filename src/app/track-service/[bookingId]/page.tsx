@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -23,7 +24,8 @@ const t = {
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
   messageProvider: "Message",
-  contactOptionsSimulated: "Contact options are simulated for this demo."
+  contactOptionsSimulated: "Contact options are simulated for this demo.",
+  backButton: "Back"
 };
 
 
@@ -76,7 +78,7 @@ export default function TrackServicePage() {
       setError(t.bookingNotFoundOrInvalid);
       setLoading(false);
     }
-  }, [bookingId]); // t removed from dependencies
+  }, [bookingId]);
 
   if (loading) {
     return (
@@ -110,7 +112,7 @@ export default function TrackServicePage() {
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-6">
       <Button variant="outline" onClick={() => router.back()} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+        <ArrowLeft className="mr-2 h-4 w-4" /> {t.backButton}
       </Button>
 
       <Card className="shadow-xl bg-card">

@@ -1,7 +1,4 @@
-import { getDictionary } from '@/lib/dictionaries';
-import SignUpPageContent from './SignUpPageContent';
-
-export default async function SignUpPage({ params: { locale } }: { params: { locale: string } }) {
-  const dict = await getDictionary(locale);
-  return <SignUpPageContent t={dict.SignUpPage || {}} locale={locale} />;
-}
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/signup/page.tsx.
+// Please delete the /src/app/[locale] directory.

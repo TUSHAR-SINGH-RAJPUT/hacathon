@@ -1,9 +1,4 @@
-import { getDictionary } from '@/lib/dictionaries';
-import BookingConfirmationPageContent from './BookingConfirmationPageContent';
-
-export default async function BookingConfirmationPage({ params: { locale } }: { params: { locale: string } }) {
-  const dict = await getDictionary(locale);
-  const t = dict.BookingConfirmationPage || {}; 
-
-  return <BookingConfirmationPageContent t={t} locale={locale} />;
-}
+// This file was part of the [locale] routing structure for i18n.
+// As i18n is being reverted, this file is no longer needed.
+// Its logic has been merged back into /src/app/booking-confirmation/page.tsx.
+// Please delete the /src/app/[locale] directory.
