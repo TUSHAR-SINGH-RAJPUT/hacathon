@@ -4,10 +4,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Lightbulb, Users, Target, MessageCircle, X as CloseIcon } from 'lucide-react'; // Added MessageCircle and CloseIcon
+import { ArrowRight, Zap, Lightbulb, Users, Target, MessageCircle, X as CloseIcon } from 'lucide-react';
 import Logo from '@/components/Logo';
 import Script from 'next/script';
-import React, { useState } from 'react'; // Added useState
+import React, { useState } from 'react';
 
 // Hardcoded English strings since i18n was reverted
 const t = {
@@ -26,7 +26,7 @@ const t = {
   trustText: "Building a platform where quality service and reliability are paramount.",
   readyToSimplify: "Ready to Simplify Your Service Needs?",
   joinCommunityText: "Join the kariGaar community today. Post a job or find a skilled professional in minutes.",
-  chatWithUs: "Chat with Our Assistant", // This title might be less relevant now or can be removed
+  chatWithUs: "Chat with Our Assistant",
   openChat: "Open Chat",
   closeChat: "Close Chat"
 };
@@ -115,15 +115,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* This section for embedded chatbot is now replaced by the floating button */}
-      {/* <section className="py-16 md:py-20 bg-background">
+      {/* This section was for the directly embedded chatbot, now handled by the floating button and panel */}
+      {/* 
+      <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">{t.chatWithUs}</h2>
           <div className="max-w-3xl mx-auto bg-card p-4 sm:p-6 rounded-xl shadow-2xl">
             <iframe
               id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
               title="Tyrone: Job Application Assistant"
-              onLoad={(e: any) => e.target.parentElement.scrollTo(0, 0)}
+              onLoad={(e: any) => {
+                if (e.target && e.target.parentElement) {
+                  e.target.parentElement.scrollTo(0, 0);
+                }
+              }}
               allowtransparency="true"
               allow="geolocation; microphone; camera; fullscreen"
               src="https://agent.jotform.com/0196db22d17d7cc8ab41c9dfabe188b64f9e/voice?embedMode=iframe&background=1&shadow=1"
@@ -139,7 +144,8 @@ export default function LandingPage() {
             ></iframe>
           </div>
         </div>
-      </section> */}
+      </section> 
+      */}
       <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
       <Script id="jotform-init" strategy="lazyOnload">
         {`
@@ -178,7 +184,7 @@ export default function LandingPage() {
         <Button
           variant="default"
           size="icon"
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl bg-primary hover:bg-primary/90 text-primary-foreground animate-bounce z-50"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl bg-primary hover:bg-primary/90 text-primary-foreground z-[9999]" // Increased z-index
           onClick={() => setIsChatOpen(true)}
           aria-label={t.openChat}
         >
@@ -188,7 +194,7 @@ export default function LandingPage() {
 
       {/* Chatbot Iframe Container (conditionally rendered) */}
       {isChatOpen && (
-        <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-50 bg-card shadow-2xl rounded-t-lg md:rounded-lg overflow-hidden w-full max-w-md h-[70vh] md:h-[688px] flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-300">
+        <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-[10000] bg-card shadow-2xl rounded-t-lg md:rounded-lg overflow-hidden w-full max-w-md h-[70vh] md:h-[688px] flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-300"> {/* Increased z-index */}
           <div className="flex justify-between items-center p-3 bg-secondary text-secondary-foreground border-b">
             <h3 className="font-semibold">{t.chatWithUs}</h3>
             <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(false)} aria-label={t.closeChat}>
@@ -200,7 +206,6 @@ export default function LandingPage() {
               id="JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e"
               title="Tyrone: Job Application Assistant"
               onLoad={(e: any) => {
-                // Try to ensure parent is available before scrolling
                 if (e.target && e.target.parentElement) {
                   e.target.parentElement.scrollTo(0, 0);
                 }
@@ -245,7 +250,7 @@ export default function LandingPage() {
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.05; } /* Reduced default opacity for dark theme */
+            0%, 100% { opacity: 0.05; }
             50% { opacity: 0.2; }
         }
         .dark .animate-pulse, .dark .animate-pulse-delay {
