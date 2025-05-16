@@ -7,11 +7,10 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Lightbulb, Users, Target } from 'lucide-react';
 import Logo from '@/components/Logo';
-import type { Locale } from '@/../next.config'; // Locale type might still be useful for Link components
 
 interface LandingPageContentProps {
   dict: any; // Dictionary passed from the server component
-  locale: Locale; // Locale passed for any client-side Link components if needed
+  locale: string; // Locale passed for any client-side Link components if needed
 }
 
 export default function LandingPageContent({ dict, locale }: LandingPageContentProps) {
@@ -60,7 +59,7 @@ export default function LandingPageContent({ dict, locale }: LandingPageContentP
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10">
             {dict.tagline}
           </p>
-          <Link href="/platform-home" passHref>
+          <Link href={`/${locale}/platform-home`} passHref>
             <Button size="lg" className="px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
               {dict.getStartedNow} <ArrowRight className="ml-3 h-6 w-6" />
             </Button>
@@ -102,7 +101,7 @@ export default function LandingPageContent({ dict, locale }: LandingPageContentP
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10">
             {dict.joinCommunityText}
           </p>
-          <Link href="/platform-home" passHref>
+          <Link href={`/${locale}/platform-home`} passHref>
             <Button size="lg" className="px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transform transition-transform hover:scale-105 active:scale-95 shadow-xl">
               {dict.explorePlatform} <ArrowRight className="ml-3 h-6 w-6" />
             </Button>

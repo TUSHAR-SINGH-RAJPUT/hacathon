@@ -7,10 +7,9 @@ import { InfoIcon, Users, Target, BookOpen, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function AboutPage({ params: { locale } }: Props) {
@@ -74,7 +73,7 @@ export default async function AboutPage({ params: { locale } }: Props) {
         <p className="text-muted-foreground max-w-xl mx-auto mb-6">
           {dict.platformGuideDescription}
         </p>
-        <Link href="/about/guide" passHref>
+        <Link href={`/${locale}/about/guide`} passHref>
           <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
             {dict.explorePlatformGuide} <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

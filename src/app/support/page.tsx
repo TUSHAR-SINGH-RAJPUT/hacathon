@@ -7,7 +7,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { HelpCircle, Mail, Phone, LifeBuoy } from "lucide-react"; 
 import Link from "next/link";
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 const createFaqItems = (dict: any) => [
   {
@@ -29,7 +28,7 @@ const createFaqItems = (dict: any) => [
 ];
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function SupportPage({ params: { locale } }: Props) {
@@ -101,7 +100,7 @@ export default async function SupportPage({ params: { locale } }: Props) {
       </Card>
 
       <div className="text-center">
-         <Link href="/about/guide" passHref>
+         <Link href={`/${locale}/about/guide`} passHref>
           <Button variant="link" className="text-primary text-lg">
             <LifeBuoy className="mr-2 h-5 w-5" /> {t.visitPlatformGuide}
           </Button>

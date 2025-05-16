@@ -6,56 +6,55 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Home, PlusSquare, Search, UserCircle, Briefcase, InfoIcon, ArrowRight, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 // This structure assumes fixed English titles for now or would need these titles also in dict
 // For simplicity, keeping titles in English, but descriptions could be translated.
-const createGuideSections = (dict: any) => [ // dict parameter for future use
+const createGuideSections = (dict: any, locale: string) => [ 
   { 
     title: "Getting Started: Homepage Overview", 
     description: "Understand the main features accessible from our homepage.", 
-    link: "/about/guide/homepage", 
+    link: `/${locale}/about/guide/homepage`, 
     icon: <Home className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Posting a New Job", 
     description: "Learn how to create effective job posts to attract the right professionals.", 
-    link: "/about/guide/posting-a-job", 
+    link: `/${locale}/about/guide/posting-a-job`, 
     icon: <PlusSquare className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Browsing Services & Provider Profiles", 
     description: "Find out how to search for services and understand provider profiles.", 
-    link: "/about/guide/browsing-services", 
+    link: `/${locale}/about/guide/browsing-services`, 
     icon: <Search className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Using Your Job List (Cart) & Booking", 
     description: "Manage your shortlisted providers and understand the booking process.", 
-    link: "/about/guide/job-list-booking", 
+    link: `/${locale}/about/guide/job-list-booking`, 
     icon: <UserCircle className="h-6 w-6 text-primary" />
   },
   { 
     title: "Joining as a Professional", 
     description: "A step-by-step guide for service providers to register and get started.", 
-    link: "/about/guide/joining-as-pro", 
+    link: `/${locale}/about/guide/joining-as-pro`, 
     icon: <Briefcase className="h-6 w-6 text-primary" /> 
   },
   { 
     title: "Managing Your Account", 
     description: "Information on login, signup, and managing your user settings (for customers and pros).", 
-    link: "/about/guide/managing-account", 
+    link: `/${locale}/about/guide/managing-account`, 
     icon: <UserCircle className="h-6 w-6 text-primary" /> 
   },
 ];
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function PlatformGuidePage({ params: { locale } }: Props) {
   const dict = await getDictionary(locale);
-  const guideSections = createGuideSections(dict);
+  const guideSections = createGuideSections(dict, locale);
 
   return (
     <div className="animate-in fade-in duration-500 space-y-12">

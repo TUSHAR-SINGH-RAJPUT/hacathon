@@ -6,7 +6,6 @@ import { ListOrdered, CalendarDays, Info } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 // Dummy booking data
 const dummyBookings = [
@@ -15,7 +14,7 @@ const dummyBookings = [
 ];
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function MyBookingsPage({ params: { locale } }: Props) {
@@ -59,7 +58,7 @@ export default async function MyBookingsPage({ params: { locale } }: Props) {
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${booking.status === "Completed" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
                     {booking.status}
                   </span>
-                  <Link href={booking.link || `/track-service/${booking.id}`} passHref>
+                  <Link href={`/${locale}${booking.link}` || `/${locale}/track-service/${booking.id}`} passHref>
                     <Button variant="link" className="text-primary text-sm p-0 h-auto">{t.trackViewDetails}</Button>
                   </Link>
                 </div>
@@ -69,7 +68,7 @@ export default async function MyBookingsPage({ params: { locale } }: Props) {
             <div className="text-center py-6">
               <Info className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
               <p className="text-muted-foreground">{t.noBookingsYet}</p>
-              <Link href="/browse-providers" passHref>
+              <Link href={`/${locale}/browse-providers`} passHref>
                 <Button variant="outline" className="mt-4 text-primary border-primary">{t.findServices}</Button>
               </Link>
             </div>

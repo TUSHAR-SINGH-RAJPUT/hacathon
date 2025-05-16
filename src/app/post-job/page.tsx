@@ -6,51 +6,50 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Lightbulb, Users, ListChecks, Edit, AlertCircle } from 'lucide-react'; 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function PostJobPage({ params: { locale } }: Props) {
   const dict = await getDictionary(locale);
   const formDict = { // Pass specific translations to the client form component
-    jobTitle: "Job Title",
-    jobTitlePlaceholder: "e.g., Interior Wall Painting for 2BHK",
-    jobTitleDescription: "A clear, concise title helps attract the right pros (max 100 characters).",
-    serviceType: "Service Type",
-    selectServicePlaceholder: "Select a service category",
-    detailedJobDescription: "Detailed Job Description",
-    jobDescriptionPlaceholder: "Describe the work thoroughly: tasks, materials (yours or pro's), measurements, special instructions. More details mean better quotes!",
-    jobDescriptionHint: "Be specific for accurate understanding (min 20, max 1000 characters).",
-    jobLocation: "Job Location",
-    locationPlaceholder: "e.g., Your Area, City, Pincode (India)",
-    locationDescription: "Specify where the service is needed (e.g., \"Koramangala, Bangalore\" or \"560095\").",
-    urgencyLevel: "Urgency Level",
-    urgencyPlaceholder: "How soon do you need it?",
-    estimatedJobSize: "Estimated Job Size",
-    jobSizePlaceholder: "Estimate the job size",
-    numberOfProfessionals: "Number of Professionals Needed (Estimate)",
-    numberOfProfessionalsPlaceholder: "e.g., 1 or 2",
-    numberOfProfessionalsDescription: "For medium or large jobs, how many people might be required?",
-    getAIPriceEstimate: "Get AI Price Estimate (₹)",
-    postJobAndFind: "Post Job & Find Professionals",
-    coreJobDetails: "Core Job Details",
-    coreJobDetailsDesc: "Start by telling us the basics of what you need.",
-    locationAndUrgency: "Location & Urgency",
-    locationAndUrgencyDesc: "Help us understand where and when the job needs to be done.",
-    scopeAndTeam: "Scope & Team",
-    scopeAndTeamDesc: "Define the scale of the job.",
-    aiPriceEstimation: "AI Price Estimation",
-    estimatedRange: "Estimated Range",
-    factorsConsidered: "Factors considered",
-    aiNote: "Note: This is an AI-generated estimate for budgetary purposes. Actual bids from professionals may vary.",
-    validationError: "Validation Error",
-    validationErrorDesc: "Please fill in all required fields correctly before estimating. Medium/Large jobs require number of people.",
-    priceEstimated: "Price Estimated!",
-    estimationFailed: "Estimation Failed",
-    jobPostedSimulated: "Job Posted (Simulated)",
-    jobPostedSimulatedDesc: "Your job request has been successfully submitted. Professionals will be notified."
+    jobTitle: dict.jobTitle || "Job Title",
+    jobTitlePlaceholder: dict.jobTitlePlaceholder || "e.g., Interior Wall Painting for 2BHK",
+    jobTitleDescription: dict.jobTitleDescription || "A clear, concise title helps attract the right pros (max 100 characters).",
+    serviceType: dict.serviceType || "Service Type",
+    selectServicePlaceholder: dict.selectServicePlaceholder || "Select a service category",
+    detailedJobDescription: dict.detailedJobDescription || "Detailed Job Description",
+    jobDescriptionPlaceholder: dict.jobDescriptionPlaceholder || "Describe the work thoroughly: tasks, materials (yours or pro's), measurements, special instructions. More details mean better quotes!",
+    jobDescriptionHint: dict.jobDescriptionHint || "Be specific for accurate understanding (min 20, max 1000 characters).",
+    jobLocation: dict.jobLocation || "Job Location",
+    locationPlaceholder: dict.locationPlaceholder || "e.g., Your Area, City, Pincode (India)",
+    locationDescription: dict.locationDescription || "Specify where the service is needed (e.g., \"Koramangala, Bangalore\" or \"560095\").",
+    urgencyLevel: dict.urgencyLevel || "Urgency Level",
+    urgencyPlaceholder: dict.urgencyPlaceholder || "How soon do you need it?",
+    estimatedJobSize: dict.estimatedJobSize || "Estimated Job Size",
+    jobSizePlaceholder: dict.jobSizePlaceholder || "Estimate the job size",
+    numberOfProfessionals: dict.numberOfProfessionals || "Number of Professionals Needed (Estimate)",
+    numberOfProfessionalsPlaceholder: dict.numberOfProfessionalsPlaceholder || "e.g., 1 or 2",
+    numberOfProfessionalsDescription: dict.numberOfProfessionalsDescription || "For medium or large jobs, how many people might be required?",
+    getAIPriceEstimate: dict.getAIPriceEstimate || "Get AI Price Estimate (₹)",
+    postJobAndFind: dict.postJobAndFind || "Post Job & Find Professionals",
+    coreJobDetails: dict.coreJobDetails || "Core Job Details",
+    coreJobDetailsDesc: dict.coreJobDetailsDesc || "Start by telling us the basics of what you need.",
+    locationAndUrgency: dict.locationAndUrgency || "Location & Urgency",
+    locationAndUrgencyDesc: dict.locationAndUrgencyDesc || "Help us understand where and when the job needs to be done.",
+    scopeAndTeam: dict.scopeAndTeam || "Scope & Team",
+    scopeAndTeamDesc: dict.scopeAndTeamDesc || "Define the scale of the job.",
+    aiPriceEstimation: dict.aiPriceEstimation || "AI Price Estimation",
+    estimatedRange: dict.estimatedRange || "Estimated Range",
+    factorsConsidered: dict.factorsConsidered || "Factors considered",
+    aiNote: dict.aiNote || "Note: This is an AI-generated estimate for budgetary purposes. Actual bids from professionals may vary.",
+    validationError: dict.validationError || "Validation Error",
+    validationErrorDesc: dict.validationErrorDesc || "Please fill in all required fields correctly before estimating. Medium/Large jobs require number of people.",
+    priceEstimated: dict.priceEstimated || "Price Estimated!",
+    estimationFailed: dict.estimationFailed || "Estimation Failed",
+    jobPostedSimulated: dict.jobPostedSimulated || "Job Posted (Simulated)",
+    jobPostedSimulatedDesc: dict.jobPostedSimulatedDesc || "Your job request has been successfully submitted. Professionals will be notified."
     // Add more keys from JobPostingForm as needed
   };
 

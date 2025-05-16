@@ -3,10 +3,9 @@
 import ProviderListings from '@/components/providers/ProviderListings';
 import { serviceCategories, dummyProviders } from '@/components/providers/dummyData';
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function BrowseProvidersPage({ params: { locale } }: Props) {
@@ -41,6 +40,7 @@ export default async function BrowseProvidersPage({ params: { locale } }: Props)
         initialProviders={dummyProviders} 
         serviceCategories={serviceCategories} 
         translations={providerListingsTranslations}
+        locale={locale}
       />
     </div>
   );

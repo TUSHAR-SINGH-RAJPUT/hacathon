@@ -5,10 +5,9 @@ import ProviderRegistrationForm from './ProviderRegistrationForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Briefcase, MapPin, Users, Award, TrendingUp, ShieldCheck } from 'lucide-react';
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function JoinAsProPage({ params: { locale } }: Props) {
@@ -17,23 +16,23 @@ export default async function JoinAsProPage({ params: { locale } }: Props) {
   // Simplified dictionary for the child form component
   // In a larger app, this might be part of dict or a separate form dictionary
   const formTranslations = {
-    fullName: "Full Name",
-    emailAddress: "Email Address",
-    phoneNumberOptional: "Phone Number (Optional)",
-    primaryServiceLocation: "Primary Service Location",
-    locationDescription: "City, State where you primarily offer services.",
-    servicesYouOffer: "Services You Offer",
-    servicesDescription: "Select all services you are proficient in.",
-    yearsOfExperience: "Years of Experience",
-    typicalHourlyRateOptional: "Typical Hourly Rate (Optional)",
-    rateDescription: "Provide a range or indicate custom quotes.",
-    aboutYouServices: "About You / Your Services",
-    bioPlaceholder: "Describe your skills, experience, and what makes your service stand out.",
-    profileImageUrlOptional: "Profile Image URL (Optional)",
-    profileImageDescription: "Link to your professional photo. If blank, a placeholder will be used.",
-    nextDocumentVerification: "Next: Document Verification",
-    basicInformation: "Basic Information",
-    serviceDetails: "Service Details",
+    fullName: dict.fullName || "Full Name",
+    emailAddress: dict.emailAddress || "Email Address",
+    phoneNumberOptional: dict.phoneNumberOptional || "Phone Number (Optional)",
+    primaryServiceLocation: dict.primaryServiceLocation || "Primary Service Location",
+    locationDescription: dict.locationDescription || "City, State where you primarily offer services.",
+    servicesYouOffer: dict.servicesYouOffer || "Services You Offer",
+    servicesDescription: dict.servicesDescription || "Select all services you are proficient in.",
+    yearsOfExperience: dict.yearsOfExperience || "Years of Experience",
+    typicalHourlyRateOptional: dict.typicalHourlyRateOptional || "Typical Hourly Rate (Optional)",
+    rateDescription: dict.rateDescription || "Provide a range or indicate custom quotes.",
+    aboutYouServices: dict.aboutYouServices || "About You / Your Services",
+    bioPlaceholder: dict.bioPlaceholder || "Describe your skills, experience, and what makes your service stand out.",
+    profileImageUrlOptional: dict.profileImageUrlOptional || "Profile Image URL (Optional)",
+    profileImageDescription: dict.profileImageDescription || "Link to your professional photo. If blank, a placeholder will be used.",
+    nextDocumentVerification: dict.nextDocumentVerification || "Next: Document Verification",
+    basicInformation: dict.basicInformation || "Basic Information",
+    serviceDetails: dict.serviceDetails || "Service Details",
     // ... add more as needed by ProviderRegistrationForm
   };
 

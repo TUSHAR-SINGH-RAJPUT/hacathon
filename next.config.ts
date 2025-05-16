@@ -1,10 +1,6 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  i18n: {
-    locales: ['en', 'hi', 'kn'],
-    defaultLocale: 'en',
-  },
   typescript: {
     ignoreBuildErrors: true,
   },

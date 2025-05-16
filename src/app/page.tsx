@@ -3,11 +3,10 @@
 
 // This file is now a Server Component
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 import LandingPageContent from './LandingPageContent'; // Import the new client component
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function LandingPage({ params: { locale } }: Props) {

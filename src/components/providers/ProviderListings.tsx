@@ -16,11 +16,12 @@ interface ProviderListingsProps {
   initialProviders: ServiceProvider[];
   serviceCategories: { value: ServiceCategory; label: string }[];
   translations: any; // For translated texts
+  locale: string; // Added locale prop
 }
 
 const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__"; 
 
-export default function ProviderListings({ initialProviders, serviceCategories, translations: t }: ProviderListingsProps) {
+export default function ProviderListings({ initialProviders, serviceCategories, translations: t, locale }: ProviderListingsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [minRating, setMinRating] = useState<number>(0);
@@ -121,7 +122,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
       {filteredProviders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProviders.map(provider => (
-            <ProviderCard key={provider.id} provider={provider} />
+            <ProviderCard key={provider.id} provider={provider} locale={locale} />
           ))}
         </div>
       ) : (

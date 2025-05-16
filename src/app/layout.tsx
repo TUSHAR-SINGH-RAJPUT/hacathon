@@ -16,7 +16,7 @@ const geistSans = Geist({
 // export const metadata: Metadata = { ... };
 
 export async function generateStaticParams() {
-  // Locales from next.config.js
+  // Locales from i18nConfig (now implicitly defined)
   const locales = ['en', 'hi', 'kn'];
   return locales.map((locale) => ({ locale }));
 }
@@ -26,7 +26,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: { locale: string }; // Changed Locale to string
 }>) {
   const dict = await getDictionary(params.locale); // Load dictionary for the footer
 

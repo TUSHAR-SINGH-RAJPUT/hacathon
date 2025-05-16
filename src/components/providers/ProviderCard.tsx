@@ -22,11 +22,11 @@ const ServiceTypeIcon = ({ type }: { type: ServiceProvider['serviceTypes'][0] })
   return icons[type] || <Briefcase className="h-4 w-4 mr-1 inline-block" />;
 };
 
-export default function ProviderCard({ provider }: { provider: ServiceProvider }) {
+export default function ProviderCard({ provider, locale }: { provider: ServiceProvider, locale: string }) {
   return (
     <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden transform hover:-translate-y-1">
       <CardHeader className="p-0">
-        <Link href={`/browse-providers/profile/${provider.id}`} passHref>
+        <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref>
           <div className="relative w-full h-48 cursor-pointer group">
             <Image
               src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
@@ -39,7 +39,7 @@ export default function ProviderCard({ provider }: { provider: ServiceProvider }
           </div>
         </Link>
         <div className="p-4">
-          <Link href={`/browse-providers/profile/${provider.id}`} passHref>
+          <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref>
             <CardTitle className="text-xl font-semibold mb-1 hover:text-primary cursor-pointer">{provider.name}</CardTitle>
           </Link>
           <div className="flex items-center text-sm text-amber-500 mb-2">
@@ -78,13 +78,13 @@ export default function ProviderCard({ provider }: { provider: ServiceProvider }
       </CardContent>
       <CardFooter className="p-4 border-t">
         <div className="flex w-full gap-2">
-        <Link href={`/browse-providers/profile/${provider.id}`} passHref className="flex-1">
+        <Link href={`/${locale}/browse-providers/profile/${provider.id}`} passHref className="flex-1">
           <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
             <User size={16} className="mr-2"/>
             View Profile
           </Button>
         </Link>
-        <Link href={`/chat/${provider.id}`} passHref className="flex-1">
+        <Link href={`/${locale}/chat/${provider.id}`} passHref className="flex-1">
           <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
             <MessageSquare size={16} className="mr-2" /> Message
           </Button>

@@ -5,10 +5,9 @@ import DocumentVerificationForm from '../DocumentVerificationForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { ShieldCheck } from 'lucide-react';
 import { getDictionary } from '@/lib/dictionaries';
-import type { Locale } from '@/../next.config';
 
 type Props = {
-  params: { locale: Locale };
+  params: { locale: string }; // Changed Locale to string
 };
 
 export default async function VerifyDocumentsPage({ params: { locale } }: Props) {
