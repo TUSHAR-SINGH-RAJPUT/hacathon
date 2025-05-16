@@ -18,27 +18,28 @@ export default function ProviderCard({ provider, locale, translations: tProp }: 
   const t = tProp || {}; // Ensure t is always an object
 
   return (
-    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-background overflow-hidden transform hover:-translate-y-1">
+    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-all duration-300 bg-card overflow-hidden transform hover:-translate-y-1.5 hover:scale-[1.02]">
       <CardHeader className="p-0">
         <Link href={`/browse-providers/profile/${provider.id}`} passHref>
-          <div className="relative w-full h-48 cursor-pointer group">
+          <div className="relative w-full h-48 cursor-pointer group overflow-hidden">
             <Image
               src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
               alt={`${provider.name}'s profile`}
               fill
               style={{objectFit:"cover"}}
               data-ai-hint="worker portrait"
-              className="group-hover:scale-105 transition-transform duration-300"
+              className="group-hover:scale-110 transition-transform duration-500 ease-in-out"
             />
+             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
         </Link>
         <div className="p-4">
           <Link href={`/browse-providers/profile/${provider.id}`} passHref>
-            <CardTitle className="text-xl font-semibold mb-1 hover:text-primary cursor-pointer">{provider.name}</CardTitle>
+            <CardTitle className="text-xl font-semibold mb-1 hover:text-primary cursor-pointer transition-colors">{provider.name}</CardTitle>
           </Link>
-          <div className="flex items-center text-sm text-amber-500 mb-2">
+          <div className="flex items-center text-sm text-amber-400 mb-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={`h-5 w-5 ${i < Math.round(provider.rating) ? 'fill-current' : 'text-muted-foreground/50'}`} />
+              <Star key={i} className={`h-5 w-5 ${i < Math.round(provider.rating) ? 'fill-current' : 'text-muted-foreground/30'}`} />
             ))}
             <span className="ml-2 text-muted-foreground">({provider.reviewsCount} {t.reviewsText || "reviews"})</span>
           </div>
@@ -59,27 +60,27 @@ export default function ProviderCard({ provider, locale, translations: tProp }: 
           )}
         </div>
         <div className="mt-3">
-          <p className="text-xs font-semibold text-foreground mb-1">{t.servicesLabel || "Services:"}</p>
+          <p className="text-xs font-semibold text-foreground mb-1.5">{t.servicesLabel || "Services:"}</p>
           <div className="flex flex-wrap gap-2">
             {provider.serviceTypes.slice(0, 3).map((type) => (
-              <Badge key={type} variant="secondary" className="bg-secondary text-secondary-foreground flex items-center">
-                <ServiceTypeIcon type={type} className="h-4 w-4 mr-1 inline-block" /> {type}
+              <Badge key={type} variant="secondary" className="bg-secondary/70 text-secondary-foreground flex items-center text-xs py-1 px-2.5 shadow-sm">
+                <ServiceTypeIcon type={type} className="h-3.5 w-3.5 mr-1.5 inline-block" /> {type}
               </Badge>
             ))}
-            {provider.serviceTypes.length > 3 && <Badge variant="outline">+{provider.serviceTypes.length - 3} {t.more || "more"}</Badge>}
+            {provider.serviceTypes.length > 3 && <Badge variant="outline" className="text-xs py-1 px-2.5">+{provider.serviceTypes.length - 3} {t.more || "more"}</Badge>}
           </div>
         </div>
       </CardContent>
-      <CardFooter className="p-4 border-t">
+      <CardFooter className="p-4 border-t mt-auto">
         <div className="flex w-full gap-2">
         <Link href={`/browse-providers/profile/${provider.id}`} passHref className="flex-1">
-          <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+          <Button variant="outline" className="w-full">
             <User size={16} className="mr-2"/>
             {t.viewProfileText || "View Profile"}
           </Button>
         </Link>
         <Link href={`/chat/${provider.id}`} passHref className="flex-1">
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button className="w-full">
             <MessageSquare size={16} className="mr-2" /> {t.messageText || "Message"}
           </Button>
         </Link>

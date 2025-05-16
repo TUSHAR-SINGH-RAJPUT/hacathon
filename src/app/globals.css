@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    /* Neutral Light Theme (Default) */
+    /* Neutral Light Theme (Fallback if dark class is removed) */
     --background: 0 0% 100%; /* White */
     --foreground: 240 10% 3.9%; /* Near Black */
 
@@ -55,51 +55,51 @@
   }
 
   .dark {
-    /* Neutral Dark Theme */
-    --background: 240 10% 3.9%; /* Near Black */
-    --foreground: 0 0% 98%; /* White */
+    /* Refined Dark Theme */
+    --background: 220 18% 11%; /* Dark Slate Blue/Charcoal */
+    --foreground: 210 20% 95%; /* Lighter Gray for text */
 
-    --card: 240 10% 3.9%; /* Near Black */
-    --card-foreground: 0 0% 98%; /* White */
+    --card: 220 15% 16%; /* Slightly lighter than background */
+    --card-foreground: 210 20% 95%;
 
-    --popover: 240 10% 3.9%; /* Near Black */
-    --popover-foreground: 0 0% 98%; /* White */
+    --popover: 220 15% 13%; /* Darker for popovers */
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 217.2 91.2% 59.8%; /* Brighter Blue for Dark Mode */
-    --primary-foreground: 210 40% 98%; /* White */
+    --primary: 190 70% 55%; /* Vibrant Teal */
+    --primary-foreground: 210 40% 98%; /* White/Very Light Gray */
 
-    --secondary: 240 3.7% 15.9%; /* Dark Gray */
-    --secondary-foreground: 0 0% 98%; /* White */
+    --secondary: 210 30% 30%; /* Muted Blue/Gray */
+    --secondary-foreground: 210 20% 85%; /* Lighter Muted Text */
 
-    --muted: 240 3.7% 15.9%; /* Dark Gray */
-    --muted-foreground: 240 5% 64.9%; /* Lighter Gray */
+    --muted: 220 10% 25%; /* Muted Dark Gray */
+    --muted-foreground: 210 15% 60%; /* Medium-Light Gray */
 
-    --accent: 240 3.7% 15.9%;  /* Dark Gray */
-    --accent-foreground: 0 0% 98%; /* White */
+    --accent: 190 60% 45%;  /* Darker Teal for accents */
+    --accent-foreground: 210 30% 90%; /* Light Teal/White */
 
-    --destructive: 0 62.8% 30.6%; /* Darker Red */
-    --destructive-foreground: 0 0% 98%; /* White */
+    --destructive: 0 70% 55%; /* Slightly less harsh Red */
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%; /* Dark Gray Border */
-    --input: 240 3.7% 15.9%; /* Dark Gray Input BG */
-    --ring: 217.2 91.2% 59.8%; /* Brighter Blue for focus rings */
+    --border: 220 15% 25%; /* Softer border */
+    --input: 220 15% 22%; /* Input background */
+    --ring: 190 70% 60%; /* Teal for focus rings */
 
     /* Dark Theme Chart Colors */
-    --chart-1: 217.2 91.2% 59.8%; /* Primary Blue (Brighter) */
-    --chart-2: 150 70% 55%; /* Muted Green (Brighter) */
-    --chart-3: 25 85% 65%; /* Muted Orange (Brighter) */
-    --chart-4: 270 70% 65%; /* Muted Purple (Brighter) */
-    --chart-5: 0 0% 60%; /* Light Gray */
+    --chart-1: 190 70% 55%; /* Primary Teal */
+    --chart-2: 160 50% 50%; /* Muted Green (adjusted for dark) */
+    --chart-3: 35 70% 60%; /* Muted Orange (adjusted for dark) */
+    --chart-4: 260 60% 65%; /* Muted Purple (adjusted for dark) */
+    --chart-5: 210 10% 50%; /* Medium Gray */
 
     /* Sidebar variables for dark theme */
-    --sidebar-background: 240 10% 5.9%; /* Very Dark Gray */
-    --sidebar-foreground: 0 0% 98%; /* White */
-    --sidebar-primary: 217.2 91.2% 59.8%; /* Brighter Blue */
-    --sidebar-primary-foreground: 210 40% 98%; /* White */
-    --sidebar-accent: 240 3.7% 15.9%; /* Dark Gray */
-    --sidebar-accent-foreground: 0 0% 98%; /* White */
-    --sidebar-border: 240 3.7% 12%; /* Slightly darker border */
-    --sidebar-ring: 217.2 91.2% 59.8%; /* Brighter Blue */
+    --sidebar-background: 220 18% 14%; /* Consistent with card or slightly darker */
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 190 70% 55%; /* Teal */
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 220 15% 25%; /* Darker Accent for sidebar */
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 190 70% 60%;
   }
 }
 
