@@ -29,32 +29,49 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
 
   const filteredProviders = useMemo(() => {
     return initialProviders.filter(provider => {
-      const searchTermLower = searchTerm.toLowerCase().trim();
       const providerNameLower = provider.name.toLowerCase();
       const providerBioLower = provider.bio.toLowerCase();
-      const providerCombinedText = `${providerNameLower} ${providerBioLower}`; // Used for multi-word bio search
+      const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
+      
+      const searchTermLower = searchTerm.toLowerCase().trim();
 
-      let keywordMatch = true; 
+      let keywordMatch = true;
 
       if (searchTermLower !== '') {
-        const searchKeywords = searchTermLower.split(' ').filter(kw => kw.length > 0);
+        const rawKeywords = searchTermLower.split(' ');
+        // Filter for non-empty keywords that contain at least one alphanumeric character
+        const validKeywords = rawKeywords.filter(kw => kw.length > 0 && /[a-z0-9]/i.test(kw));
 
-        if (searchKeywords.length === 1) {
-          const singleKeyword = searchKeywords[0];
-          if (singleKeyword.length === 1) { // Strict "starts with name" for single-letter searches
-            keywordMatch = providerNameLower.startsWith(singleKeyword);
-          } else { // For longer single words, ONLY match if name starts with the keyword
-            keywordMatch = providerNameLower.startsWith(singleKeyword);
+        if (validKeywords.length === 0) {
+          // If search term had content but none of it forms a valid alphanumeric keyword (e.g. ";;;")
+          keywordMatch = false;
+        } else if (validKeywords.length === 1) {
+          const singleValidKeyword = validKeywords[0];
+          // Check if the keyword starts with an alphanumeric character.
+          // This helps to ensure that terms like ";dh;" won't match names starting with them.
+          const isSensiblePrefix = /^[a-z0-9]/i.test(singleValidKeyword);
+
+          if (singleValidKeyword.length === 1 && /^[a-z0-9]$/i.test(singleValidKeyword)) {
+            // Strict "starts with name" for single alphanumeric character searches
+            keywordMatch = providerNameLower.startsWith(singleValidKeyword);
+          } else if (isSensiblePrefix) {
+            // For longer single valid keywords that start with an alphanumeric character,
+            // match if the provider's name starts with that keyword.
+            keywordMatch = providerNameLower.startsWith(singleValidKeyword);
+          } else {
+            // If the single keyword is not a sensible prefix (e.g., starts with ';', like ";dh;"),
+            // it shouldn't match a name by starting with it.
+            keywordMatch = false; 
           }
-        } else if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present in name OR bio
-          keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
+        } else { // Multiple valid keywords
+          // All valid keywords must be present in the combined name or bio
+          keywordMatch = validKeywords.every(keyword => providerCombinedText.includes(keyword));
         }
-        // If searchKeywords is empty (e.g., user typed only spaces and trimmed to empty), keywordMatch remains true (no filter)
       }
-
+      
       const categoryMatch = selectedCategory === ALL_CATEGORIES_VALUE || provider.serviceTypes.includes(selectedCategory as ServiceCategory);
       const ratingMatch = provider.rating >= minRating;
-      const locationMatch = locationFilter === '' || provider.location.toLowerCase().includes(locationFilter.toLowerCase());
+      const locationMatch = locationFilter === '' || provider.location.toLowerCase().includes(locationFilter.toLowerCase().trim());
       
       return keywordMatch && categoryMatch && ratingMatch && locationMatch;
     });
