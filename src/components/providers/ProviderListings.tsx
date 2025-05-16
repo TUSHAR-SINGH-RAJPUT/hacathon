@@ -34,21 +34,22 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
       const providerBioLower = provider.bio.toLowerCase();
       const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
 
-      let keywordMatch = true; // Default to true, will be set to false if criteria not met
+      let keywordMatch = true; 
 
       if (searchTermLower !== '') {
         const searchKeywords = searchTermLower.split(' ').filter(kw => kw.length > 0);
 
-        if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present
-          keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
-        } else if (searchKeywords.length === 1) { // Single-word/initial search
+        if (searchKeywords.length === 1) {
           const singleKeyword = searchKeywords[0];
-          // Match if name starts with the keyword OR keyword is present anywhere in name/bio
-          keywordMatch = providerNameLower.startsWith(singleKeyword) || providerCombinedText.includes(singleKeyword);
-        } else { 
-          // If searchKeywords is empty (e.g., user typed only spaces), treat as no keyword filter
-          keywordMatch = true;
+          if (singleKeyword.length === 1) { // Strict "starts with name" for single-letter searches
+            keywordMatch = providerNameLower.startsWith(singleKeyword);
+          } else { // For longer single words, allow "starts with name" OR general keyword match
+            keywordMatch = providerNameLower.startsWith(singleKeyword) || providerCombinedText.includes(singleKeyword);
+          }
+        } else if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present
+          keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
         }
+        // If searchKeywords is empty (e.g., user typed only spaces and trimmed to empty), keywordMatch remains true (no filter)
       }
 
       const categoryMatch = selectedCategory === ALL_CATEGORIES_VALUE || provider.serviceTypes.includes(selectedCategory as ServiceCategory);
@@ -150,4 +151,3 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     </div>
   );
 }
-
