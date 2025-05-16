@@ -23,24 +23,36 @@ const ALL_CATEGORIES_VALUE = "__ALL_CATEGORIES__";
 
 export default function ProviderListings({ initialProviders, serviceCategories, filterTranslations: t, providerCardTranslations, locale }: ProviderListingsProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES_VALUE); // Default to ALL_CATEGORIES_VALUE
   const [minRating, setMinRating] = useState<number>(0);
   const [locationFilter, setLocationFilter] = useState('');
 
   const filteredProviders = useMemo(() => {
     return initialProviders.filter(provider => {
-      const nameMatch = provider.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const bioMatch = provider.bio.toLowerCase().includes(searchTerm.toLowerCase());
+      // Keyword search logic
+      let keywordMatch = true; // Assume match if no search term
+      if (searchTerm.trim() !== '') {
+        const searchKeywords = searchTerm.toLowerCase().split(' ').filter(kw => kw.length > 0);
+        if (searchKeywords.length > 0) {
+          const providerNameLower = provider.name.toLowerCase();
+          const providerBioLower = provider.bio.toLowerCase();
+          const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
+          
+          keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
+        }
+      }
+
       const categoryMatch = selectedCategory === '' || selectedCategory === ALL_CATEGORIES_VALUE || provider.serviceTypes.includes(selectedCategory as ServiceCategory);
       const ratingMatch = provider.rating >= minRating;
       const locationMatch = locationFilter === '' || provider.location.toLowerCase().includes(locationFilter.toLowerCase());
-      return (nameMatch || bioMatch) && categoryMatch && ratingMatch && locationMatch;
+      
+      return keywordMatch && categoryMatch && ratingMatch && locationMatch;
     });
   }, [initialProviders, searchTerm, selectedCategory, minRating, locationFilter]);
 
   const resetFilters = () => {
     setSearchTerm('');
-    setSelectedCategory(''); 
+    setSelectedCategory(ALL_CATEGORIES_VALUE); 
     setMinRating(0);
     setLocationFilter('');
   };
@@ -63,7 +75,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
           <div>
             <Label htmlFor="service-category" className="text-sm font-medium text-secondary-foreground">{t.serviceCategory || "Service Category"}</Label>
             <Select 
-              value={selectedCategory === '' ? ALL_CATEGORIES_VALUE : selectedCategory} 
+              value={selectedCategory} 
               onValueChange={(value) => setSelectedCategory(value)}
             >
               <SelectTrigger id="service-category" className="bg-background focus:ring-primary">
