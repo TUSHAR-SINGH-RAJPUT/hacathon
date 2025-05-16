@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +26,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { estimateJobPrice, EstimateJobPriceInput, EstimateJobPriceOutput } from "@/ai/flows/estimate-job-price";
 import React, { useState } from "react";
-import { Loader2, Wand2, Users } from "lucide-react";
+import { Loader2, Wand2, Users, Briefcase, MessageSquare, MapPin, Clock, CalendarCheck2, Tag, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from "@/components/ui/card";
 import type { ServiceCategory } from "@/types";
 
 const serviceCategories: { value: ServiceCategory; label: string }[] = [
@@ -61,7 +62,7 @@ const formSchema = z.object({
   return true;
 }, {
   message: "Number of people is required for medium or large jobs.",
-  path: ["numberOfPeople"], // Path of the error
+  path: ["numberOfPeople"], 
 });
 
 export default function JobPostingForm() {
@@ -91,7 +92,7 @@ export default function JobPostingForm() {
     const parseResult = formSchema.safeParse(values);
 
     if (!parseResult.success) {
-      form.trigger(); // Show validation errors
+      form.trigger(); 
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields correctly before estimating. Medium/Large jobs require number of people.",
@@ -138,175 +139,192 @@ export default function JobPostingForm() {
       title: "Job Posted (Simulated)",
       description: "Your job request has been successfully submitted. Professionals will be notified.",
     });
-    // form.reset(); 
-    // setEstimationResult(null);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="jobTitle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Job Title</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Interior Wall Painting for 2BHK" {...field} />
-              </FormControl>
-              <FormDescription>A clear and concise title for your job (max 100 characters).</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+        <Card className="bg-card/70 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-card-foreground flex items-center gap-2"><Info className="text-primary"/>Core Job Details</CardTitle>
+            <UiCardDescription>Start by telling us the basics of what you need.</UiCardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-4">
+            <FormField
+              control={form.control}
+              name="jobTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Tag className="text-primary h-4 w-4"/>Job Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Interior Wall Painting for 2BHK" {...field} />
+                  </FormControl>
+                  <FormDescription>A clear, concise title helps attract the right pros (max 100 characters).</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="serviceType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Service Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a service category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {serviceCategories.map(category => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="serviceType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Briefcase className="text-primary h-4 w-4"/>Service Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a service category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {serviceCategories.map(category => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="jobDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Detailed Job Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe the work in detail: what needs to be done, specific tasks, any materials you'll provide or expect the pro to bring, measurements if applicable, and any special instructions or requirements. The more details, the better!"
-                  className="resize-y min-h-[120px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>Provide as much detail as possible (min 20, max 1000 characters). This helps pros understand the scope and give accurate quotes.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Job Location</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Your Area, City, State or Pincode (India)" {...field} />
-              </FormControl>
-              <FormDescription>Specify where the service is needed (e.g., "Indiranagar, Bangalore" or "560038").</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="jobDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><MessageSquare className="text-primary h-4 w-4"/>Detailed Job Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe the work thoroughly: tasks, materials (yours or pro's), measurements, special instructions. More details mean better quotes!"
+                      className="resize-y min-h-[150px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Be specific for accurate understanding (min 20, max 1000 characters).</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
         
-        <div className="grid md:grid-cols-2 gap-8">
-          <FormField
-            control={form.control}
-            name="urgency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Urgency Level</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <Card className="bg-card/70 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-card-foreground flex items-center gap-2"><MapPin className="text-primary"/>Location & Urgency</CardTitle>
+             <UiCardDescription>Help us understand where and when the job needs to be done.</UiCardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-4">
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><MapPin className="text-primary h-4 w-4"/>Job Location</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="How soon do you need it?" />
-                    </SelectTrigger>
+                    <Input placeholder="e.g., Your Area, City, Pincode (India)" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    {urgencyLevels.map(level => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormDescription>Specify where the service is needed (e.g., "Koramangala, Bangalore" or "560095").</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="urgency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Clock className="text-primary h-4 w-4"/>Urgency Level</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="How soon do you need it?" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {urgencyLevels.map(level => (
+                        <SelectItem key={level} value={level}>
+                          {level}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
-          <FormField
-            control={form.control}
-            name="size"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estimated Job Size</FormLabel>
-                <Select onValueChange={(value) => {
-                    field.onChange(value);
-                    if (!value.startsWith("Medium") && !value.startsWith("Large")) {
-                        form.setValue("numberOfPeople", undefined); 
-                        form.clearErrors("numberOfPeople");
-                    } else if (form.getValues("numberOfPeople") === undefined) {
-                        form.setValue("numberOfPeople", 1); 
-                    }
-                }} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Estimate the job size" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {jobSizes.map(size => (
-                      <SelectItem key={size} value={size}>
-                        {size}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+        <Card className="bg-card/70 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-card-foreground flex items-center gap-2"><CalendarCheck2 className="text-primary"/>Scope & Team</CardTitle>
+            <UiCardDescription>Define the scale of the job.</UiCardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-4">
+             <FormField
+              control={form.control}
+              name="size"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><Users className="text-primary h-4 w-4"/>Estimated Job Size</FormLabel>
+                  <Select onValueChange={(value) => {
+                      field.onChange(value);
+                      if (!value.startsWith("Medium") && !value.startsWith("Large")) {
+                          form.setValue("numberOfPeople", undefined); 
+                          form.clearErrors("numberOfPeople");
+                      } else if (form.getValues("numberOfPeople") === undefined) {
+                          form.setValue("numberOfPeople", 1); 
+                      }
+                  }} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Estimate the job size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {jobSizes.map(size => (
+                        <SelectItem key={size} value={size}>
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {showNumberOfPeople && (
+              <FormField
+                control={form.control}
+                name="numberOfPeople"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><Users className="text-primary h-4 w-4" />Number of Professionals Needed (Estimate)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="1" placeholder="e.g., 1 or 2" {...field} 
+                      onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)}
+                      />
+                    </FormControl>
+                    <FormDescription>For medium or large jobs, how many people might be required?</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
-          />
-        </div>
-
-        {showNumberOfPeople && (
-          <FormField
-            control={form.control}
-            name="numberOfPeople"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center"><Users className="h-4 w-4 mr-2 text-primary" />Number of People Required (Estimate)</FormLabel>
-                <FormControl>
-                  <Input type="number" min="1" placeholder="e.g., 1 or 2" {...field} 
-                  onChange={e => field.onChange(parseInt(e.target.value,10) || undefined)}
-                  />
-                </FormControl>
-                <FormDescription>For medium or large jobs, estimate how many professionals might be needed.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
+          </CardContent>
+        </Card>
 
         {estimationResult && (
-          <Alert variant="default" className="bg-secondary text-secondary-foreground">
-            <Wand2 className="h-5 w-5 text-primary" />
-            <AlertTitle className="font-semibold text-primary">AI Price Estimation</AlertTitle>
-            <AlertDescription>
-              <p className="font-medium text-lg">Estimated Range: {estimationResult.estimatedPriceRange}</p>
-              <p className="text-sm mt-1">Factors considered: {estimationResult.factorsConsidered}</p>
-              <p className="text-xs mt-2 text-muted-foreground">Note: This is an AI-generated estimate for budgetary purposes only. Actual bids from professionals may vary.</p>
+          <Alert variant="default" className="bg-secondary text-secondary-foreground border-primary/30 shadow-lg">
+            <Wand2 className="h-6 w-6 text-primary" />
+            <AlertTitle className="font-semibold text-lg text-primary">AI Price Estimation</AlertTitle>
+            <AlertDescription className="space-y-1">
+              <p className="font-medium text-xl">Estimated Range: {estimationResult.estimatedPriceRange}</p>
+              <p className="text-md">Factors considered: {estimationResult.factorsConsidered}</p>
+              <p className="text-xs mt-2 ">Note: This is an AI-generated estimate for budgetary purposes. Actual bids from professionals may vary.</p>
             </AlertDescription>
           </Alert>
         )}
@@ -318,23 +336,24 @@ export default function JobPostingForm() {
           </Alert>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row gap-4 pt-6 justify-center">
           <Button
             type="button"
             variant="outline"
+            size="lg"
             onClick={handleEstimatePrice}
             disabled={isEstimating}
             className="w-full sm:w-auto text-primary border-primary hover:bg-primary hover:text-primary-foreground"
           >
             {isEstimating ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
-              <Wand2 className="mr-2 h-4 w-4" />
+              <Wand2 className="mr-2 h-5 w-5" />
             )}
             Get AI Price Estimate (₹)
           </Button>
-          <Button type="submit" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isEstimating}>
-            Post Job & Get Quotes
+          <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90" disabled={isEstimating}>
+            Post Job & Find Professionals
           </Button>
         </div>
       </form>
