@@ -32,7 +32,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
       const searchTermLower = searchTerm.toLowerCase().trim();
       const providerNameLower = provider.name.toLowerCase();
       const providerBioLower = provider.bio.toLowerCase();
-      const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
+      const providerCombinedText = `${providerNameLower} ${providerBioLower}`; // Used for multi-word bio search
 
       let keywordMatch = true; 
 
@@ -43,10 +43,10 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
           const singleKeyword = searchKeywords[0];
           if (singleKeyword.length === 1) { // Strict "starts with name" for single-letter searches
             keywordMatch = providerNameLower.startsWith(singleKeyword);
-          } else { // For longer single words, allow "starts with name" OR general keyword match
-            keywordMatch = providerNameLower.startsWith(singleKeyword) || providerCombinedText.includes(singleKeyword);
+          } else { // For longer single words, ONLY match if name starts with the keyword
+            keywordMatch = providerNameLower.startsWith(singleKeyword);
           }
-        } else if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present
+        } else if (searchKeywords.length > 1) { // Multi-word search: all keywords must be present in name OR bio
           keywordMatch = searchKeywords.every(keyword => providerCombinedText.includes(keyword));
         }
         // If searchKeywords is empty (e.g., user typed only spaces and trimmed to empty), keywordMatch remains true (no filter)
@@ -86,7 +86,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
             <Label htmlFor="service-category" className="text-sm font-medium text-secondary-foreground">{t.serviceCategory || "Service Category"}</Label>
             <Select 
               value={selectedCategory} 
-              onValueChange={(value) => setSelectedCategory(value)}
+              onValueChange={(value) => setSelectedCategory(value || ALL_CATEGORIES_VALUE)}
             >
               <SelectTrigger id="service-category" className="bg-background focus:ring-primary">
                 <SelectValue placeholder={t.allCategories || "All Categories"} />
