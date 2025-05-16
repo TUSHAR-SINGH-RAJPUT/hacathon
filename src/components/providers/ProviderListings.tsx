@@ -7,15 +7,16 @@ import ProviderCard from './ProviderCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, XCircle, Star } from 'lucide-react';
+import { Search, XCircle, Star, Mic } from 'lucide-react'; // Added Mic icon
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { useToast } from "@/hooks/use-toast"; // Added useToast
 
 interface ProviderListingsProps {
   initialProviders: ServiceProvider[];
   serviceCategories: { value: ServiceCategory; label: string }[];
-  filterTranslations: any; // Translations for filter controls
-  providerCardTranslations: any; // Translations for ProviderCard
+  filterTranslations: any; 
+  providerCardTranslations: any; 
   locale: string;
 }
 
@@ -26,6 +27,7 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
   const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES_VALUE);
   const [minRating, setMinRating] = useState<number>(0);
   const [locationFilter, setLocationFilter] = useState('');
+  const { toast } = useToast(); // Initialize toast
 
   const filteredProviders = useMemo(() => {
     return initialProviders.filter(provider => {
@@ -34,38 +36,33 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
       const providerCombinedText = `${providerNameLower} ${providerBioLower}`;
       
       const searchTermLower = searchTerm.toLowerCase().trim();
-
       let keywordMatch = true;
 
       if (searchTermLower !== '') {
-        const rawKeywords = searchTermLower.split(' ');
-        // Filter for non-empty keywords that contain at least one alphanumeric character
-        const validKeywords = rawKeywords.filter(kw => kw.length > 0 && /[a-z0-9]/i.test(kw));
+        const rawKeywords = searchTermLower.split(' ').filter(kw => kw.length > 0);
+        const validKeywords = rawKeywords.filter(kw => /[a-z0-9]/i.test(kw));
 
-        if (validKeywords.length === 0) {
-          // If search term had content but none of it forms a valid alphanumeric keyword (e.g. ";;;")
-          keywordMatch = false;
+        if (validKeywords.length === 0 && rawKeywords.length > 0) {
+          keywordMatch = false; // Search term had content but no valid alphanumeric keywords
         } else if (validKeywords.length === 1) {
           const singleValidKeyword = validKeywords[0];
-          // Check if the keyword starts with an alphanumeric character.
-          // This helps to ensure that terms like ";dh;" won't match names starting with them.
-          const isSensiblePrefix = /^[a-z0-9]/i.test(singleValidKeyword);
-
           if (singleValidKeyword.length === 1 && /^[a-z0-9]$/i.test(singleValidKeyword)) {
-            // Strict "starts with name" for single alphanumeric character searches
             keywordMatch = providerNameLower.startsWith(singleValidKeyword);
-          } else if (isSensiblePrefix) {
-            // For longer single valid keywords that start with an alphanumeric character,
-            // match if the provider's name starts with that keyword.
+          } else if (/^[a-z0-9]/i.test(singleValidKeyword)) {
             keywordMatch = providerNameLower.startsWith(singleValidKeyword);
           } else {
-            // If the single keyword is not a sensible prefix (e.g., starts with ';', like ";dh;"),
-            // it shouldn't match a name by starting with it.
             keywordMatch = false; 
           }
-        } else { // Multiple valid keywords
-          // All valid keywords must be present in the combined name or bio
+        } else if (validKeywords.length > 1) {
           keywordMatch = validKeywords.every(keyword => providerCombinedText.includes(keyword));
+        } else {
+          // If no valid keywords extracted but search term was not empty initially (e.g. ";;;"),
+          // it defaults to true unless explicitly set to false earlier for non-alphanumeric-only input.
+          // This path means searchTermLower had something but it wasn't parseable into valid keywords
+          // according to current logic, so we might assume no filtering if that's desired,
+          // or ensure keywordMatch becomes false if any rawKeywords existed but none were valid.
+          // For now, if validKeywords is empty AND rawKeywords was not empty, implies non-match.
+           if (rawKeywords.length > 0) keywordMatch = false;
         }
       }
       
@@ -82,6 +79,14 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     setSelectedCategory(ALL_CATEGORIES_VALUE); 
     setMinRating(0);
     setLocationFilter('');
+  };
+
+  const handleVoiceAssistClick = () => {
+    toast({
+      title: "Voice Assistant (Simulated)",
+      description: "This feature is coming soon! You could ask for help like 'find a painter in Bangalore' or 'how do I upload my resume?'.",
+      duration: 5000,
+    });
   };
 
   return (
@@ -145,7 +150,10 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
             />
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+           <Button variant="outline" onClick={handleVoiceAssistClick} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+            <Mic className="mr-2 h-4 w-4" /> Voice Assist (Beta)
+          </Button>
            <Button variant="ghost" onClick={resetFilters} className="text-primary hover:bg-primary/10">
             <XCircle className="mr-2 h-4 w-4" /> {t.clearFilters || "Clear Filters"}
           </Button>
@@ -168,3 +176,4 @@ export default function ProviderListings({ initialProviders, serviceCategories, 
     </div>
   );
 }
+
