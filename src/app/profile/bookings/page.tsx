@@ -1,4 +1,6 @@
 
+"use client"; // Add this directive
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListOrdered, CalendarDays, Info, MessageCircle } from "lucide-react"; // Using MessageCircle for WhatsApp
 import Link from "next/link";
