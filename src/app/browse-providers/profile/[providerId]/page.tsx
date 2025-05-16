@@ -6,19 +6,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { dummyProviders } from '@/components/providers/dummyData';
 import type { ServiceProvider } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription as UiCardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, ShoppingCart, MessageCircle, Users as UsersIcon, ArrowLeft, ArrowRight, ThumbsUp } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, ShoppingCart, MessageCircle, Users as UsersIcon, ArrowLeft, ArrowRight, ThumbsUp, Search } from 'lucide-react'; // Added Search
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useEffect, useCallback } from 'react';
 import { Separator } from '@/components/ui/separator';
 import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-
+// Removed Textarea and Label as they were only for the review form
 
 // Hardcoded English strings
 const t = {
@@ -40,13 +38,8 @@ const t = {
   recommendedProfessionals: "Recommended Professionals",
   reviews: "reviews",
   customerReviews: "Customer Reviews",
-  noReviewsYet: "No reviews yet. Be the first to leave one!",
-  leaveAReview: "Leave a Review",
-  yourRating: "Your Rating",
-  yourComments: "Your Comments",
-  submitReview: "Submit Review",
-  reviewSubmitted: "Review Submitted!",
-  thankYouForFeedback: "Thank you for your feedback.",
+  noReviewsYet: "No reviews yet for this provider.", // Updated message
+  // Removed "Leave a Review" related translations
   previous: "Previous",
   next: "Next",
   of: "of"
@@ -63,23 +56,7 @@ const providerCardTranslations = {
   messageText: "Message"
 };
 
-
-const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (rating: number) => void }) => {
-  return (
-    <div className="flex items-center space-x-1 py-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`h-6 w-6 cursor-pointer transition-colors ${
-            star <= rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground hover:text-amber-300'
-          }`}
-          onClick={() => setRating(star)}
-        />
-      ))}
-    </div>
-  );
-};
-
+// StarRatingInput component is removed as it's no longer used on this page
 
 export default function ProviderProfilePage() {
   const params = useParams();
@@ -91,15 +68,13 @@ export default function ProviderProfilePage() {
 
   const [provider, setProvider] = useState<ServiceProvider | undefined>(undefined);
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
-  const [userRating, setUserRating] = useState(0);
-  const [userComment, setUserComment] = useState('');
   const [isHoveringReviews, setIsHoveringReviews] = useState(false);
   
   useEffect(() => {
     const foundProvider = dummyProviders.find(p => p.id === providerId);
     setProvider(foundProvider);
     if (foundProvider) {
-      setCurrentReviewIndex(0); // Reset review index when provider changes
+      setCurrentReviewIndex(0); 
     }
   }, [providerId]);
 
@@ -118,39 +93,12 @@ export default function ProviderProfilePage() {
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
     if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
-      intervalId = setInterval(handleNextReview, 5000); // Change review every 5 seconds
+      intervalId = setInterval(handleNextReview, 5000); 
     }
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount or when isHoveringReviews/provider changes
+    return () => clearInterval(intervalId); 
   }, [provider, isHoveringReviews, handleNextReview]);
 
-
-  const handleSubmitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!provider) return;
-    // Simulate adding a review
-    const newReview = {
-      id: `review-${Date.now()}`,
-      reviewerName: "Current User (Demo)",
-      rating: userRating,
-      comment: userComment,
-      date: new Date().toISOString(),
-    };
-    
-    // This part is tricky without a proper state management for dummyData or backend.
-    // For now, let's just log it and show a toast. A real app would update the data source.
-    console.log("New Review:", newReview, "for provider:", provider.id);
-    toast({ title: t.reviewSubmitted, description: t.thankYouForFeedback });
-    
-    // To make it appear in the slideshow, we'd ideally update the 'provider.reviews' state.
-    // This is a simplified version for the demo:
-    const updatedProvider = { ...provider, reviews: [newReview, ...(provider.reviews || [])]};
-    setProvider(updatedProvider); // This will make the new review appear first
-    setCurrentReviewIndex(0); // Show the new review
-    
-    setUserRating(0);
-    setUserComment('');
-  };
-
+  // Removed handleSubmitReview function
 
   if (!provider) {
     return (
@@ -198,9 +146,9 @@ export default function ProviderProfilePage() {
             <Image
               src={provider.profileImageUrl || `https://placehold.co/800x400.png?text=${provider.name.split(' ').join('+')}`}
               alt={`${provider.name}'s profile background`}
+              data-ai-hint="professional service action"
               fill
               style={{objectFit: 'cover'}}
-              data-ai-hint="professional service action"
               className="opacity-30 mix-blend-overlay"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -335,31 +283,8 @@ export default function ProviderProfilePage() {
             <p className="text-muted-foreground text-center py-4">{t.noReviewsYet}</p>
           )}
 
-          <Separator />
-
-          <div>
-            <h4 className="text-lg font-semibold text-card-foreground mb-3">{t.leaveAReview}</h4>
-            <form onSubmit={handleSubmitReview} className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">{t.yourRating}</Label>
-                <StarRatingInput rating={userRating} setRating={setUserRating} />
-              </div>
-              <div>
-                <Label htmlFor="userComment" className="text-sm font-medium text-muted-foreground">{t.yourComments}</Label>
-                <Textarea 
-                  id="userComment"
-                  value={userComment}
-                  onChange={(e) => setUserComment(e.target.value)}
-                  placeholder="Share your experience..."
-                  className="min-h-[100px] bg-background"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full sm:w-auto" disabled={userRating === 0 || userComment.trim() === ''}>
-                {t.submitReview}
-              </Button>
-            </form>
-          </div>
+          {/* Leave a Review Form Removed */}
+          
         </CardContent>
       </Card>
 
