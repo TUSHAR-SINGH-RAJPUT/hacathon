@@ -4,14 +4,14 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Languages, Globe } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Languages, Globe } from 'lucide-react'; // Added Globe back, will use Languages for the button
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   SheetClose,
+  SheetTrigger, // Added SheetTrigger
 } from "@/components/ui/sheet";
 import {
   Popover,
@@ -25,7 +25,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogClose as DialogPrimitiveClose, // Renamed to avoid conflict with SheetClose
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -46,7 +46,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
-// Hardcoded English translations for Header (as i18n was reverted)
+// Hardcoded English translations for Header
 const headerTranslations = {
     navHome: "Home",
     navPostJob: "Post a Job",
@@ -85,7 +85,8 @@ const headerTranslations = {
     voiceAssistErrorInit: "Speech recognition is not initialized.",
     voiceAssistErrorStart: "Could not start voice recognition. Ensure mic is connected and permissions allowed.",
     voiceAssistDisclaimer: "Voice feature depends on browser & network. May not work in all environments.",
-    googleTranslateLabel: "Translate Page"
+    googleTranslateLabel: "Translate Page",
+    language: "Language",
 };
 
 
@@ -133,15 +134,14 @@ export default function Header() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
-  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
+  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true); // Assume supported initially
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   
   const [isDesktopTranslateOpen, setIsDesktopTranslateOpen] = useState(false);
   const [isMobileTranslateOpen, setIsMobileTranslateOpen] = useState(false);
-  const googleTranslateElementHeaderRef = useRef<HTMLDivElement>(null);
-  const googleTranslateElementHeaderMobileRef = useRef<HTMLDivElement>(null);
-
-  const t = headerTranslations; // Using hardcoded translations
+  
+  // Use hardcoded English translations directly
+  const t = headerTranslations;
 
   useEffect(() => {
     setIsClient(true);
@@ -149,38 +149,37 @@ export default function Header() {
 
   const initGoogleTranslate = useCallback((elementId: string) => {
     if (typeof window !== 'undefined' && (window as any).google?.translate?.TranslateElement && document.getElementById(elementId)) {
-      if (!document.getElementById(elementId)?.querySelector('.goog-te-gadget')) {
-        new (window as any).google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
-          elementId
-        );
+      const targetElement = document.getElementById(elementId);
+      if (targetElement && !targetElement.querySelector('.goog-te-gadget')) {
+        // console.log(`Initializing Google Translate for: ${elementId}`);
+        try {
+          new (window as any).google.translate.TranslateElement(
+            { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
+            elementId
+          );
+        } catch (error) {
+          console.error("Error initializing Google Translate for " + elementId + ":", error);
+        }
       }
     }
   }, []);
 
   useEffect(() => {
-    if (!isClient || typeof window === 'undefined') return;
+    if (!isClient || typeof window === 'undefined' || !(window as any).googleTranslateElementInitGlobal) return;
 
-    // Check if the global init function is available (set by layout.tsx)
-    if (typeof (window as any).googleTranslateElementInitGlobal === 'function') {
-        // Attempt direct initialization if API is already loaded
-        if ((window as any).google?.translate?.TranslateElement) {
-            initGoogleTranslate('google_translate_element_header');
-            initGoogleTranslate('google_translate_element_header_mobile');
-        }
-    }
+    const attemptInit = (id: string) => {
+      if (document.getElementById(id)) {
+        initGoogleTranslate(id);
+      }
+    };
     
-    // Setup observer for elements that might render later (e.g. popover content)
+    attemptInit('google_translate_element_header');
+    attemptInit('google_translate_element_header_mobile');
+
     const observer = new MutationObserver((mutationsList, observerInstance) => {
-      if ((window as any).google?.translate?.TranslateElement) { // Check again if Google API is ready
-        const headerDiv = document.getElementById('google_translate_element_header');
-        if (headerDiv && !headerDiv.querySelector('.goog-te-gadget')) {
-          initGoogleTranslate('google_translate_element_header');
-        }
-        const mobileHeaderDiv = document.getElementById('google_translate_element_header_mobile');
-        if (mobileHeaderDiv && !mobileHeaderDiv.querySelector('.goog-te-gadget')) {
-          initGoogleTranslate('google_translate_element_header_mobile');
-        }
+      if ((window as any).google?.translate?.TranslateElement) {
+        attemptInit('google_translate_element_header');
+        attemptInit('google_translate_element_header_mobile');
       }
     });
 
@@ -190,11 +189,9 @@ export default function Header() {
 
 
   useEffect(() => {
-    if (!isClient) return;
-    let SpeechRecognitionAPI: any;
-    if (typeof window !== 'undefined') {
-      SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    }
+    if (!isClient) return; // Only run on the client
+
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognitionAPI) {
       setIsRecognitionApiSupported(false);
@@ -204,56 +201,63 @@ export default function Header() {
     setIsRecognitionApiSupported(true);
 
     if (!recognitionRef.current) {
-      recognitionRef.current = new SpeechRecognitionAPI();
-      const recognition = recognitionRef.current;
-      if (!recognition) {
-        setRecognitionError(t.voiceAssistErrorInit);
-        return;
-      }
-      recognition.lang = 'en-US';
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let interimTranscriptLocal = '';
-        let finalTranscriptLocal = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscriptLocal += event.results[i][0].transcript;
-          } else {
-            interimTranscriptLocal += event.results[i][0].transcript;
+      try {
+        recognitionRef.current = new SpeechRecognitionAPI();
+        const recognition = recognitionRef.current;
+        if (!recognition) {
+          setRecognitionError(t.voiceAssistErrorInit);
+          return;
+        }
+        recognition.lang = 'en-US'; // Explicitly set language
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          let interimTranscriptLocal = '';
+          let finalTranscriptLocal = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscriptLocal += event.results[i][0].transcript;
+            } else {
+              interimTranscriptLocal += event.results[i][0].transcript;
+            }
           }
-        }
-        setTranscript(finalTranscriptLocal || interimTranscriptLocal);
-        if (finalTranscriptLocal) {
-          setRecognitionError(null);
-        }
-      };
+          setTranscript(finalTranscriptLocal || interimTranscriptLocal);
+          if (finalTranscriptLocal) {
+            setRecognitionError(null);
+          }
+        };
 
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error("Speech recognition error object:", event); 
-        let errorMessage = t.voiceAssistErrorGeneric;
-        if (event.error === 'no-speech') {
-          errorMessage = t.voiceAssistErrorNoSpeech;
-        } else if (event.error === 'audio-capture') {
-          errorMessage = t.voiceAssistErrorAudioCapture;
-        } else if (event.error === 'not-allowed') {
-          errorMessage = t.voiceAssistErrorNotAllowed;
-        } else if (event.error === 'network') {
-          errorMessage = t.voiceAssistErrorNetwork;
-           console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service or related permissions.");
-        } else {
-          errorMessage = `${t.voiceAssistErrorGeneric || 'Speech recognition error'} (Code: ${event.error})`;
-        }
-        setRecognitionError(errorMessage);
-        setIsListening(false);
-      };
+        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error("Speech recognition error object:", event); 
+          let errorMessage = t.voiceAssistErrorGeneric;
+          if (event.error === 'no-speech') {
+            errorMessage = t.voiceAssistErrorNoSpeech;
+          } else if (event.error === 'audio-capture') {
+            errorMessage = t.voiceAssistErrorAudioCapture;
+          } else if (event.error === 'not-allowed') {
+            errorMessage = t.voiceAssistErrorNotAllowed;
+          } else if (event.error === 'network') {
+            errorMessage = t.voiceAssistErrorNetwork;
+            console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service or related permissions.");
+          } else {
+            errorMessage = `${t.voiceAssistErrorGeneric} (Code: ${event.error})`;
+          }
+          setRecognitionError(errorMessage);
+          setIsListening(false);
+        };
 
-      recognition.onend = () => {
-        setIsListening(false);
-      };
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+      } catch (e) {
+        console.error("Error initializing SpeechRecognitionAPI:", e);
+        setIsRecognitionApiSupported(false);
+        setRecognitionError("Failed to initialize voice recognition.");
+      }
     }
-  }, [isClient, t]); 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient, t]); // Added t to dependency array because error messages use it.
 
   const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
@@ -272,13 +276,14 @@ export default function Header() {
   ], [t]);
 
   const openVoiceDialog = useCallback(() => {
+    if (!isClient) return;
     if (!isRecognitionApiSupported) {
         setRecognitionError(t.voiceAssistNotSupported);
     }
     setTranscript('');
-    setRecognitionError(isRecognitionApiSupported ? null : (t.voiceAssistNotSupported));
+    setRecognitionError(isRecognitionApiSupported ? null : t.voiceAssistNotSupported);
     setIsVoiceDialogVisible(true);
-  }, [isRecognitionApiSupported, t]);
+  }, [isClient, isRecognitionApiSupported, t.voiceAssistNotSupported]);
 
   const handleToggleListening = useCallback(() => {
     if (!recognitionRef.current) {
@@ -300,7 +305,7 @@ export default function Header() {
           } else if (error.name === 'InvalidStateError' && isListening) {
               console.warn("Recognition already started or in invalid state.");
           } else {
-               setRecognitionError(t.voiceAssistErrorStart || "Could not start voice recognition.");
+               setRecognitionError(t.voiceAssistErrorStart);
           }
           setIsListening(false); 
       }
@@ -331,127 +336,128 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center space-x-2">
+             {/* Desktop Voice Assistant Button */}
+             <Button
+                variant="ghost"
+                size="icon"
+                onClick={openVoiceDialog}
+                className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10"
+                aria-label={t.voiceAssistLabel}
+                disabled={!isClient || !isRecognitionApiSupported}
+              >
+                <Mic size={20} />
+              </Button>
+
             {/* Desktop Translate Button */}
-            {isClient && (
-              <Popover open={isDesktopTranslateOpen} onOpenChange={setIsDesktopTranslateOpen}>
+             <Popover open={isDesktopTranslateOpen} onOpenChange={setIsDesktopTranslateOpen}>
                 <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10" 
-                    aria-label={t.googleTranslateLabel || "Translate Page"}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10"
+                    aria-label={t.googleTranslateLabel}
+                    disabled={!isClient}
                   >
                     <Languages size={20} />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
-                  onOpenAutoFocus={(e) => e.preventDefault()}
+                <PopoverContent 
+                  className="w-auto p-1 z-[10001] popover-content-language-translator"
+                  align="end"
+                  sideOffset={5}
                 >
-                  <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
+                  {isClient && <div id="google_translate_element_header"></div>}
                 </PopoverContent>
               </Popover>
-            )}
 
-            {isClient && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={openVoiceDialog}
-                className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
-                aria-label={t.voiceAssistLabel || "Voice Assistant"}
-                disabled={!isRecognitionApiSupported && isClient} 
-              >
-                <Mic size={20} />
-              </Button>
-            )}
 
-            {isClient && isLoggedIn && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary hover:bg-primary/10">
-                    <ShoppingCart size={20} />
-                    {cart.length > 0 && (
-                      <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full bg-primary text-primary-foreground">
-                        {cart.length}
-                      </Badge>
-                    )}
-                    <span className="sr-only">{t.jobList || "Your Job List"}</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 z-50 mr-4 mt-1 bg-card text-card-foreground shadow-xl rounded-lg">
-                  <div className="p-4">
-                    <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList || "Your Job List"}</h4>
-                    {cart.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">{t.jobListEmpty || "Your job list is empty. Add providers!"}</p>
-                    ) : (
-                      <>
-                        <ul className="space-y-3 max-h-48 overflow-y-auto">
-                          {cart.map(item => (
-                            <li key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:bg-secondary/50 transition-colors">
-                              <div className="flex items-center gap-2 overflow-hidden">
-                                 <Image
-                                  src={item.profileImageUrl || `https://placehold.co/32x32.png`}
-                                  alt={item.name}
-                                  data-ai-hint="person avatar"
-                                  width={32}
-                                  height={32}
-                                  className="rounded-full"
-                                />
-                                <span className="text-sm font-medium truncate text-foreground">{item.name}</span>
-                              </div>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
-                                <X size={16} />
-                                <span className="sr-only">{t.removeProvider(item.name) || `Remove ${item.name}`}</span>
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                        <Separator className="my-3" />
-                        <div className="space-y-2">
-                          <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional || "Service Address (Optional)"}</Label>
-                          <Input
-                            id="customer-address"
-                            placeholder={t.enterAddressPlaceholder || "Enter your address or area"}
-                            value={customerAddress || ''}
-                            onChange={(e) => setCustomerAddress(e.target.value)}
-                            className="text-sm"
-                          />
-                        </div>
-                        <Button
-                          onClick={handleProceedToBooking}
-                          className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
-                          disabled={cart.length === 0}
-                        >
-                          {t.proceedToBooking || "Proceed to Booking"}
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
-
+            {/* Desktop Cart and Profile/Login */}
             <div className="hidden md:flex items-center space-x-2">
+              {isClient && isLoggedIn && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary hover:bg-primary/10">
+                      <ShoppingCart size={20} />
+                      {cart.length > 0 && (
+                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full bg-primary text-primary-foreground">
+                          {cart.length}
+                        </Badge>
+                      )}
+                      <span className="sr-only">{t.jobList}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 z-50 mr-4 mt-1 bg-card text-card-foreground shadow-xl rounded-lg">
+                    <div className="p-4">
+                      <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList}</h4>
+                      {cart.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">{t.jobListEmpty}</p>
+                      ) : (
+                        <>
+                          <ul className="space-y-3 max-h-48 overflow-y-auto">
+                            {cart.map(item => (
+                              <li key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:bg-secondary/50 transition-colors">
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                  <Image
+                                    src={item.profileImageUrl || `https://placehold.co/32x32.png`}
+                                    alt={item.name}
+                                    data-ai-hint="person avatar"
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full"
+                                  />
+                                  <span className="text-sm font-medium truncate text-foreground">{item.name}</span>
+                                </div>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
+                                  <X size={16} />
+                                  <span className="sr-only">{t.removeProvider(item.name)}</span>
+                                </Button>
+                              </li>
+                            ))}
+                          </ul>
+                          <Separator className="my-3" />
+                          <div className="space-y-2">
+                            <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional}</Label>
+                            <Input
+                              id="customer-address"
+                              placeholder={t.enterAddressPlaceholder}
+                              value={customerAddress || ''}
+                              onChange={(e) => setCustomerAddress(e.target.value)}
+                              className="text-sm"
+                            />
+                          </div>
+                          <Button
+                            onClick={handleProceedToBooking}
+                            className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                            disabled={cart.length === 0}
+                          >
+                            {t.proceedToBooking}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+
               {isClient && isLoggedIn ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:text-primary hover:bg-primary/10">
                       <UserCircle size={24} />
-                       <span className="sr-only">{t.myAccount || "My Account"}</span>
+                      <span className="sr-only">{t.myAccount}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-card text-card-foreground">
-                    <DropdownMenuLabel>{t.myAccount || "My Account"}</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="w-56 bg-card text-card-foreground z-[10001]">
+                    <DropdownMenuLabel>{t.myAccount}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {profileNavItems.map(item => (
-                       <DropdownMenuItem key={item.label} asChild>
-                         <Link href={item.href} className="flex items-center gap-2 w-full">{item.icon} {item.label}</Link>
-                       </DropdownMenuItem>
+                      <DropdownMenuItem key={item.label} asChild>
+                        <Link href={item.href} className="flex items-center gap-2 w-full cursor-pointer">{item.icon} {item.label}</Link>
+                      </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
-                      <LogOut size={16} /> {t.navLogout || "Logout"}
+                      <LogOut size={16} /> {t.navLogout}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -459,145 +465,146 @@ export default function Header() {
                 <>
                   <Link href={`/login`} passHref>
                     <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                      {t.navLogin || "Login"}
+                      {t.navLogin}
                     </Button>
                   </Link>
                   <Link href={`/signup`} passHref>
                     <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                      {t.navSignUp || "Sign Up"}
+                      {t.navSignUp}
                     </Button>
                   </Link>
                 </>
               ) : ( 
                 <> 
-                  <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
-                  <Button disabled>{t.navSignUp || "Sign Up"}</Button>
+                  <Button variant="outline" disabled>{t.navLogin}</Button>
+                  <Button disabled>{t.navSignUp}</Button>
                 </>
               )}
             </div>
-          </div>
 
-          {/* Mobile Menu and Actions */}
-          <div className="md:hidden ml-2 flex items-center">
-             {isClient && (
+            {/* Mobile Menu Trigger, Voice, and Translate */}
+            <div className="md:hidden flex items-center space-x-1">
+               <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={openVoiceDialog}
+                  className="inline-flex text-foreground hover:text-primary hover:bg-primary/10"
+                  aria-label={t.voiceAssistLabel}
+                  disabled={!isClient || !isRecognitionApiSupported}
+                >
+                  <Mic size={20} />
+                </Button>
+
               <Popover open={isMobileTranslateOpen} onOpenChange={setIsMobileTranslateOpen}>
                 <PopoverTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="inline-flex text-foreground hover:text-primary hover:bg-primary/10 mr-1" /* md:hidden is implicit from parent */
-                    aria-label={t.googleTranslateLabel || "Translate Page"}
+                   <Button
+                    variant="ghost"
+                    size="icon"
+                    className="inline-flex text-foreground hover:text-primary hover:bg-primary/10"
+                    aria-label={t.googleTranslateLabel}
+                    disabled={!isClient}
                   >
                     <Languages size={20} />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
-                  onOpenAutoFocus={(e) => e.preventDefault()}
+                <PopoverContent 
+                  className="w-auto p-1 z-[10001] popover-content-language-translator"
+                  align="end"
+                  sideOffset={5}
                 >
-                  <div id="google_translate_element_header_mobile" ref={googleTranslateElementHeaderMobileRef}></div>
+                 {isClient && <div id="google_translate_element_header_mobile"></div>}
                 </PopoverContent>
               </Popover>
-            )}
-            {isClient && (
-                 <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={openVoiceDialog}
-                    className="inline-flex text-foreground hover:text-primary hover:bg-primary/10 mr-1" /* md:hidden is implicit */
-                    aria-label={t.voiceAssistLabel || "Voice Assistant"}
-                    disabled={!isRecognitionApiSupported && isClient}
-                  >
-                    <Mic size={20} />
+
+              <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">{t.toggleMenu || "Toggle Menu"}</span>
                   </Button>
-            )}
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t.toggleMenu || "Toggle Menu"}</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-card text-card-foreground">
-                <SheetHeader className="mb-6 pb-4 border-b border-border">
-                  <SheetTitle>
-                    <Logo size="medium" />
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col space-y-2">
-                  {navItems.map(item => (
-                     <SheetClose asChild key={item.label}>
-                      <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
-                        {item.label}
-                      </NavLink>
-                    </SheetClose>
-                  ))}
-                  
-                  <Separator className="my-3 bg-border" />
-                  
-                  {isClient && isLoggedIn ? (
-                    <>
-                      {profileNavItems.map(item => (
-                         <SheetClose asChild key={item.label}>
-                          <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
-                            {item.label}
-                          </NavLink>
-                         </SheetClose>
-                      ))}
-                      <Separator className="my-3 bg-border" />
-                      <SheetClose asChild>
-                          <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
-                          <LogOut size={20} /> {t.navLogout || "Logout"}
-                          </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-card text-card-foreground">
+                  <SheetHeader className="mb-6 pb-4 border-b border-border">
+                    <SheetTitle>
+                      <Logo size="medium" />
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="flex flex-col space-y-2">
+                    {navItems.map(item => (
+                      <SheetClose asChild key={item.label}>
+                        <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
+                          {item.label}
+                        </NavLink>
                       </SheetClose>
-                    </>
-                  ) : isClient ? (
-                    <>
-                      <SheetClose asChild>
-                          <Link href={`/login`} passHref>
-                          <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                              <UserCircle size={20} /> {t.navLogin || "Login"}
-                          </Button>
-                          </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                          <Link href={`/signup`} passHref>
-                          <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                              {t.navSignUp || "Sign Up"}
-                          </Button>
-                          </Link>
-                      </SheetClose>
-                    </>
-                  ) : null }
-                </div>
-              </SheetContent>
-            </Sheet>
+                    ))}
+                    <Separator className="my-3 bg-border" />
+                    {isClient && isLoggedIn && (
+                      <>
+                        {profileNavItems.map(item => (
+                          <SheetClose asChild key={item.label}>
+                            <NavLink href={item.href} icon={item.icon} className="w-full justify-start text-lg py-3" currentPath={currentPathname}>
+                              {item.label}
+                            </NavLink>
+                          </SheetClose>
+                        ))}
+                        <Separator className="my-3 bg-border" />
+                      </>
+                    )}
+                    
+                    {isClient && isLoggedIn ? (
+                        <SheetClose asChild>
+                            <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
+                            <LogOut size={20} /> {t.navLogout}
+                            </Button>
+                        </SheetClose>
+                    ) : isClient ? (
+                      <>
+                        <SheetClose asChild>
+                            <Link href={`/login`} passHref>
+                            <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                                <UserCircle size={20} /> {t.navLogin}
+                            </Button>
+                            </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                            <Link href={`/signup`} passHref>
+                            <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                                {t.navSignUp}
+                            </Button>
+                            </Link>
+                        </SheetClose>
+                      </>
+                    ) : null }
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </header>
 
-      {isClient && isVoiceDialogVisible && ( // Conditionally render Dialog only on client and when visible
+      {isClient && isVoiceDialogVisible && (
         <Dialog open={isVoiceDialogVisible} onOpenChange={setIsVoiceDialogVisible}>
           <DialogContent className="sm:max-w-md bg-card text-card-foreground">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Mic className="text-primary" /> {t.voiceAssistDialogTitle || "Voice Assistant (Simulated)"}
+                <Mic className="text-primary" /> {t.voiceAssistDialogTitle}
               </DialogTitle>
               <DialogDescription>
-               {t.voiceAssistDisclaimer || "Voice feature depends on browser & network. May not work in all environments."}
+               {t.voiceAssistDisclaimer}
               </DialogDescription>
             </DialogHeader>
             
             <div className="my-4 p-4 bg-background rounded-md min-h-[60px] flex items-center justify-center text-center">
               {isListening ? (
-                <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening || "Listening..."}</p>
+                <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening}</p>
               ) : transcript ? (
                 <p className="text-sm text-foreground">{transcript}</p>
               ) : recognitionError ? (
                 <p className="text-sm text-destructive">{recognitionError}</p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  {isClient && isRecognitionApiSupported ? (t.voiceAssistPrompt || "Click the microphone below to start speaking.") : (t.voiceAssistNotSupported || "Voice recognition not supported in your browser.")}
+                  {isRecognitionApiSupported ? t.voiceAssistPrompt : t.voiceAssistNotSupported}
                 </p>
               )}
             </div>
@@ -606,18 +613,18 @@ export default function Header() {
               variant={isListening ? "destructive" : "default"}
               className="w-full"
               onClick={handleToggleListening}
-              disabled={!isClient || !isRecognitionApiSupported}
+              disabled={!isRecognitionApiSupported}
             >
               <Mic className="mr-2 h-4 w-4" />
-              {isListening ? (t.voiceAssistStopListening || "Stop Listening") : (t.voiceAssistStartListening || "Start Listening")}
+              {isListening ? t.voiceAssistStopListening : t.voiceAssistStartListening}
             </Button>
             
             <DialogFooter className="mt-6">
-              <DialogClose asChild>
+              <DialogPrimitiveClose asChild>
                 <Button type="button" variant="secondary">
-                  {t.close || "Close"}
+                  {t.close}
                 </Button>
-              </DialogClose>
+              </DialogPrimitiveClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>
