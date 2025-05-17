@@ -10,10 +10,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
-
 // Removed Leaflet-specific imports from here
 
-const layoutTranslations = { // Keeping hardcoded English as per current setup
+const layoutTranslations = {
   chatWithUsTitle: "Chat with Our Assistant",
   chatWithUs: "Chat with Us",
   closeChat: "Close Chat",
@@ -34,31 +33,16 @@ export default function RootLayout({
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
 
-  // Google Translate Element Initialization (Global function definition)
-  useEffect(() => {
-    const initializeGoogleTranslate = () => {
-      if ((window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
-        console.log("Google Translate API loaded, init function is ready in RootLayout.");
-      }
-    };
-
+    // Define the global Google Translate initialization function
     if (typeof window !== 'undefined') {
-      if (!document.getElementById('google-translate-api-script')) {
-        const addScript = document.createElement('script');
-        addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal');
-        addScript.setAttribute('id', 'google-translate-api-script');
-        document.body.appendChild(addScript);
-        (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
-      } else {
-         // Script already exists, ensure init function is set if not already
-        if (!(window as any).googleTranslateElementInitGlobal) {
-            (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
-        }
-      }
+      (window as any).googleTranslateElementInitGlobal = () => {
+        // This function will be called by the Google Translate script
+        // The actual new google.translate.TranslateElement calls are now in Header.tsx
+        console.log("Global Google Translate Init Function is ready.");
+      };
     }
-  }, [isClient]);
+  }, []);
 
 
   return (
@@ -66,7 +50,6 @@ export default function RootLayout({
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
-        {/* No Leaflet CSS link */}
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
@@ -77,7 +60,6 @@ export default function RootLayout({
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              {/* Google Translate element is now in the Header, not the footer */}
               {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
@@ -124,6 +106,13 @@ export default function RootLayout({
             )}
           </>
         )}
+        
+        {/* Google Translate API Script */}
+        <Script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal"
+          strategy="afterInteractive"
+          id="google-translate-api-script"
+        />
 
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">

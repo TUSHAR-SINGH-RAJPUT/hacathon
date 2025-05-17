@@ -34,10 +34,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  // DropdownMenuSub, // Not used in this version for lang
-  // DropdownMenuSubTrigger,
-  // DropdownMenuSubContent,
-  // DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/context/CartContext';
@@ -49,6 +45,48 @@ import { Label } from '@/components/ui/label';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
+
+
+const headerTranslations = {
+    navHome: "Home",
+    navPostJob: "Post a Job",
+    navBrowseServices: "Browse Services",
+    navJoinAsPro: "Join as Pro",
+    navAboutUs: "About Us",
+    navLogin: "Login",
+    navSignUp: "Sign Up",
+    navLogout: "Logout",
+    myAccount: "My Account",
+    editProfile: "Edit Profile",
+    myBookings: "My Bookings",
+    customerSupport: "Customer Support",
+    feedbacks: "Feedbacks",
+    security: "Security",
+    language: "Language",
+    jobList: "Your Job List",
+    jobListEmpty: "Your job list is empty. Add providers!",
+    serviceAddressOptional: "Service Address (Optional)",
+    enterAddressPlaceholder: "Enter your address or area",
+    proceedToBooking: "Proceed to Booking",
+    toggleMenu: "Toggle Menu",
+    removeProvider: (name: string) => `Remove ${name}`,
+    close: "Close",
+    voiceAssistLabel: "Voice Assistant",
+    voiceAssistDialogTitle: "Voice Assistant (Simulated)",
+    voiceAssistListening: "Listening...",
+    voiceAssistPrompt: "Click the microphone below to start speaking.",
+    voiceAssistNotSupported: "Voice recognition not supported in your browser.",
+    voiceAssistStopListening: "Stop Listening",
+    voiceAssistStartListening: "Start Listening",
+    voiceAssistErrorGeneric: "An error occurred during speech recognition.",
+    voiceAssistErrorNoSpeech: "No speech was detected. Please try again.",
+    voiceAssistErrorAudioCapture: "Microphone problem. Please ensure it's enabled and working.",
+    voiceAssistErrorNotAllowed: "Permission to use microphone was denied. Please enable it in your browser settings.",
+    voiceAssistErrorNetwork: "Network error during speech recognition. Check your connection or try again later.",
+    voiceAssistErrorInit: "Speech recognition is not initialized.",
+    voiceAssistErrorStart: "Could not start voice recognition. Ensure mic is connected and permissions allowed.",
+    voiceAssistDisclaimer: "Voice feature depends on browser & network. May not work in all environments."
+};
 
 interface NavLinkProps {
   href?: string;
@@ -80,47 +118,6 @@ const NavLink = React.memo(({ href, children, icon, onClick, className, currentP
 });
 NavLink.displayName = 'NavLink';
 
-// Hardcoded English strings for header (as per previous state)
-const headerTranslations = {
-    navHome: "Home",
-    navPostJob: "Post a Job",
-    navBrowseServices: "Browse Services",
-    navJoinAsPro: "Join as Pro",
-    navAboutUs: "About Us",
-    navLogin: "Login",
-    navSignUp: "Sign Up",
-    navLogout: "Logout",
-    myAccount: "My Account",
-    editProfile: "Edit Profile",
-    myBookings: "My Bookings",
-    customerSupport: "Customer Support",
-    feedbacks: "Feedbacks",
-    security: "Security",
-    language: "Language", // Key for language dropdown/section title
-    jobList: "Your Job List",
-    jobListEmpty: "Your job list is empty. Add providers!",
-    serviceAddressOptional: "Service Address (Optional)",
-    enterAddressPlaceholder: "Enter your address or area",
-    proceedToBooking: "Proceed to Booking",
-    toggleMenu: "Toggle Menu",
-    removeProvider: (name: string) => `Remove ${name}`,
-    close: "Close",
-    voiceAssistLabel: "Voice Assistant",
-    voiceAssistDialogTitle: "Voice Assistant (Simulated)",
-    voiceAssistListening: "Listening...",
-    voiceAssistPrompt: "Click the microphone below to start speaking.",
-    voiceAssistNotSupported: "Voice recognition not supported in your browser.",
-    voiceAssistStopListening: "Stop Listening",
-    voiceAssistStartListening: "Start Listening",
-    voiceAssistErrorGeneric: "An error occurred during speech recognition.",
-    voiceAssistErrorNoSpeech: "No speech was detected. Please try again.",
-    voiceAssistErrorAudioCapture: "Microphone problem. Please ensure it's enabled and working.",
-    voiceAssistErrorNotAllowed: "Permission to use microphone was denied. Please enable it in your browser settings.",
-    voiceAssistErrorNetwork: "Network error during speech recognition. Check your connection or try again later.",
-    voiceAssistErrorInit: "Speech recognition is not initialized.",
-    voiceAssistErrorStart: "Could not start voice recognition. Ensure mic is connected and permissions allowed.",
-    voiceAssistDisclaimer: "Voice feature depends on browser & network. May not work in all environments."
-};
 
 export default function Header() {
   const { cart, removeFromCart, customerAddress, setCustomerAddress } = useCart();
@@ -138,10 +135,11 @@ export default function Header() {
   const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
+  const t = headerTranslations; 
+
   const googleTranslateElementHeaderRef = useRef<HTMLDivElement>(null);
   const googleTranslateElementMobileRef = useRef<HTMLDivElement>(null);
 
-  const t = headerTranslations; // Using hardcoded English
 
   useEffect(() => {
     setIsClient(true);
@@ -149,82 +147,86 @@ export default function Header() {
     let SpeechRecognitionAPI: any;
     if (typeof window !== 'undefined') {
       SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    }
 
-    if (!SpeechRecognitionAPI) {
-      setIsRecognitionApiSupported(false);
-      setRecognitionError(t.voiceAssistNotSupported);
-      console.warn("Speech Recognition API not supported in this browser.");
-      return;
-    }
+      if (!SpeechRecognitionAPI) {
+        setIsRecognitionApiSupported(false);
+        setRecognitionError(t.voiceAssistNotSupported);
+        console.warn("Speech Recognition API not supported in this browser.");
+        return;
+      }
 
-    if (!recognitionRef.current && SpeechRecognitionAPI) { // Check if SpeechRecognitionAPI is defined
-        recognitionRef.current = new SpeechRecognitionAPI();
-        const recognition = recognitionRef.current;
+      if (!recognitionRef.current) {
+          recognitionRef.current = new SpeechRecognitionAPI();
+          const recognition = recognitionRef.current;
 
-        if (!recognition) {
-            setIsRecognitionApiSupported(false);
-            setRecognitionError(t.voiceAssistErrorInit);
-            return;
-        }
-        recognition.lang = 'en-US';
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          let interimTranscriptLocal = '';
-          let finalTranscriptLocal = '';
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              finalTranscriptLocal += event.results[i][0].transcript;
-            } else {
-              interimTranscriptLocal += event.results[i][0].transcript;
+          if (!recognition) {
+              setIsRecognitionApiSupported(false);
+              setRecognitionError(t.voiceAssistErrorInit);
+              return;
+          }
+          recognition.lang = 'en-US';
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          
+          recognition.onresult = (event: SpeechRecognitionEvent) => {
+            let interimTranscriptLocal = '';
+            let finalTranscriptLocal = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                finalTranscriptLocal += event.results[i][0].transcript;
+              } else {
+                interimTranscriptLocal += event.results[i][0].transcript;
+              }
             }
-          }
-          setTranscript(finalTranscriptLocal || interimTranscriptLocal);
-          if (finalTranscriptLocal) {
-            setRecognitionError(null);
-          }
-        };
+            setTranscript(finalTranscriptLocal || interimTranscriptLocal);
+            if (finalTranscriptLocal) {
+              setRecognitionError(null);
+            }
+          };
 
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error("Speech recognition error object:", event); 
-          let errorMessage = t.voiceAssistErrorGeneric;
-          if (event.error === 'no-speech') {
-            errorMessage = t.voiceAssistErrorNoSpeech;
-          } else if (event.error === 'audio-capture') {
-            errorMessage = t.voiceAssistErrorAudioCapture;
-          } else if (event.error === 'not-allowed') {
-            errorMessage = t.voiceAssistErrorNotAllowed;
-          } else if (event.error === 'network') {
-            errorMessage = t.voiceAssistErrorNetwork;
-            console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service, or a temporary service outage.");
-          } else {
-            errorMessage = `${t.voiceAssistErrorGeneric} (Code: ${event.error})`;
-          }
-          setRecognitionError(errorMessage);
-          setIsListening(false);
-        };
+          recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+            console.error("Speech recognition error object:", event); 
+            let errorMessage = t.voiceAssistErrorGeneric;
+            if (event.error === 'no-speech') {
+              errorMessage = t.voiceAssistErrorNoSpeech;
+            } else if (event.error === 'audio-capture') {
+              errorMessage = t.voiceAssistErrorAudioCapture;
+            } else if (event.error === 'not-allowed') {
+              errorMessage = t.voiceAssistErrorNotAllowed;
+            } else if (event.error === 'network') {
+              errorMessage = t.voiceAssistErrorNetwork;
+              console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service.");
+            } else {
+              errorMessage = `${t.voiceAssistErrorGeneric} (Code: ${event.error})`;
+            }
+            setRecognitionError(errorMessage);
+            setIsListening(false);
+          };
 
-        recognition.onend = () => {
-          setIsListening(false);
-        };
+          recognition.onend = () => {
+            setIsListening(false);
+          };
+      }
     }
+
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
     };
-  }, [isClient, t]); // Added isClient and t to dependency array
+  }, [isClient, t]);
 
-  const initGoogleTranslateForElement = useCallback((elementId: string) => {
+
+  const initializeGoogleTranslateForElement = useCallback((elementId: string) => {
     if (isClient && typeof window !== 'undefined' && (window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
       const targetDiv = document.getElementById(elementId);
+      // Check if widget is already initialized in this specific div
       if (targetDiv && !targetDiv.querySelector('.goog-te-gadget')) {
         new (window as any).google.translate.TranslateElement(
           { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
           elementId
         );
+        console.log(`Google Translate initialized for ${elementId}`);
       }
     }
   }, [isClient]);
@@ -232,39 +234,37 @@ export default function Header() {
   useEffect(() => {
     if (!isClient || !(window as any).google?.translate?.TranslateElement) return;
 
-    const initAllTranslators = () => {
-        initGoogleTranslateForElement('google_translate_element_header');
-        initGoogleTranslateForElement('google_translate_element_header_mobile');
-    }
-
-    // Initial attempt
-    initAllTranslators();
-
-    // Observe for dynamic content
-    const observer = new MutationObserver((mutationsList, observerInstance) => {
-        for (const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                // Check if our target divs might have been added
-                if (googleTranslateElementHeaderRef.current?.isConnected || googleTranslateElementMobileRef.current?.isConnected) {
-                     initAllTranslators();
-                }
-            }
+    const observerCallback = (mutationsList: MutationRecord[], observer: MutationObserver) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          if (googleTranslateElementHeaderRef.current && document.getElementById('google_translate_element_header')) {
+            initializeGoogleTranslateForElement('google_translate_element_header');
+          }
+          if (googleTranslateElementMobileRef.current && document.getElementById('google_translate_element_header_mobile')) {
+            initializeGoogleTranslateForElement('google_translate_element_header_mobile');
+          }
         }
-    });
+      }
+    };
 
+    const observer = new MutationObserver(observerCallback);
     observer.observe(document.body, { childList: true, subtree: true });
 
+    // Initial attempt
+    if (googleTranslateElementHeaderRef.current) initializeGoogleTranslateForElement('google_translate_element_header');
+    if (googleTranslateElementMobileRef.current) initializeGoogleTranslateForElement('google_translate_element_header_mobile');
+    
     return () => observer.disconnect();
 
-  }, [isClient, initGoogleTranslateForElement]);
+  }, [isClient, initializeGoogleTranslateForElement]);
 
 
   const navItems = useMemo(() => [
-    { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
-    { href: `/post-job`, label: t.navPostJob || "Post a Job", icon: <PlusSquare size={18} /> },
-    { href: `/browse-providers`, label: t.navBrowseServices || "Browse Services", icon: <Search size={18} /> },
-    { href: `/join-as-pro`, label: t.navJoinAsPro || "Join as Pro", icon: <Briefcase size={18} /> },
-    { href: `/about`, label: t.navAboutUs || "About Us", icon: <InfoIcon size={18} /> },
+    { href: `/platform-home`, label: t.navHome, icon: <Home size={18} /> },
+    { href: `/post-job`, label: t.navPostJob, icon: <PlusSquare size={18} /> },
+    { href: `/browse-providers`, label: t.navBrowseServices, icon: <Search size={18} /> },
+    { href: `/join-as-pro`, label: t.navJoinAsPro, icon: <Briefcase size={18} /> },
+    { href: `/about`, label: t.navAboutUs, icon: <InfoIcon size={18} /> },
   ], [t]);
 
   const handleProceedToBooking = useCallback(() => {
@@ -274,11 +274,11 @@ export default function Header() {
   }, [cart.length, router]);
 
   const profileNavItems = useMemo(() => [
-    { href: `/profile/edit`, label: t.editProfile || "Edit Profile", icon: <Edit3 size={16}/> },
-    { href: `/profile/bookings`, label: t.myBookings || "My Bookings", icon: <ListOrdered size={16}/> },
-    { href: `/support`, label: t.customerSupport || "Customer Support", icon: <HelpCircle size={16}/> },
-    { href: `/profile/feedback`, label: t.feedbacks || "Feedbacks", icon: <StarIcon size={16}/> },
-    { href: `/profile/security`, label: t.security || "Security", icon: <Shield size={16}/> },
+    { href: `/profile/edit`, label: t.editProfile, icon: <Edit3 size={16}/> },
+    { href: `/profile/bookings`, label: t.myBookings, icon: <ListOrdered size={16}/> },
+    { href: `/support`, label: t.customerSupport, icon: <HelpCircle size={16}/> },
+    { href: `/profile/feedback`, label: t.feedbacks, icon: <StarIcon size={16}/> },
+    { href: `/profile/security`, label: t.security, icon: <Shield size={16}/> },
   ], [t]);
 
   const openVoiceDialog = useCallback(() => {
@@ -348,7 +348,7 @@ export default function Header() {
                 </PopoverTrigger>
                 <PopoverContent 
                     className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border popover-content-language-translator" 
-                    onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus stealing
+                    onOpenAutoFocus={(e) => e.preventDefault()} 
                 >
                   <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
                 </PopoverContent>
@@ -459,7 +459,7 @@ export default function Header() {
                   </Link>
                 </>
               ) : (
-                <> {/* Fallback for SSR or when isClient is false */}
+                <> 
                   <Button variant="outline" disabled>{t.navLogin}</Button>
                   <Button disabled>{t.navSignUp}</Button>
                 </>
@@ -468,8 +468,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden ml-2 flex items-center"> {/* Added flex items-center for mobile translate trigger */}
-            {/* Mobile Google Translate Button */}
+          <div className="md:hidden ml-2 flex items-center">
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10 mr-1" aria-label={t.language}>
@@ -516,8 +515,6 @@ export default function Header() {
                       </Button>
                   </SheetClose>
                   
-                  {/* Google Translate section removed from here, moved to header bar for mobile */}
-
                   <Separator className="my-3 bg-border" />
                   
                   {isClient && isLoggedIn ? (
@@ -608,4 +605,3 @@ export default function Header() {
     </>
   );
 }
-
