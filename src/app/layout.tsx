@@ -10,9 +10,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
-// Removed Leaflet-specific imports
 
-const layoutTranslations = {
+// Removed Leaflet-specific imports from here
+
+const layoutTranslations = { // Keeping hardcoded English as per current setup
   chatWithUsTitle: "Chat with Our Assistant",
   chatWithUs: "Chat with Us",
   closeChat: "Close Chat",
@@ -32,11 +33,11 @@ export default function RootLayout({
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Indicate client-side rendering
+    setIsClient(true);
   }, []);
 
+  // Google Translate Element Initialization (Global function definition)
   useEffect(() => {
-    // Google Translate Element Initialization
     const initializeGoogleTranslate = () => {
       if ((window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
         console.log("Google Translate API loaded, init function is ready in RootLayout.");
@@ -51,8 +52,9 @@ export default function RootLayout({
         document.body.appendChild(addScript);
         (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
       } else {
+         // Script already exists, ensure init function is set if not already
         if (!(window as any).googleTranslateElementInitGlobal) {
-          (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
+            (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
         }
       }
     }
@@ -64,18 +66,18 @@ export default function RootLayout({
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
-        {/* Removed Leaflet CSS link */}
+        {/* No Leaflet CSS link */}
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
           <CartProvider>
-            <Header />
+            <Header /> {/* Header now handles its own translate widget initialization */}
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
               {children}
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              <div id="google_translate_element_header" className="inline-block mx-auto mb-2"></div> {/* Placeholder for header-based translator */}
+              {/* Google Translate element is now in the Header, not the footer */}
               {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>

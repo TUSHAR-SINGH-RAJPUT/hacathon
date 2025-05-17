@@ -34,10 +34,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal
+  // DropdownMenuSub, // Not used in this version for lang
+  // DropdownMenuSubTrigger,
+  // DropdownMenuSubContent,
+  // DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/context/CartContext';
@@ -80,7 +80,7 @@ const NavLink = React.memo(({ href, children, icon, onClick, className, currentP
 });
 NavLink.displayName = 'NavLink';
 
-
+// Hardcoded English strings for header (as per previous state)
 const headerTranslations = {
     navHome: "Home",
     navPostJob: "Post a Job",
@@ -96,10 +96,7 @@ const headerTranslations = {
     customerSupport: "Customer Support",
     feedbacks: "Feedbacks",
     security: "Security",
-    language: "Language",
-    english: "English",
-    hindi: "Hindi",
-    kannada: "Kannada",
+    language: "Language", // Key for language dropdown/section title
     jobList: "Your Job List",
     jobListEmpty: "Your job list is empty. Add providers!",
     serviceAddressOptional: "Service Address (Optional)",
@@ -119,7 +116,7 @@ const headerTranslations = {
     voiceAssistErrorNoSpeech: "No speech was detected. Please try again.",
     voiceAssistErrorAudioCapture: "Microphone problem. Please ensure it's enabled and working.",
     voiceAssistErrorNotAllowed: "Permission to use microphone was denied. Please enable it in your browser settings.",
-    voiceAssistErrorNetwork: "Network error during speech recognition. Check your connection.",
+    voiceAssistErrorNetwork: "Network error during speech recognition. Check your connection or try again later.",
     voiceAssistErrorInit: "Speech recognition is not initialized.",
     voiceAssistErrorStart: "Could not start voice recognition. Ensure mic is connected and permissions allowed.",
     voiceAssistDisclaimer: "Voice feature depends on browser & network. May not work in all environments."
@@ -140,11 +137,11 @@ export default function Header() {
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
   const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+
   const googleTranslateElementHeaderRef = useRef<HTMLDivElement>(null);
   const googleTranslateElementMobileRef = useRef<HTMLDivElement>(null);
 
-
-  const t = headerTranslations; // Using hardcoded English for now
+  const t = headerTranslations; // Using hardcoded English
 
   useEffect(() => {
     setIsClient(true);
@@ -154,7 +151,6 @@ export default function Header() {
       SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     }
 
-
     if (!SpeechRecognitionAPI) {
       setIsRecognitionApiSupported(false);
       setRecognitionError(t.voiceAssistNotSupported);
@@ -162,7 +158,7 @@ export default function Header() {
       return;
     }
 
-    if (!recognitionRef.current) {
+    if (!recognitionRef.current && SpeechRecognitionAPI) { // Check if SpeechRecognitionAPI is defined
         recognitionRef.current = new SpeechRecognitionAPI();
         const recognition = recognitionRef.current;
 
@@ -175,7 +171,6 @@ export default function Header() {
         recognition.continuous = false;
         recognition.interimResults = true;
         
-
         recognition.onresult = (event: SpeechRecognitionEvent) => {
           let interimTranscriptLocal = '';
           let finalTranscriptLocal = '';
@@ -220,38 +215,48 @@ export default function Header() {
         recognitionRef.current.stop();
       }
     };
-  }, [t]); // Added t to dependency array
+  }, [isClient, t]); // Added isClient and t to dependency array
 
-  const initGoogleTranslate = useCallback(() => {
-    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
-      if (googleTranslateElementHeaderRef.current && !googleTranslateElementHeaderRef.current.querySelector('.goog-te-gadget')) {
+  const initGoogleTranslateForElement = useCallback((elementId: string) => {
+    if (isClient && typeof window !== 'undefined' && (window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
+      const targetDiv = document.getElementById(elementId);
+      if (targetDiv && !targetDiv.querySelector('.goog-te-gadget')) {
         new (window as any).google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE },
-          'google_translate_element_header'
-        );
-      }
-      if (googleTranslateElementMobileRef.current && !googleTranslateElementMobileRef.current.querySelector('.goog-te-gadget')) {
-         new (window as any).google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE }, // Or use .COLLECTION for mobile
-          'google_translate_element_header_mobile'
+          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
+          elementId
         );
       }
     }
-  }, []);
-
+  }, [isClient]);
 
   useEffect(() => {
-    initGoogleTranslate(); // Try initial init
+    if (!isClient || !(window as any).google?.translate?.TranslateElement) return;
 
-    // Observe for when the popover/sheet makes the element available
-    const observer = new MutationObserver(() => {
-        initGoogleTranslate();
-    });
-    if(isClient) {
-        observer.observe(document.body, { childList: true, subtree: true });
+    const initAllTranslators = () => {
+        initGoogleTranslateForElement('google_translate_element_header');
+        initGoogleTranslateForElement('google_translate_element_header_mobile');
     }
+
+    // Initial attempt
+    initAllTranslators();
+
+    // Observe for dynamic content
+    const observer = new MutationObserver((mutationsList, observerInstance) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                // Check if our target divs might have been added
+                if (googleTranslateElementHeaderRef.current?.isConnected || googleTranslateElementMobileRef.current?.isConnected) {
+                     initAllTranslators();
+                }
+            }
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     return () => observer.disconnect();
-  }, [isClient, isSheetOpen, initGoogleTranslate]);
+
+  }, [isClient, initGoogleTranslateForElement]);
 
 
   const navItems = useMemo(() => [
@@ -284,7 +289,7 @@ export default function Header() {
 
   const handleToggleListening = useCallback(() => {
     if (!recognitionRef.current) {
-      setRecognitionError(t.voiceAssistErrorInit || "Speech recognition not initialized.");
+      setRecognitionError(t.voiceAssistErrorInit);
       return;
     }
     if (isListening) {
@@ -298,14 +303,13 @@ export default function Header() {
       } catch (error: any) {
           console.error("Error starting recognition:", error);
           if (error.name === 'NotAllowedError') {
-               setRecognitionError(t.voiceAssistErrorNotAllowed || "Permission to use microphone was denied.");
+               setRecognitionError(t.voiceAssistErrorNotAllowed);
           } else if (error.name === 'InvalidStateError' && isListening) {
-              // Already listening, do nothing or log
               console.warn("Recognition already started or in invalid state.");
           } else {
-               setRecognitionError(t.voiceAssistErrorStart || "Could not start voice recognition.");
+               setRecognitionError(t.voiceAssistErrorStart);
           }
-          setIsListening(false); // Ensure it's set to false if start fails
+          setIsListening(false); 
       }
     }
   }, [isListening, t]);
@@ -330,18 +334,15 @@ export default function Header() {
                 size="icon"
                 onClick={openVoiceDialog}
                 className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
-                aria-label={t.voiceAssistLabel || "Voice Assistant"}
+                aria-label={t.voiceAssistLabel}
                 disabled={!isClient || !isRecognitionApiSupported}
               >
                 <Mic size={20} />
               </Button>
-          </nav>
-
-          <div className="flex items-center space-x-2">
-            <div className="hidden md:block">
-               <Popover>
+              {/* Google Translate Popover for Desktop */}
+              <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.language || "Language"}>
+                  <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.language}>
                     <Globe size={20} />
                   </Button>
                 </PopoverTrigger>
@@ -352,8 +353,9 @@ export default function Header() {
                   <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
                 </PopoverContent>
               </Popover>
-            </div>
+          </nav>
 
+          <div className="flex items-center space-x-2">
             {isClient && isLoggedIn && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -364,14 +366,14 @@ export default function Header() {
                         {cart.length}
                       </Badge>
                     )}
-                    <span className="sr-only">{t.jobList || "Your Job List"}</span>
+                    <span className="sr-only">{t.jobList}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 z-50 mr-4 mt-1 bg-card text-card-foreground shadow-xl rounded-lg">
                   <div className="p-4">
-                    <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList || "Your Job List"}</h4>
+                    <h4 className="font-medium text-lg mb-3 pb-2 border-b border-border">{t.jobList}</h4>
                     {cart.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">{t.jobListEmpty || "Your job list is empty."}</p>
+                      <p className="text-sm text-muted-foreground">{t.jobListEmpty}</p>
                     ) : (
                       <>
                         <ul className="space-y-3 max-h-48 overflow-y-auto">
@@ -390,17 +392,17 @@ export default function Header() {
                               </div>
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
                                 <X size={16} />
-                                <span className="sr-only">{t.removeProvider ? t.removeProvider(item.name) : `Remove ${item.name}`}</span>
+                                <span className="sr-only">{t.removeProvider(item.name)}</span>
                               </Button>
                             </li>
                           ))}
                         </ul>
                         <Separator className="my-3" />
                         <div className="space-y-2">
-                          <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional || "Service Address (Optional)"}</Label>
+                          <Label htmlFor="customer-address" className="text-xs font-medium text-muted-foreground">{t.serviceAddressOptional}</Label>
                           <Input
                             id="customer-address"
-                            placeholder={t.enterAddressPlaceholder || "Enter your address or area"}
+                            placeholder={t.enterAddressPlaceholder}
                             value={customerAddress || ''}
                             onChange={(e) => setCustomerAddress(e.target.value)}
                             className="text-sm"
@@ -411,7 +413,7 @@ export default function Header() {
                           className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
                           disabled={cart.length === 0}
                         >
-                          {t.proceedToBooking || "Proceed to Booking"}
+                          {t.proceedToBooking}
                         </Button>
                       </>
                     )}
@@ -426,11 +428,11 @@ export default function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:text-primary hover:bg-primary/10">
                       <UserCircle size={24} />
-                       <span className="sr-only">{t.myAccount || "My Account"}</span>
+                       <span className="sr-only">{t.myAccount}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-card text-card-foreground">
-                    <DropdownMenuLabel>{t.myAccount || "My Account"}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t.myAccount}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {profileNavItems.map(item => (
                        <DropdownMenuItem key={item.label} asChild>
@@ -439,7 +441,7 @@ export default function Header() {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout} className="flex items-center gap-2 w-full text-destructive focus:bg-destructive/20 focus:text-destructive cursor-pointer">
-                      <LogOut size={16} /> {t.navLogout || "Logout"}
+                      <LogOut size={16} /> {t.navLogout}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -447,31 +449,46 @@ export default function Header() {
                 <>
                   <Link href={`/login`} passHref>
                     <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                      {t.navLogin || "Login"}
+                      {t.navLogin}
                     </Button>
                   </Link>
                   <Link href={`/signup`} passHref>
                     <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                      {t.navSignUp || "Sign Up"}
+                      {t.navSignUp}
                     </Button>
                   </Link>
                 </>
               ) : (
-                <>
-                  <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
-                  <Button disabled>{t.navSignUp || "Sign Up"}</Button>
+                <> {/* Fallback for SSR or when isClient is false */}
+                  <Button variant="outline" disabled>{t.navLogin}</Button>
+                  <Button disabled>{t.navSignUp}</Button>
                 </>
               )}
             </div>
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden ml-2">
+          <div className="md:hidden ml-2 flex items-center"> {/* Added flex items-center for mobile translate trigger */}
+            {/* Mobile Google Translate Button */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10 mr-1" aria-label={t.language}>
+                  <Globe size={20} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border popover-content-language-translator" 
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+              >
+                <div id="google_translate_element_header_mobile" ref={googleTranslateElementMobileRef}></div>
+              </PopoverContent>
+            </Popover>
+
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t.toggleMenu || "Toggle Menu"}</span>
+                  <span className="sr-only">{t.toggleMenu}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-card text-card-foreground">
@@ -495,14 +512,11 @@ export default function Header() {
                         className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10"
                         disabled={!isClient || !isRecognitionApiSupported}
                       >
-                        <Mic size={20} /> {t.voiceAssistLabel || "Voice Assistant"}
+                        <Mic size={20} /> {t.voiceAssistLabel}
                       </Button>
                   </SheetClose>
-
-                  <div className="p-2 border-t border-border mt-2">
-                     <Label className="text-sm font-medium text-muted-foreground mb-2 block">{t.language || "Language"}</Label>
-                     <div id="google_translate_element_header_mobile" ref={googleTranslateElementMobileRef}></div>
-                  </div>
+                  
+                  {/* Google Translate section removed from here, moved to header bar for mobile */}
 
                   <Separator className="my-3 bg-border" />
                   
@@ -518,7 +532,7 @@ export default function Header() {
                       <Separator className="my-3 bg-border" />
                       <SheetClose asChild>
                           <Button onClick={logout} variant="ghost" className="w-full justify-start text-lg py-3 gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive">
-                          <LogOut size={20} /> {t.navLogout || "Logout"}
+                          <LogOut size={20} /> {t.navLogout}
                           </Button>
                       </SheetClose>
                     </>
@@ -527,14 +541,14 @@ export default function Header() {
                       <SheetClose asChild>
                           <Link href={`/login`} passHref>
                           <Button variant="outline" className="w-full justify-center text-lg py-3 gap-3 text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                              <UserCircle size={20} /> {t.navLogin || "Login"}
+                              <UserCircle size={20} /> {t.navLogin}
                           </Button>
                           </Link>
                       </SheetClose>
                       <SheetClose asChild>
                           <Link href={`/signup`} passHref>
                           <Button className="w-full justify-center text-lg py-3 gap-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                              {t.navSignUp || "Sign Up"}
+                              {t.navSignUp}
                           </Button>
                           </Link>
                       </SheetClose>
@@ -551,23 +565,23 @@ export default function Header() {
         <DialogContent className="sm:max-w-md bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Mic className="text-primary" /> {t.voiceAssistDialogTitle || "Voice Assistant (Simulated)"}
+              <Mic className="text-primary" /> {t.voiceAssistDialogTitle}
             </DialogTitle>
             <DialogDescription>
-             {t.voiceAssistDisclaimer || "Voice feature depends on browser & network."}
+             {t.voiceAssistDisclaimer}
             </DialogDescription>
           </DialogHeader>
           
           <div className="my-4 p-4 bg-background rounded-md min-h-[60px] flex items-center justify-center text-center">
             {isListening ? (
-              <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening || "Listening..."}</p>
+              <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening}</p>
             ) : transcript ? (
               <p className="text-sm text-foreground">{transcript}</p>
             ) : recognitionError ? (
               <p className="text-sm text-destructive">{recognitionError}</p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {isClient && isRecognitionApiSupported ? (t.voiceAssistPrompt || "Click to start speaking.") : (t.voiceAssistNotSupported || "Voice not supported.")}
+                {isClient && isRecognitionApiSupported ? t.voiceAssistPrompt : t.voiceAssistNotSupported}
               </p>
             )}
           </div>
@@ -579,13 +593,13 @@ export default function Header() {
             disabled={!isClient || !isRecognitionApiSupported}
           >
             <Mic className="mr-2 h-4 w-4" />
-            {isListening ? (t.voiceAssistStopListening || "Stop Listening") : (t.voiceAssistStartListening || "Start Listening")}
+            {isListening ? t.voiceAssistStopListening : t.voiceAssistStartListening}
           </Button>
           
           <DialogFooter className="mt-6">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
-                {t.close || "Close"}
+                {t.close}
               </Button>
             </DialogClose>
           </DialogFooter>
@@ -594,3 +608,4 @@ export default function Header() {
     </>
   );
 }
+
