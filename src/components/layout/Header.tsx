@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Languages } from 'lucide-react';
+import { Home, PlusSquare, Search, UserCircle, ShoppingCart, X, Briefcase, InfoIcon, LogOut, Edit3, ListOrdered, Shield, HelpCircle, StarIcon, Settings, Menu, Mic, Languages, Globe } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -34,6 +34,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/context/CartContext';
@@ -46,7 +50,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
-// Hardcoded English translations for Header (as i18n was reverted)
+// Hardcoded English translations
 const headerTranslations = {
     navHome: "Home",
     navPostJob: "Post a Job",
@@ -81,12 +85,13 @@ const headerTranslations = {
     voiceAssistErrorNoSpeech: "No speech was detected. Please try again.",
     voiceAssistErrorAudioCapture: "Microphone problem. Please ensure it's enabled and working.",
     voiceAssistErrorNotAllowed: "Permission to use microphone was denied. Please enable it in your browser settings.",
-    voiceAssistErrorNetwork: "Network error during speech recognition. Please check your connection or try again later.",
+    voiceAssistErrorNetwork: "Network error during speech recognition. Check your connection or try again later.",
     voiceAssistErrorInit: "Speech recognition is not initialized.",
     voiceAssistErrorStart: "Could not start voice recognition. Ensure mic is connected and permissions allowed.",
     voiceAssistDisclaimer: "Voice feature depends on browser & network. May not work in all environments.",
     googleTranslateLabel: "Translate Page"
 };
+
 
 interface NavLinkProps {
   href?: string;
@@ -127,18 +132,18 @@ export default function Header() {
 
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  
   const [isVoiceDialogVisible, setIsVoiceDialogVisible] = useState(false);
-
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
-  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
+  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true); // Assume supported initially
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-
-  const t = headerTranslations; // Use hardcoded English translations
-
+  
   const googleTranslateElementHeaderRef = useRef<HTMLDivElement>(null);
-  const googleTranslateElementMobileRef = useRef<HTMLDivElement>(null);
+  const googleTranslateElementHeaderMobileRef = useRef<HTMLDivElement>(null);
+
+  const t = headerTranslations;
 
   useEffect(() => {
     setIsClient(true);
@@ -148,7 +153,7 @@ export default function Header() {
     if (!isClient) return;
 
     let SpeechRecognitionAPI: any;
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') { // Ensure window access is client-side
       SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     }
 
@@ -158,17 +163,16 @@ export default function Header() {
       console.warn("Speech Recognition API not supported in this browser.");
       return;
     }
+    setIsRecognitionApiSupported(true); // Supported
 
     if (!recognitionRef.current) {
       recognitionRef.current = new SpeechRecognitionAPI();
       const recognition = recognitionRef.current;
-
       if (!recognition) {
-        setIsRecognitionApiSupported(false);
         setRecognitionError(t.voiceAssistErrorInit);
         return;
       }
-      recognition.lang = 'en-US';
+      recognition.lang = 'en-US'; // Explicitly set language
       recognition.continuous = false;
       recognition.interimResults = true;
       
@@ -201,7 +205,7 @@ export default function Header() {
           errorMessage = t.voiceAssistErrorNetwork;
           console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service.");
         } else {
-          errorMessage = `${t.voiceAssistErrorGeneric} (Code: ${event.error})`;
+          errorMessage = `${t.voiceAssistErrorGeneric || 'Speech recognition error'} (Code: ${event.error})`;
         }
         setRecognitionError(errorMessage);
         setIsListening(false);
@@ -211,48 +215,42 @@ export default function Header() {
         setIsListening(false);
       };
     }
-  }, [isClient, t]);
+  }, [isClient, t]); 
 
-  // Google Translate Initialization Effect
-  useEffect(() => {
-    if (!isClient || typeof window === 'undefined' || !(window as any).googleTranslateElementInitGlobal) {
-      return;
-    }
-
-    const initTranslateForElement = (elementId: string) => {
-      const targetElement = document.getElementById(elementId);
-      if ((window as any).google?.translate?.TranslateElement && targetElement && !targetElement.querySelector('.goog-te-gadget')) {
+  const initGoogleTranslate = useCallback((elementId: string) => {
+    if (typeof window !== 'undefined' && (window as any).google?.translate?.TranslateElement && document.getElementById(elementId)) {
+      if (!document.getElementById(elementId)?.querySelector('.goog-te-gadget')) {
         new (window as any).google.translate.TranslateElement(
           { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
           elementId
         );
-        console.log(`Google Translate initialized for ${elementId}`);
       }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined' || !(window as any).googleTranslateElementInitGlobal) return;
+    
+    const initAll = () => {
+      if (googleTranslateElementHeaderRef.current) initGoogleTranslate('google_translate_element_header');
+      if (googleTranslateElementHeaderMobileRef.current) initGoogleTranslate('google_translate_element_header_mobile');
     };
 
-    const observerCallback = (mutationsList: MutationRecord[], observer: MutationObserver) => {
-      for(const mutation of mutationsList) {
-        if (mutation.type === 'childList' || mutation.type === 'attributes') {
-          if (googleTranslateElementHeaderRef.current && document.getElementById('google_translate_element_header')) {
-            initTranslateForElement('google_translate_element_header');
-          }
-          if (googleTranslateElementMobileRef.current && document.getElementById('google_translate_element_header_mobile')) {
-            initTranslateForElement('google_translate_element_header_mobile');
-          }
-        }
+    initAll(); 
+
+    const observer = new MutationObserver((mutationsList, observerInstance) => {
+      if (document.getElementById('google_translate_element_header') && !document.getElementById('google_translate_element_header')?.querySelector('.goog-te-gadget')) {
+        initGoogleTranslate('google_translate_element_header');
       }
-    };
+      if (document.getElementById('google_translate_element_header_mobile') && !document.getElementById('google_translate_element_header_mobile')?.querySelector('.goog-te-gadget')) {
+        initGoogleTranslate('google_translate_element_header_mobile');
+      }
+    });
 
-    const observer = new MutationObserver(observerCallback);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-
-    // Initial attempt if elements are already there
-    if (googleTranslateElementHeaderRef.current) initTranslateForElement('google_translate_element_header');
-    if (googleTranslateElementMobileRef.current) initTranslateForElement('google_translate_element_header_mobile');
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-
-  }, [isClient]);
+  }, [isClient, initGoogleTranslate]);
 
 
   const navItems = useMemo(() => [
@@ -262,12 +260,6 @@ export default function Header() {
     { href: `/join-as-pro`, label: t.navJoinAsPro || "Join as Pro", icon: <Briefcase size={18} /> },
     { href: `/about`, label: t.navAboutUs || "About Us", icon: <InfoIcon size={18} /> },
   ], [t]);
-
-  const handleProceedToBooking = useCallback(() => {
-    if (cart.length > 0) {
-      router.push(`/booking-confirmation`);
-    }
-  }, [cart.length, router]);
 
   const profileNavItems = useMemo(() => [
     { href: `/profile/edit`, label: t.editProfile || "Edit Profile", icon: <Edit3 size={16}/> },
@@ -303,12 +295,18 @@ export default function Header() {
           } else if (error.name === 'InvalidStateError' && isListening) {
               console.warn("Recognition already started or in invalid state.");
           } else {
-               setRecognitionError(t.voiceAssistErrorStart);
+               setRecognitionError(t.voiceAssistErrorStart || "Could not start voice recognition.");
           }
           setIsListening(false); 
       }
     }
   }, [isListening, t]);
+
+  const handleProceedToBooking = useCallback(() => {
+    if (cart.length > 0) {
+      router.push(`/booking-confirmation`);
+    }
+  }, [cart.length, router]);
 
 
   return (
@@ -325,32 +323,39 @@ export default function Header() {
                 {item.label}
               </NavLink>
             ))}
-             <Button
+            {isClient && (
+              <Button
                 variant="ghost"
                 size="icon"
                 onClick={openVoiceDialog}
                 className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
                 aria-label={t.voiceAssistLabel || "Voice Assistant"}
-                disabled={!isClient || !isRecognitionApiSupported}
+                disabled={!isRecognitionApiSupported}
               >
                 <Mic size={20} />
               </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.googleTranslateLabel || "Translate Page"}>
-                    <Languages size={20} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent 
-                    className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border popover-content-language-translator" 
-                    onOpenAutoFocus={(e) => e.preventDefault()} 
-                >
-                  <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
-                </PopoverContent>
-              </Popover>
+            )}
           </nav>
 
           <div className="flex items-center space-x-2">
+             {isClient && ( // Moved Translate button here for desktop
+              <div className="hidden md:flex">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.googleTranslateLabel || "Translate Page"}>
+                      <Languages size={20} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+
             {isClient && isLoggedIn && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -453,7 +458,7 @@ export default function Header() {
                     </Button>
                   </Link>
                 </>
-              ) : (
+              ) : ( 
                 <> 
                   <Button variant="outline" disabled>{t.navLogin || "Login"}</Button>
                   <Button disabled>{t.navSignUp || "Sign Up"}</Button>
@@ -464,20 +469,21 @@ export default function Header() {
 
           {/* Mobile Menu */}
           <div className="md:hidden ml-2 flex items-center">
-            <Popover>
-              <PopoverTrigger asChild>
-                 <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.googleTranslateLabel || "Translate Page"}>
-                    <Languages size={20} />
-                  </Button>
-              </PopoverTrigger>
-              <PopoverContent 
-                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border popover-content-language-translator" 
-                  onOpenAutoFocus={(e) => e.preventDefault()}
-              >
-                <div id="google_translate_element_header_mobile" ref={googleTranslateElementMobileRef}></div>
-              </PopoverContent>
-            </Popover>
-
+             {isClient && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10 mr-1" aria-label={t.googleTranslateLabel || "Translate Page"}>
+                      <Languages size={20} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <div id="google_translate_element_header_mobile" ref={googleTranslateElementHeaderMobileRef}></div>
+                  </PopoverContent>
+                </Popover>
+              )}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -499,16 +505,18 @@ export default function Header() {
                       </NavLink>
                     </SheetClose>
                   ))}
-                   <SheetClose asChild>
-                     <Button 
-                        onClick={openVoiceDialog} 
-                        variant="ghost" 
-                        className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10"
-                        disabled={!isClient || !isRecognitionApiSupported}
-                      >
-                        <Mic size={20} /> {t.voiceAssistLabel || "Voice Assistant"}
-                      </Button>
-                  </SheetClose>
+                   {isClient && (
+                      <SheetClose asChild>
+                        <Button 
+                          onClick={openVoiceDialog} 
+                          variant="ghost" 
+                          className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10"
+                          disabled={!isRecognitionApiSupported}
+                        >
+                          <Mic size={20} /> {t.voiceAssistLabel || "Voice Assistant"}
+                        </Button>
+                      </SheetClose>
+                    )}
                   
                   <Separator className="my-3 bg-border" />
                   
@@ -600,4 +608,3 @@ export default function Header() {
     </>
   );
 }
-
