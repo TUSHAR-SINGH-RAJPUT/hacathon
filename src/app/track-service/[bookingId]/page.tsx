@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic'; // Import next/dynamic
+import dynamic from 'next/dynamic'; 
 
 // Hardcoded English strings
 const t = {
@@ -21,7 +21,7 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  loadingMap: "Loading map...",
+  loadingMap: "Initializing map...", // Changed from "Loading map..." to reflect pre-MapContainer state
   providerLocation: "Provider Location",
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
@@ -33,7 +33,12 @@ const t = {
 // Dynamically import the Map component with SSR disabled
 const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
   ssr: false,
-  loading: () => <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2 text-muted-foreground">{t.loadingMap}</p></div>,
+  loading: () => (
+    <div style={{ height: '300px', width: '100%' }} className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="ml-2 text-muted-foreground">{t.loadingMap}</p>
+    </div>
+  ),
 });
 
 
@@ -71,6 +76,8 @@ export default function TrackServicePage() {
 
   useEffect(() => {
     if (bookingId) {
+      setLoading(true); // Ensure loading is true when bookingId changes
+      setError(null);
       fetchBookingDetails(bookingId)
         .then(data => {
           if (data) {
@@ -88,7 +95,7 @@ export default function TrackServicePage() {
       setError(t.bookingNotFoundOrInvalid);
       setLoading(false);
     }
-  }, [bookingId]);
+  }, [bookingId]); // Rerun effect if bookingId changes
 
   if (loading) {
     return (
@@ -166,7 +173,9 @@ export default function TrackServicePage() {
           </Card>
           
           {bookingDetails.providerLocation ? (
+            // Pass a key to TrackServiceMap to ensure it remounts if bookingId changes
             <TrackServiceMap
+              key={bookingId} 
               center={[bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng]}
               providerName={bookingDetails.provider.name}
             />
