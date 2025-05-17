@@ -4,9 +4,10 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2 } from 'lucide-react';
+import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, Navigation } from 'lucide-react'; // Added Navigation icon
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Link from 'next/link'; // Added Link for Waze button
 
 // Hardcoded English strings
 const t = {
@@ -20,10 +21,11 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  providerLocation: "Provider Location (Map Placeholder)", // Placeholder text
+  providerLocation: "Provider Location (Map Placeholder)",
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
   messageProvider: "Message",
+  navigateWithWaze: "Navigate with Waze",
   contactOptionsSimulated: "Contact options are simulated for this demo.",
   backButton: "Back"
 };
@@ -45,7 +47,6 @@ const fetchBookingDetails = async (bookingId: string) => {
       status: "En Route",
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034",
-      // providerLocation is removed as map is removed
     };
   }
   return null;
@@ -105,6 +106,9 @@ export default function TrackServicePage() {
     );
   }
 
+  const wazeBaseUrl = "https://www.waze.com/ul";
+  const wazeLink = `${wazeBaseUrl}?q=${encodeURIComponent(bookingDetails.serviceAddress)}&navigate=yes`;
+
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-6">
       <Button variant="outline" onClick={() => router.back()} className="mb-4">
@@ -151,8 +155,16 @@ export default function TrackServicePage() {
             <p className="ml-2">{t.providerLocation}</p>
           </div>
 
+          <div className="text-center">
+            <p className="text-sm text-foreground font-medium mb-1">{t.serviceAddressLabel}:</p>
+            <p className="text-sm text-muted-foreground">{bookingDetails.serviceAddress}</p>
+             <a href={wazeLink} target="_blank" rel="noopener noreferrer" className="inline-block mt-3">
+              <Button variant="outline" className="w-full sm:w-auto text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                <Navigation className="mr-2 h-5 w-5" /> {t.navigateWithWaze}
+              </Button>
+            </a>
+          </div>
 
-          <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel}: {bookingDetails.serviceAddress}</p>
 
           <div className="grid grid-cols-2 gap-4 pt-4">
             <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
