@@ -34,10 +34,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/context/CartContext';
@@ -50,7 +46,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
-// Hardcoded English translations
+// Hardcoded English translations for Header (as i18n was reverted)
 const headerTranslations = {
     navHome: "Home",
     navPostJob: "Post a Job",
@@ -137,33 +133,75 @@ export default function Header() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
-  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true); // Assume supported initially
+  const [isRecognitionApiSupported, setIsRecognitionApiSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   
+  const [isDesktopTranslateOpen, setIsDesktopTranslateOpen] = useState(false);
+  const [isMobileTranslateOpen, setIsMobileTranslateOpen] = useState(false);
   const googleTranslateElementHeaderRef = useRef<HTMLDivElement>(null);
   const googleTranslateElementHeaderMobileRef = useRef<HTMLDivElement>(null);
 
-  const t = headerTranslations;
+  const t = headerTranslations; // Using hardcoded translations
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  const initGoogleTranslate = useCallback((elementId: string) => {
+    if (typeof window !== 'undefined' && (window as any).google?.translate?.TranslateElement && document.getElementById(elementId)) {
+      if (!document.getElementById(elementId)?.querySelector('.goog-te-gadget')) {
+        new (window as any).google.translate.TranslateElement(
+          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
+          elementId
+        );
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return;
+
+    // Check if the global init function is available (set by layout.tsx)
+    if (typeof (window as any).googleTranslateElementInitGlobal === 'function') {
+        // Attempt direct initialization if API is already loaded
+        if ((window as any).google?.translate?.TranslateElement) {
+            initGoogleTranslate('google_translate_element_header');
+            initGoogleTranslate('google_translate_element_header_mobile');
+        }
+    }
+    
+    // Setup observer for elements that might render later (e.g. popover content)
+    const observer = new MutationObserver((mutationsList, observerInstance) => {
+      if ((window as any).google?.translate?.TranslateElement) { // Check again if Google API is ready
+        const headerDiv = document.getElementById('google_translate_element_header');
+        if (headerDiv && !headerDiv.querySelector('.goog-te-gadget')) {
+          initGoogleTranslate('google_translate_element_header');
+        }
+        const mobileHeaderDiv = document.getElementById('google_translate_element_header_mobile');
+        if (mobileHeaderDiv && !mobileHeaderDiv.querySelector('.goog-te-gadget')) {
+          initGoogleTranslate('google_translate_element_header_mobile');
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [isClient, initGoogleTranslate]);
+
+
   useEffect(() => {
     if (!isClient) return;
-
     let SpeechRecognitionAPI: any;
-    if (typeof window !== 'undefined') { // Ensure window access is client-side
+    if (typeof window !== 'undefined') {
       SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     }
 
     if (!SpeechRecognitionAPI) {
       setIsRecognitionApiSupported(false);
-      setRecognitionError(t.voiceAssistNotSupported);
       console.warn("Speech Recognition API not supported in this browser.");
       return;
     }
-    setIsRecognitionApiSupported(true); // Supported
+    setIsRecognitionApiSupported(true);
 
     if (!recognitionRef.current) {
       recognitionRef.current = new SpeechRecognitionAPI();
@@ -172,7 +210,7 @@ export default function Header() {
         setRecognitionError(t.voiceAssistErrorInit);
         return;
       }
-      recognition.lang = 'en-US'; // Explicitly set language
+      recognition.lang = 'en-US';
       recognition.continuous = false;
       recognition.interimResults = true;
       
@@ -203,7 +241,7 @@ export default function Header() {
           errorMessage = t.voiceAssistErrorNotAllowed;
         } else if (event.error === 'network') {
           errorMessage = t.voiceAssistErrorNetwork;
-          console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service.");
+           console.error("Web Speech API reported a 'network' error. This might be an issue with the browser's connection to its speech recognition service or related permissions.");
         } else {
           errorMessage = `${t.voiceAssistErrorGeneric || 'Speech recognition error'} (Code: ${event.error})`;
         }
@@ -216,42 +254,6 @@ export default function Header() {
       };
     }
   }, [isClient, t]); 
-
-  const initGoogleTranslate = useCallback((elementId: string) => {
-    if (typeof window !== 'undefined' && (window as any).google?.translate?.TranslateElement && document.getElementById(elementId)) {
-      if (!document.getElementById(elementId)?.querySelector('.goog-te-gadget')) {
-        new (window as any).google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false },
-          elementId
-        );
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isClient || typeof window === 'undefined' || !(window as any).googleTranslateElementInitGlobal) return;
-    
-    const initAll = () => {
-      if (googleTranslateElementHeaderRef.current) initGoogleTranslate('google_translate_element_header');
-      if (googleTranslateElementHeaderMobileRef.current) initGoogleTranslate('google_translate_element_header_mobile');
-    };
-
-    initAll(); 
-
-    const observer = new MutationObserver((mutationsList, observerInstance) => {
-      if (document.getElementById('google_translate_element_header') && !document.getElementById('google_translate_element_header')?.querySelector('.goog-te-gadget')) {
-        initGoogleTranslate('google_translate_element_header');
-      }
-      if (document.getElementById('google_translate_element_header_mobile') && !document.getElementById('google_translate_element_header_mobile')?.querySelector('.goog-te-gadget')) {
-        initGoogleTranslate('google_translate_element_header_mobile');
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, [isClient, initGoogleTranslate]);
-
 
   const navItems = useMemo(() => [
     { href: `/platform-home`, label: t.navHome || "Home", icon: <Home size={18} /> },
@@ -270,10 +272,13 @@ export default function Header() {
   ], [t]);
 
   const openVoiceDialog = useCallback(() => {
+    if (!isRecognitionApiSupported) {
+        setRecognitionError(t.voiceAssistNotSupported);
+    }
     setTranscript('');
-    setRecognitionError(null);
+    setRecognitionError(isRecognitionApiSupported ? null : (t.voiceAssistNotSupported));
     setIsVoiceDialogVisible(true);
-  }, []);
+  }, [isRecognitionApiSupported, t]);
 
   const handleToggleListening = useCallback(() => {
     if (!recognitionRef.current) {
@@ -323,37 +328,42 @@ export default function Header() {
                 {item.label}
               </NavLink>
             ))}
+          </nav>
+
+          <div className="flex items-center space-x-2">
+            {/* Desktop Translate Button */}
+            {isClient && (
+              <Popover open={isDesktopTranslateOpen} onOpenChange={setIsDesktopTranslateOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10" 
+                    aria-label={t.googleTranslateLabel || "Translate Page"}
+                  >
+                    <Languages size={20} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
+                </PopoverContent>
+              </Popover>
+            )}
+
             {isClient && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={openVoiceDialog}
-                className="text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
+                className="hidden md:inline-flex text-foreground hover:text-primary hover:bg-primary/10 ml-1 lg:ml-2"
                 aria-label={t.voiceAssistLabel || "Voice Assistant"}
-                disabled={!isRecognitionApiSupported}
+                disabled={!isRecognitionApiSupported && isClient} 
               >
                 <Mic size={20} />
               </Button>
-            )}
-          </nav>
-
-          <div className="flex items-center space-x-2">
-             {isClient && ( // Moved Translate button here for desktop
-              <div className="hidden md:flex">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10" aria-label={t.googleTranslateLabel || "Translate Page"}>
-                      <Languages size={20} />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                  >
-                    <div id="google_translate_element_header" ref={googleTranslateElementHeaderRef}></div>
-                  </PopoverContent>
-                </Popover>
-              </div>
             )}
 
             {isClient && isLoggedIn && (
@@ -467,23 +477,40 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu and Actions */}
           <div className="md:hidden ml-2 flex items-center">
              {isClient && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-foreground hover:text-primary hover:bg-primary/10 mr-1" aria-label={t.googleTranslateLabel || "Translate Page"}>
-                      <Languages size={20} />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
-                    onOpenAutoFocus={(e) => e.preventDefault()}
+              <Popover open={isMobileTranslateOpen} onOpenChange={setIsMobileTranslateOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="inline-flex text-foreground hover:text-primary hover:bg-primary/10 mr-1" /* md:hidden is implicit from parent */
+                    aria-label={t.googleTranslateLabel || "Translate Page"}
                   >
-                    <div id="google_translate_element_header_mobile" ref={googleTranslateElementHeaderMobileRef}></div>
-                  </PopoverContent>
-                </Popover>
-              )}
+                    <Languages size={20} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-1 bg-card text-card-foreground shadow-lg rounded-md border z-[10001] popover-content-language-translator"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div id="google_translate_element_header_mobile" ref={googleTranslateElementHeaderMobileRef}></div>
+                </PopoverContent>
+              </Popover>
+            )}
+            {isClient && (
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={openVoiceDialog}
+                    className="inline-flex text-foreground hover:text-primary hover:bg-primary/10 mr-1" /* md:hidden is implicit */
+                    aria-label={t.voiceAssistLabel || "Voice Assistant"}
+                    disabled={!isRecognitionApiSupported && isClient}
+                  >
+                    <Mic size={20} />
+                  </Button>
+            )}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -505,18 +532,6 @@ export default function Header() {
                       </NavLink>
                     </SheetClose>
                   ))}
-                   {isClient && (
-                      <SheetClose asChild>
-                        <Button 
-                          onClick={openVoiceDialog} 
-                          variant="ghost" 
-                          className="w-full justify-start text-lg py-3 gap-3 text-foreground hover:text-primary hover:bg-primary/10"
-                          disabled={!isRecognitionApiSupported}
-                        >
-                          <Mic size={20} /> {t.voiceAssistLabel || "Voice Assistant"}
-                        </Button>
-                      </SheetClose>
-                    )}
                   
                   <Separator className="my-3 bg-border" />
                   
@@ -561,50 +576,53 @@ export default function Header() {
         </div>
       </header>
 
-      <Dialog open={isVoiceDialogVisible} onOpenChange={setIsVoiceDialogVisible}>
-        <DialogContent className="sm:max-w-md bg-card text-card-foreground">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Mic className="text-primary" /> {t.voiceAssistDialogTitle || "Voice Assistant (Simulated)"}
-            </DialogTitle>
-            <DialogDescription>
-             {t.voiceAssistDisclaimer || "Voice feature depends on browser & network. May not work in all environments."}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="my-4 p-4 bg-background rounded-md min-h-[60px] flex items-center justify-center text-center">
-            {isListening ? (
-              <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening || "Listening..."}</p>
-            ) : transcript ? (
-              <p className="text-sm text-foreground">{transcript}</p>
-            ) : recognitionError ? (
-              <p className="text-sm text-destructive">{recognitionError}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                {isClient && isRecognitionApiSupported ? (t.voiceAssistPrompt || "Click the microphone below to start speaking.") : (t.voiceAssistNotSupported || "Voice recognition not supported in your browser.")}
-              </p>
-            )}
-          </div>
+      {isClient && isVoiceDialogVisible && ( // Conditionally render Dialog only on client and when visible
+        <Dialog open={isVoiceDialogVisible} onOpenChange={setIsVoiceDialogVisible}>
+          <DialogContent className="sm:max-w-md bg-card text-card-foreground">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Mic className="text-primary" /> {t.voiceAssistDialogTitle || "Voice Assistant (Simulated)"}
+              </DialogTitle>
+              <DialogDescription>
+               {t.voiceAssistDisclaimer || "Voice feature depends on browser & network. May not work in all environments."}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="my-4 p-4 bg-background rounded-md min-h-[60px] flex items-center justify-center text-center">
+              {isListening ? (
+                <p className="text-sm text-primary italic animate-pulse">{t.voiceAssistListening || "Listening..."}</p>
+              ) : transcript ? (
+                <p className="text-sm text-foreground">{transcript}</p>
+              ) : recognitionError ? (
+                <p className="text-sm text-destructive">{recognitionError}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {isClient && isRecognitionApiSupported ? (t.voiceAssistPrompt || "Click the microphone below to start speaking.") : (t.voiceAssistNotSupported || "Voice recognition not supported in your browser.")}
+                </p>
+              )}
+            </div>
 
-          <Button
-            variant={isListening ? "destructive" : "default"}
-            className="w-full"
-            onClick={handleToggleListening}
-            disabled={!isClient || !isRecognitionApiSupported}
-          >
-            <Mic className="mr-2 h-4 w-4" />
-            {isListening ? (t.voiceAssistStopListening || "Stop Listening") : (t.voiceAssistStartListening || "Start Listening")}
-          </Button>
-          
-          <DialogFooter className="mt-6">
-            <DialogClose asChild>
-              <Button type="button" variant="secondary">
-                {t.close || "Close"}
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <Button
+              variant={isListening ? "destructive" : "default"}
+              className="w-full"
+              onClick={handleToggleListening}
+              disabled={!isClient || !isRecognitionApiSupported}
+            >
+              <Mic className="mr-2 h-4 w-4" />
+              {isListening ? (t.voiceAssistStopListening || "Stop Listening") : (t.voiceAssistStartListening || "Start Listening")}
+            </Button>
+            
+            <DialogFooter className="mt-6">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  {t.close || "Close"}
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
+
