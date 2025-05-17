@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic'; // Import next/dynamic
 
 // Hardcoded English strings
 const t = {
@@ -20,13 +21,20 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  liveMapPlaceholder: "Live map tracking for India would appear here. (Feature under development)",
+  loadingMap: "Loading map...",
+  providerLocation: "Provider Location",
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
   messageProvider: "Message",
   contactOptionsSimulated: "Contact options are simulated for this demo.",
   backButton: "Back"
 };
+
+// Dynamically import the Map component with SSR disabled
+const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
+  ssr: false,
+  loading: () => <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2 text-muted-foreground">{t.loadingMap}</p></div>,
+});
 
 
 const fetchBookingDetails = async (bookingId: string) => {
@@ -45,6 +53,8 @@ const fetchBookingDetails = async (bookingId: string) => {
       status: "En Route", 
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), 
       serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034", 
+      // Simulated provider location (Bangalore)
+      providerLocation: { lat: 12.9716, lng: 77.5946 }, 
     };
   }
   return null;
@@ -129,10 +139,10 @@ export default function TrackServicePage() {
             <Image
               src={bookingDetails.provider.profileImageUrl || `https://placehold.co/80x80.png`}
               alt={bookingDetails.provider.name}
+              data-ai-hint="person portrait"
               width={60}
               height={60}
               className="rounded-full"
-              data-ai-hint="person portrait"
             />
             <div>
               <p className="text-lg font-semibold text-foreground">{bookingDetails.provider.name}</p>
@@ -155,10 +165,18 @@ export default function TrackServicePage() {
             </CardContent>
           </Card>
           
-          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
-            <MapPin className="h-12 w-12 text-muted-foreground" />
-            <p className="ml-4 text-muted-foreground text-center">{t.liveMapPlaceholder}</p>
-          </div>
+          {bookingDetails.providerLocation ? (
+            <TrackServiceMap
+              center={[bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng]}
+              providerName={bookingDetails.provider.name}
+            />
+          ) : (
+            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
+              <MapPin className="h-12 w-12 text-muted-foreground" />
+              <p className="ml-4 text-muted-foreground text-center">Provider location not available.</p>
+            </div>
+          )}
+
           <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel}: {bookingDetails.serviceAddress}</p>
 
 
