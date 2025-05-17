@@ -11,8 +11,6 @@ import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-// For Leaflet CSS
-import 'leaflet/dist/leaflet.css';
 
 export default function RootLayout({
   children,
@@ -32,28 +30,6 @@ export default function RootLayout({
         console.log("Global Google Translate Init Function is ready.");
       };
     }
-
-    // Global Leaflet Icon Setup (client-side only)
-    const setupLeafletIcons = async () => {
-      if (typeof window !== 'undefined') {
-        const L = (await import('leaflet')).default;
-        // @ts-ignore
-        if (!L.Icon.Default.prototype._iconInitialConfigured) {
-          // @ts-ignore
-          delete L.Icon.Default.prototype._getIconUrl;
-          L.Icon.Default.mergeOptions({
-            iconRetinaUrl: (await import('leaflet/dist/images/marker-icon-2x.png')).default.src,
-            iconUrl: (await import('leaflet/dist/images/marker-icon.png')).default.src,
-            shadowUrl: (await import('leaflet/dist/images/marker-shadow.png')).default.src,
-          });
-          // @ts-ignore
-          L.Icon.Default.prototype._iconInitialConfigured = true;
-          console.log("Leaflet default icons configured globally.");
-        }
-      }
-    };
-    setupLeafletIcons();
-
   }, []);
 
   const layoutTranslations = {
@@ -63,15 +39,15 @@ export default function RootLayout({
     pageTitle: "kariGaar - Your Local Service Solution",
     pageDescription: "Find reliable local service professionals for all your needs.",
     footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`,
-    googleTranslateLabel: "Translate Page"
+    googleTranslateLabel: "Translate Page" // Retained for header, even if not used directly in layout text
   };
+
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
-         {/* Leaflet CSS - also imported via JS to ensure it's bundled */}
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>

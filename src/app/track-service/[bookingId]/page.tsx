@@ -4,10 +4,9 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
+import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState, useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 // Hardcoded English strings
 const t = {
@@ -21,13 +20,12 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  providerLocation: "Provider Location",
+  providerLocation: "Provider Location (Map Placeholder)", // Placeholder text
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
   messageProvider: "Message",
   contactOptionsSimulated: "Contact options are simulated for this demo.",
-  backButton: "Back",
-  mapPlaceholderText: "Map display is currently unavailable." // Fallback if map fails to load
+  backButton: "Back"
 };
 
 const fetchBookingDetails = async (bookingId: string) => {
@@ -47,17 +45,11 @@ const fetchBookingDetails = async (bookingId: string) => {
       status: "En Route",
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034",
-      providerLocation: { lat: 12.9716, lng: 77.5946 }, // Example coordinates for Bangalore
+      // providerLocation is removed as map is removed
     };
   }
   return null;
 };
-
-// Dynamically import the map component with SSR disabled
-const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
-  ssr: false,
-  loading: () => <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-muted rounded-lg"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2 text-muted-foreground">Loading Map...</p></div>,
-});
 
 
 export default function TrackServicePage() {
@@ -68,10 +60,8 @@ export default function TrackServicePage() {
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Indicate component has mounted on client
     if (bookingId) {
       setLoading(true);
       setError(null);
@@ -94,13 +84,6 @@ export default function TrackServicePage() {
     }
   }, [bookingId]);
 
-  const mapCenter = useMemo(() => {
-    if (bookingDetails?.providerLocation) {
-      return [bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng] as [number, number];
-    }
-    return [12.9716, 77.5946] as [number, number]; // Default center if no location
-  }, [bookingDetails?.providerLocation]);
-
 
   if (loading) {
     return (
@@ -121,15 +104,6 @@ export default function TrackServicePage() {
       </div>
     );
   }
-
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case "En Route": return <Clock className="h-5 w-5 text-blue-500 mr-2" />;
-      case "In Progress": return <Loader2 className="h-5 w-5 text-orange-500 mr-2 animate-spin" />;
-      case "Completed": return <CheckCircle className="h-5 w-5 text-green-500 mr-2" />;
-      default: return <Info className="h-5 w-5 text-muted-foreground mr-2" />;
-    }
-  };
 
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in duration-500 space-y-6">
@@ -164,31 +138,18 @@ export default function TrackServicePage() {
 
           <Card className="bg-secondary">
             <CardContent className="p-4 space-y-2">
-              <div className="flex items-center">
-                {getStatusIcon(bookingDetails.status)}
-                <p className="text-lg font-medium text-secondary-foreground">{t.statusLabel}: {bookingDetails.status}</p>
-              </div>
+              <p className="text-lg font-medium text-secondary-foreground">{t.statusLabel}: {bookingDetails.status}</p>
               {bookingDetails.status === "En Route" && bookingDetails.estimatedArrivalTime && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                   <Clock className="h-4 w-4 mr-2"/>
-                   {t.estimatedArrival}: {new Date(bookingDetails.estimatedArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
+                <p className="text-sm text-muted-foreground">{t.estimatedArrival}: {new Date(bookingDetails.estimatedArrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
               )}
             </CardContent>
           </Card>
           
-          {isClient && bookingDetails.providerLocation ? (
-            <TrackServiceMap 
-              key={bookingId} // Force remount when bookingId changes
-              center={mapCenter} 
-              providerName={bookingDetails.provider.name} 
-            />
-          ) : (
-            <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-muted rounded-lg shadow">
-              <MapPin className="h-12 w-12 text-muted-foreground" />
-              <p className="ml-4 text-muted-foreground text-center">{t.mapPlaceholderText}</p>
-            </div>
-          )}
+          {/* Placeholder for map */}
+          <div className="h-64 bg-muted rounded-lg flex items-center justify-center text-muted-foreground shadow">
+            <MapPin className="h-12 w-12" />
+            <p className="ml-2">{t.providerLocation}</p>
+          </div>
 
 
           <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel}: {bookingDetails.serviceAddress}</p>
