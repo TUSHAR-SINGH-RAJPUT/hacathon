@@ -9,14 +9,13 @@ import type { ServiceProvider } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, MapPin, Briefcase, Award, ShoppingCart, MessageCircle, Users as UsersIcon, ArrowLeft, ArrowRight, ThumbsUp, Search } from 'lucide-react'; // Added Search
+import { Star, MapPin, Briefcase, Award, ShoppingCart, MessageCircle, Users as UsersIcon, ArrowLeft, ArrowRight, ThumbsUp, Search } from 'lucide-react';
 import ProviderCard from '@/components/providers/ProviderCard';
 import { useCart } from '@/context/CartContext';
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useEffect, useCallback } from 'react';
 import { Separator } from '@/components/ui/separator';
 import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
-// Removed Textarea and Label as they were only for the review form
 
 // Hardcoded English strings
 const t = {
@@ -38,8 +37,7 @@ const t = {
   recommendedProfessionals: "Recommended Professionals",
   reviews: "reviews",
   customerReviews: "Customer Reviews",
-  noReviewsYet: "No reviews yet for this provider.", // Updated message
-  // Removed "Leave a Review" related translations
+  noReviewsYet: "No reviews yet for this provider.",
   previous: "Previous",
   next: "Next",
   of: "of"
@@ -55,8 +53,6 @@ const providerCardTranslations = {
   viewProfileText: "View Profile",
   messageText: "Message"
 };
-
-// StarRatingInput component is removed as it's no longer used on this page
 
 export default function ProviderProfilePage() {
   const params = useParams();
@@ -91,14 +87,16 @@ export default function ProviderProfilePage() {
   };
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: NodeJS.Timeout | undefined = undefined;
     if (provider && provider.reviews && provider.reviews.length > 1 && !isHoveringReviews) {
-      intervalId = setInterval(handleNextReview, 5000); 
+      intervalId = setInterval(handleNextReview, 5000); // Change review every 5 seconds
     }
-    return () => clearInterval(intervalId); 
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); 
+      }
+    };
   }, [provider, isHoveringReviews, handleNextReview]);
-
-  // Removed handleSubmitReview function
 
   if (!provider) {
     return (
@@ -144,7 +142,7 @@ export default function ProviderProfilePage() {
         <CardHeader className="p-0">
           <div className="relative w-full h-64 md:h-80 bg-gradient-to-br from-secondary via-background to-secondary/50">
             <Image
-              src={provider.profileImageUrl || `https://placehold.co/800x400.png?text=${provider.name.split(' ').join('+')}`}
+              src={provider.profileImageUrl || `https://placehold.co/800x400.png`}
               alt={`${provider.name}'s profile background`}
               data-ai-hint="professional service action"
               fill
@@ -187,7 +185,13 @@ export default function ProviderProfilePage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {provider.portfolioImages.map((img, index) => (
                       <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-md group cursor-pointer">
-                        <Image src={img} alt={`Portfolio image ${index + 1}`} fill style={{objectFit:"cover"}} data-ai-hint="project example" className="group-hover:scale-105 transition-transform duration-300"/>
+                        <Image 
+                          src={img} 
+                          alt={`Portfolio image ${index + 1}`} 
+                          fill style={{objectFit:"cover"}} 
+                          data-ai-hint="project example" 
+                          className="group-hover:scale-105 transition-transform duration-300"
+                        />
                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Search className="h-8 w-8 text-white" />
                         </div>
@@ -230,7 +234,11 @@ export default function ProviderProfilePage() {
 
       <Separator />
 
-      <Card className="shadow-xl bg-card" onMouseEnter={() => setIsHoveringReviews(true)} onMouseLeave={() => setIsHoveringReviews(false)}>
+      <Card 
+        className="shadow-xl bg-card relative group" // Added relative and group for hover effects
+        onMouseEnter={() => setIsHoveringReviews(true)} 
+        onMouseLeave={() => setIsHoveringReviews(false)}
+      >
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-card-foreground flex items-center">
             <ThumbsUp className="mr-3 h-7 w-7 text-primary"/> {t.customerReviews}
@@ -238,21 +246,19 @@ export default function ProviderProfilePage() {
         </CardHeader>
         <CardContent className="space-y-8">
           {provider.reviews && provider.reviews.length > 0 ? (
-            <div className="relative group">
-              <div className="min-h-[200px] p-6 bg-background rounded-lg shadow-inner flex flex-col justify-center">
-                {currentReview && (
-                  <div className="text-center animate-in fade-in duration-300">
-                    <div className="flex justify-center mb-2">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className={`h-5 w-5 ${i < currentReview.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground italic">&quot;{currentReview.comment}&quot;</p>
-                    <p className="text-sm font-medium text-foreground mt-3">- {currentReview.reviewerName}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(currentReview.date).toLocaleDateString()}</p>
+            <div className="min-h-[200px] p-6 bg-background rounded-lg shadow-inner flex flex-col justify-center items-center text-center relative">
+              {currentReview && (
+                <div className="animate-in fade-in duration-300 w-full">
+                  <div className="flex justify-center mb-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className={`h-5 w-5 ${i < currentReview.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'}`} />
+                    ))}
                   </div>
-                )}
-              </div>
+                  <p className="text-muted-foreground italic text-sm md:text-base max-w-md mx-auto">&quot;{currentReview.comment}&quot;</p>
+                  <p className="text-xs md:text-sm font-medium text-foreground mt-3">- {currentReview.reviewerName}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(currentReview.date).toLocaleDateString()}</p>
+                </div>
+              )}
               {provider.reviews.length > 1 && (
                  <>
                     <Button 
@@ -282,9 +288,6 @@ export default function ProviderProfilePage() {
           ) : (
             <p className="text-muted-foreground text-center py-4">{t.noReviewsYet}</p>
           )}
-
-          {/* Leave a Review Form Removed */}
-          
         </CardContent>
       </Card>
 
