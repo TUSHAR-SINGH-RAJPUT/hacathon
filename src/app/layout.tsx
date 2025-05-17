@@ -1,15 +1,24 @@
+<<<<<<< HEAD
 
 "use client";
 
+=======
+import type {Metadata} from 'next';
+import { Geist } from 'next/font/google';
+>>>>>>> 8bbdfb29f9c74c0a54cf1579dbd88833c45136f9
 import './globals.css';
 import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
+=======
+import { LanguageProvider } from '@/context/LanguageContext';
+>>>>>>> 8bbdfb29f9c74c0a54cf1579dbd88833c45136f9
 
 
 export default function RootLayout({
@@ -44,6 +53,7 @@ export default function RootLayout({
 
 
   return (
+<<<<<<< HEAD
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <title>{layoutTranslations.pageTitle}</title>
@@ -61,6 +71,23 @@ export default function RootLayout({
                {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
+=======
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} antialiased flex flex-col min-h-screen bg-background`}>
+        <AuthProvider>
+          <LanguageProvider>
+            <CartProvider> 
+              <Header />
+              <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+                {children}
+              </main>
+              <Toaster />
+              <footer className="py-6 text-center text-sm text-muted-foreground border-t">
+                © {new Date().getFullYear()} kariGaar. All rights reserved.
+              </footer>
+            </CartProvider>
+          </LanguageProvider>
+>>>>>>> 8bbdfb29f9c74c0a54cf1579dbd88833c45136f9
         </AuthProvider>
 
         {/* Google Translate API Script */}
