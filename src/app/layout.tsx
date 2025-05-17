@@ -7,9 +7,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Ensure React is imported
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
+
+// For Leaflet icon fix - import these at the top
+import L from 'leaflet';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
 
 // Hardcoded English translations for layout-specific elements
 const layoutTranslations = {
@@ -18,7 +25,8 @@ const layoutTranslations = {
   closeChat: "Close Chat",
   pageTitle: "kariGaar - Your Local Service Solution",
   pageDescription: "Find reliable local service professionals for all your needs.",
-  footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`
+  footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`,
+  googleTranslateLabel: "Translate Page"
 };
 
 export default function RootLayout({
@@ -29,28 +37,44 @@ export default function RootLayout({
   const [isChatOpen, setIsChatOpen] = useState(false);
   const currentYear = new Date().getFullYear();
 
+  // Effect for Leaflet global icon setup
+  useEffect(() => {
+    if (typeof window !== "undefined" && L && L.Icon && L.Icon.Default) {
+      // Check if already configured to prevent re-configuration
+      // Use a custom flag to ensure it's only configured once.
+      if (!(L.Icon.Default.prototype as any)._iconInitialConfigured) {
+          delete (L.Icon.Default.prototype as any)._getIconUrl; // Important for Webpack
+          L.Icon.Default.mergeOptions({
+              iconRetinaUrl: iconRetinaUrl.src,
+              iconUrl: iconUrl.src,
+              shadowUrl: shadowUrl.src,
+          });
+          (L.Icon.Default.prototype as any)._iconInitialConfigured = true;
+      }
+    }
+  }, []); // Empty dependency array ensures this runs once on mount
+
+
   // Function to initialize Google Translate Element
   useEffect(() => {
-    const existingScript = document.getElementById('google-translate-api');
-    
     const initializeGoogleTranslate = () => {
       if ((window as any).google && (window as any).google.translate) {
         // Initialization will now be triggered from Header.tsx
-        // This function definition needs to be globally available.
-        console.log("Google Translate API loaded, init function is ready.");
+        console.log("Google Translate API loaded from Layout, init function is ready.");
       }
     };
 
-    if (!existingScript) {
+    // Check if the script already exists to avoid duplicates
+    if (!document.getElementById('google-translate-api')) {
       const addScript = document.createElement('script');
       addScript.setAttribute('src', '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal');
       addScript.setAttribute('id', 'google-translate-api');
       document.body.appendChild(addScript);
       (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
     } else {
-      if (document.getElementById('google_translate_element') && (window as any).googleTranslateElementInitGlobal) {
-        // If script and element exist, ensure init function is called (though Header will primarily handle this)
-        // (window as any).googleTranslateElementInitGlobal();
+      // If script exists but element might not (e.g., due to HMR), re-check if init is needed
+      if (document.getElementById('google_translate_element_header') && !(document.getElementById('google_translate_element_header') as any)._googleTranslateInitialized && (window as any).googleTranslateElementInitGlobal) {
+        // (window as any).googleTranslateElementInitGlobal(); // Handled by Header.tsx
       }
     }
   }, []);
@@ -61,6 +85,10 @@ export default function RootLayout({
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
+        {/* Leaflet CSS - critical for map display */}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""/>
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
@@ -71,6 +99,7 @@ export default function RootLayout({
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
+               {/* Google Translate Element Container is now in Header */}
               {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
@@ -104,7 +133,7 @@ export default function RootLayout({
                      try {
                       e.target.contentWindow.parent.scrollTo(0, 0);
                      } catch (err) {
-                      console.warn("Could not scroll parent window from iframe onload:", err);
+                      // console.warn("Could not scroll parent window from iframe onload:", err);
                      }
                   }
                 }}
@@ -125,27 +154,29 @@ export default function RootLayout({
           </div>
         )}
         
-        {/* Google Translate Widget - Removed from here, will be in Header */}
-        {/* <div className="fixed bottom-4 left-4 bg-card p-1.5 rounded-md shadow-md z-50 border border-border">
-          <div id="google_translate_element"></div>
-        </div> */}
-
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">
           {`
             if (typeof window !== 'undefined') { 
-              if (window.jotformEmbedHandler) {
-                window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
-              } else {
-                const iframe = document.getElementById('JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e');
-                if (iframe) {
-                  const checkHandler = setInterval(() => {
-                    if (window.jotformEmbedHandler) {
-                      clearInterval(checkHandler);
-                      window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
-                    }
-                  }, 100);
+              const initJotform = () => {
+                if (window.jotformEmbedHandler) {
+                  window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
+                } else {
+                  const iframe = document.getElementById('JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e');
+                  if (iframe) {
+                    const checkHandler = setInterval(() => {
+                      if (window.jotformEmbedHandler) {
+                        clearInterval(checkHandler);
+                        window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
+                      }
+                    }, 100);
+                  }
                 }
+              };
+              if (document.readyState === 'complete') {
+                initJotform();
+              } else {
+                window.addEventListener('load', initJotform);
               }
             }
           `}
