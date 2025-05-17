@@ -2,37 +2,38 @@
 "use client";
 
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet'; // Import L
+// L is imported globally in RootLayout for icon setup.
+// For type information and direct use in this client component, we might need it.
+// However, for this simplification, we assume the global L is sufficient for react-leaflet.
+import type L from 'leaflet'; // Use type import if L is only for types here
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import React, { useEffect, useState, useRef } from 'react'; // Import React
+import React, { useRef, useEffect } from 'react';
 
-// Define style outside to prevent re-creation on every render
 const mapStyle = { height: '300px', width: '100%' };
 
 interface TrackServiceMapProps {
-  center: [number, number]; // [latitude, longitude]
+  center: [number, number];
   providerName: string;
 }
 
 const TrackServiceMap = ({ center, providerName }: TrackServiceMapProps) => {
-  const [isClientReady, setIsClientReady] = useState(false);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
+  // This useEffect handles the cleanup of the map instance when the component unmounts.
+  // This is critical for preventing the "Map container is already initialized" error,
+  // especially when the component is remounted due to a key change (e.g., bookingId changing).
   useEffect(() => {
-    setIsClientReady(true);
-
-    // Cleanup function
+    // The return function is the cleanup function.
     return () => {
       if (mapInstanceRef.current) {
+        // console.log("TrackServiceMap: Cleaning up Leaflet map instance", mapInstanceRef.current);
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, []); // Empty dependency array ensures this runs once on mount and cleanup on unmount
+  }, []); // Empty dependency array ensures this runs only on mount and unmount.
 
-  if (!isClientReady) {
-    return <div style={mapStyle} className="rounded-lg shadow-md bg-muted flex items-center justify-center"><p>Initializing map...</p></div>;
-  }
+  // console.log("TrackServiceMap rendering with center:", center);
 
   return (
     <MapContainer
@@ -42,8 +43,14 @@ const TrackServiceMap = ({ center, providerName }: TrackServiceMapProps) => {
       style={mapStyle}
       className="rounded-lg shadow-md"
       whenCreated={(mapInstance) => {
+        // console.log("TrackServiceMap: Leaflet map instance created via whenCreated", mapInstance);
         mapInstanceRef.current = mapInstance;
       }}
+      // placeholder={
+      //   <div style={mapStyle} className="rounded-lg shadow-md bg-muted flex items-center justify-center">
+      //     <p>Loading map...</p>
+      //   </div>
+      // }
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
