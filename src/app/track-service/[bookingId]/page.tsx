@@ -21,7 +21,7 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  loadingMap: "Initializing map...", // Changed from "Loading map..." to reflect pre-MapContainer state
+  // loadingMap: "Initializing map...", // No longer needed here, MapContainer's placeholder handles it
   providerLocation: "Provider Location",
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
@@ -31,14 +31,9 @@ const t = {
 };
 
 // Dynamically import the Map component with SSR disabled
+// The MapContainer's internal placeholder will be used, so no custom loading component here.
 const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
-  ssr: false,
-  loading: () => (
-    <div style={{ height: '300px', width: '100%' }} className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="ml-2 text-muted-foreground">{t.loadingMap}</p>
-    </div>
-  ),
+  ssr: false, 
 });
 
 
@@ -53,12 +48,12 @@ const fetchBookingDetails = async (bookingId: string) => {
         name: "Priya Sharma",
         serviceTypes: ["Painting"],
         profileImageUrl: 'https://placehold.co/80x80.png',
+        dataAiHint: "person portrait", // Added hint
         phone: "+91 98XXXXXX01" 
       },
       status: "En Route", 
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), 
       serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034", 
-      // Simulated provider location (Bangalore)
       providerLocation: { lat: 12.9716, lng: 77.5946 }, 
     };
   }
@@ -76,7 +71,7 @@ export default function TrackServicePage() {
 
   useEffect(() => {
     if (bookingId) {
-      setLoading(true); // Ensure loading is true when bookingId changes
+      setLoading(true); 
       setError(null);
       fetchBookingDetails(bookingId)
         .then(data => {
@@ -95,7 +90,7 @@ export default function TrackServicePage() {
       setError(t.bookingNotFoundOrInvalid);
       setLoading(false);
     }
-  }, [bookingId]); // Rerun effect if bookingId changes
+  }, [bookingId]); 
 
   if (loading) {
     return (
@@ -146,7 +141,7 @@ export default function TrackServicePage() {
             <Image
               src={bookingDetails.provider.profileImageUrl || `https://placehold.co/80x80.png`}
               alt={bookingDetails.provider.name}
-              data-ai-hint="person portrait"
+              data-ai-hint={bookingDetails.provider.dataAiHint || "person portrait"}
               width={60}
               height={60}
               className="rounded-full"
@@ -173,7 +168,6 @@ export default function TrackServicePage() {
           </Card>
           
           {bookingDetails.providerLocation ? (
-            // Pass a key to TrackServiceMap to ensure it remounts if bookingId changes
             <TrackServiceMap
               key={bookingId} 
               center={[bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng]}
@@ -182,7 +176,7 @@ export default function TrackServicePage() {
           ) : (
             <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
               <MapPin className="h-12 w-12 text-muted-foreground" />
-              <p className="ml-4 text-muted-foreground text-center">Provider location not available.</p>
+              <p className="ml-4 text-muted-foreground text-center">{t.providerLocation} not available.</p>
             </div>
           )}
 

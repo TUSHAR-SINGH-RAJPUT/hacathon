@@ -2,12 +2,10 @@
 "use client";
 
 import 'leaflet/dist/leaflet.css';
-// L is imported globally in RootLayout for icon setup.
-// For type information and direct use in this client component, we might need it.
-// However, for this simplification, we assume the global L is sufficient for react-leaflet.
-import type L from 'leaflet'; // Use type import if L is only for types here
+import type L from 'leaflet'; // For type safety
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react'; // Ensure React is imported for JSX
+import { Loader2 } from 'lucide-react';
 
 const mapStyle = { height: '300px', width: '100%' };
 
@@ -16,24 +14,29 @@ interface TrackServiceMapProps {
   providerName: string;
 }
 
+// A placeholder component to be used by MapContainer's placeholder prop
+const MapPlaceholder = () => (
+  <div style={mapStyle} className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <p className="ml-2 text-muted-foreground">Initializing map...</p>
+  </div>
+);
+
 const TrackServiceMap = ({ center, providerName }: TrackServiceMapProps) => {
   const mapInstanceRef = useRef<L.Map | null>(null);
 
-  // This useEffect handles the cleanup of the map instance when the component unmounts.
-  // This is critical for preventing the "Map container is already initialized" error,
-  // especially when the component is remounted due to a key change (e.g., bookingId changing).
+  // Cleanup effect: runs only on unmount because of the empty dependency array.
+  // The `key` prop on this component in its parent (TrackServicePage) ensures 
+  // it unmounts/remounts when the bookingId (and thus potentially 'center') changes.
   useEffect(() => {
-    // The return function is the cleanup function.
     return () => {
       if (mapInstanceRef.current) {
-        // console.log("TrackServiceMap: Cleaning up Leaflet map instance", mapInstanceRef.current);
+        // console.log("TrackServiceMap: Cleaning up Leaflet map instance on unmount.", mapInstanceRef.current);
         mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
+        mapInstanceRef.current = null; // Important to clear the ref
       }
     };
-  }, []); // Empty dependency array ensures this runs only on mount and unmount.
-
-  // console.log("TrackServiceMap rendering with center:", center);
+  }, []); // Empty dependency array ensures cleanup runs only on unmount
 
   return (
     <MapContainer
@@ -42,15 +45,11 @@ const TrackServiceMap = ({ center, providerName }: TrackServiceMapProps) => {
       scrollWheelZoom={true}
       style={mapStyle}
       className="rounded-lg shadow-md"
+      placeholder={<MapPlaceholder />} // Use the placeholder prop
       whenCreated={(mapInstance) => {
-        // console.log("TrackServiceMap: Leaflet map instance created via whenCreated", mapInstance);
+        // console.log("TrackServiceMap: Leaflet map instance created.", mapInstance);
         mapInstanceRef.current = mapInstance;
       }}
-      // placeholder={
-      //   <div style={mapStyle} className="rounded-lg shadow-md bg-muted flex items-center justify-center">
-      //     <p>Loading map...</p>
-      //   </div>
-      // }
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
