@@ -10,7 +10,7 @@ import ServiceTypeIcon from '@/components/icons/ServiceTypeIcon';
 
 interface ProviderCardProps {
   provider: ServiceProvider;
-  locale: string;
+  locale: string; // Retained for potential future use, though not directly used for translations here
   translations: any;
 }
 
@@ -23,7 +23,7 @@ export default function ProviderCard({ provider, locale, translations: tProp }: 
         <Link href={`/browse-providers/profile/${provider.id}`} passHref>
           <div className="relative w-full h-48 cursor-pointer group overflow-hidden">
             <Image
-              src={provider.profileImageUrl || `https://placehold.co/400x300.png?text=${provider.name.split(' ').join('+')}`}
+              src={provider.profileImageUrl || `https://placehold.co/400x300.png`}
               alt={`${provider.name}'s profile`}
               fill
               style={{objectFit:"cover"}}

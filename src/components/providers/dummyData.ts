@@ -46,7 +46,7 @@ export const dummyProviders: ServiceProvider[] = [
     serviceTypes: ['Painting', 'Handyman'],
     rating: 4.8,
     location: 'Mandya, Karnataka',
-    profileImageUrl: 'https://placehold.co/400x300.png',
+    profileImageUrl: '/images/providers/priya_sharma.jpg', // <-- UPDATED PATH
     bio: 'Experienced painter and general handyman with over 10 years in Mandya. Detail-oriented and committed to quality work. I specialize in residential and commercial painting, offering a range of finishes and techniques. Also proficient in minor plumbing, electrical fixes, and furniture assembly.',
     experienceYears: 10,
     hourlyRate: '350-500',

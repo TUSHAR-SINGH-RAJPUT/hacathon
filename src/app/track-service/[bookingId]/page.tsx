@@ -39,7 +39,7 @@ const fetchBookingDetails = async (bookingId: string) => {
       provider: {
         name: "Priya Sharma",
         serviceTypes: ["Painting"],
-        profileImageUrl: 'https://placehold.co/80x80.png?text=Priya',
+        profileImageUrl: 'https://placehold.co/80x80.png',
         phone: "+91 98XXXXXX01" 
       },
       status: "En Route", 
@@ -132,6 +132,7 @@ export default function TrackServicePage() {
               width={60}
               height={60}
               className="rounded-full"
+              data-ai-hint="person portrait"
             />
             <div>
               <p className="text-lg font-semibold text-foreground">{bookingDetails.provider.name}</p>

@@ -235,7 +235,7 @@ export default function ProviderProfilePage() {
       <Separator />
 
       <Card 
-        className="shadow-xl bg-card relative group" // Added relative and group for hover effects
+        className="shadow-xl bg-card relative group" 
         onMouseEnter={() => setIsHoveringReviews(true)} 
         onMouseLeave={() => setIsHoveringReviews(false)}
       >
