@@ -10,11 +10,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
-
-// For Leaflet icon fix - these asset imports are generally fine
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+// Removed Leaflet-specific imports
 
 const layoutTranslations = {
   chatWithUsTitle: "Chat with Our Assistant",
@@ -40,34 +36,10 @@ export default function RootLayout({
   }, []);
 
   useEffect(() => {
-    // Leaflet global icon setup
-    if (typeof window !== "undefined") { // Ensure running on client
-      import('leaflet').then(LModule => {
-        const L = LModule.default; // Leaflet is typically a default export
-        if (L && L.Icon && L.Icon.Default) {
-          if (!(L.Icon.Default.prototype as any)._iconInitialConfigured) {
-            delete (L.Icon.Default.prototype as any)._getIconUrl; // Important for Webpack
-            L.Icon.Default.mergeOptions({
-              iconRetinaUrl: iconRetinaUrl.src,
-              iconUrl: iconUrl.src,
-              shadowUrl: shadowUrl.src,
-            });
-            (L.Icon.Default.prototype as any)._iconInitialConfigured = true;
-            console.log("Leaflet default icons configured in RootLayout.");
-          }
-        }
-      }).catch(error => {
-        console.error("Error loading Leaflet for icon setup in RootLayout:", error);
-      });
-    }
-  }, []); // Empty dependency array ensures this runs once on mount
-
-  useEffect(() => {
     // Google Translate Element Initialization
     const initializeGoogleTranslate = () => {
       if ((window as any).google && (window as any).google.translate && (window as any).googleTranslateElementInitGlobal) {
         console.log("Google Translate API loaded, init function is ready in RootLayout.");
-        // Actual initialization call will be triggered from Header.tsx when elements are ready
       }
     };
 
@@ -79,17 +51,12 @@ export default function RootLayout({
         document.body.appendChild(addScript);
         (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
       } else {
-        // If script exists, ensure init function is globally available
         if (!(window as any).googleTranslateElementInitGlobal) {
           (window as any).googleTranslateElementInitGlobal = initializeGoogleTranslate;
         }
-        // Call init if conditions met and it wasn't called before (e.g. by Header)
-        if (document.getElementById('google_translate_element_header') && !(document.getElementById('google_translate_element_header') as any)?._googleTranslateInitialized && (window as any).googleTranslateElementInitGlobal) {
-           // (window as any).googleTranslateElementInitGlobal(); // Let Header handle the call
-        }
       }
     }
-  }, [isClient]); // Depend on isClient to ensure it runs after client detection
+  }, [isClient]);
 
 
   return (
@@ -97,9 +64,7 @@ export default function RootLayout({
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin=""/>
+        {/* Removed Leaflet CSS link */}
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
@@ -110,8 +75,7 @@ export default function RootLayout({
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              {/* Container for Google Translate, styled in globals.css */}
-              {/* The actual div for the widget is now rendered in Header.tsx */}
+              <div id="google_translate_element_header" className="inline-block mx-auto mb-2"></div> {/* Placeholder for header-based translator */}
               {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
@@ -158,11 +122,11 @@ export default function RootLayout({
             )}
           </>
         )}
-        
+
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">
           {`
-            if (typeof window !== 'undefined') { 
+            if (typeof window !== 'undefined') {
               const initJotform = () => {
                 if (window.jotformEmbedHandler) {
                   window.jotformEmbedHandler("iframe[id='JotFormIFrame-0196db22d17d7cc8ab41c9dfabe188b64f9e']", "https://www.jotform.com");
@@ -190,5 +154,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    

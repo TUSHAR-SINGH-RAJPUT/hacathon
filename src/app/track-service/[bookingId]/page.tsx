@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic'; 
+// Removed dynamic import for TrackServiceMap
 
 // Hardcoded English strings
 const t = {
@@ -21,26 +21,19 @@ const t = {
   bookingIdLabel: "Booking ID",
   statusLabel: "Status",
   estimatedArrival: "Estimated Arrival",
-  // loadingMap: "Initializing map...", // No longer needed here, MapContainer's placeholder handles it
   providerLocation: "Provider Location",
   serviceAddressLabel: "Service Address",
   callProvider: (name: string) => `Call ${name.split(' ')[0]}`,
   messageProvider: "Message",
   contactOptionsSimulated: "Contact options are simulated for this demo.",
-  backButton: "Back"
+  backButton: "Back",
+  mapPlaceholderText: "Map display is currently unavailable." // Placeholder text
 };
-
-// Dynamically import the Map component with SSR disabled
-// The MapContainer's internal placeholder will be used, so no custom loading component here.
-const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
-  ssr: false, 
-});
-
 
 const fetchBookingDetails = async (bookingId: string) => {
   console.log("Fetching booking details for:", bookingId);
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   if (bookingId === "dummy-booking-123") {
     return {
       id: "dummy-booking-123",
@@ -48,13 +41,13 @@ const fetchBookingDetails = async (bookingId: string) => {
         name: "Priya Sharma",
         serviceTypes: ["Painting"],
         profileImageUrl: 'https://placehold.co/80x80.png',
-        dataAiHint: "person portrait", // Added hint
-        phone: "+91 98XXXXXX01" 
+        dataAiHint: "person portrait",
+        phone: "+91 98XXXXXX01"
       },
-      status: "En Route", 
-      estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), 
-      serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034", 
-      providerLocation: { lat: 12.9716, lng: 77.5946 }, 
+      status: "En Route",
+      estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034",
+      providerLocation: { lat: 12.9716, lng: 77.5946 }, // Kept for data structure, but won't be used by map
     };
   }
   return null;
@@ -71,7 +64,7 @@ export default function TrackServicePage() {
 
   useEffect(() => {
     if (bookingId) {
-      setLoading(true); 
+      setLoading(true);
       setError(null);
       fetchBookingDetails(bookingId)
         .then(data => {
@@ -90,7 +83,7 @@ export default function TrackServicePage() {
       setError(t.bookingNotFoundOrInvalid);
       setLoading(false);
     }
-  }, [bookingId]); 
+  }, [bookingId]);
 
   if (loading) {
     return (
@@ -111,7 +104,7 @@ export default function TrackServicePage() {
       </div>
     );
   }
-  
+
   const getStatusIcon = (status: string) => {
     switch(status) {
       case "En Route": return <Clock className="h-5 w-5 text-blue-500 mr-2" />;
@@ -166,22 +159,14 @@ export default function TrackServicePage() {
               )}
             </CardContent>
           </Card>
-          
-          {bookingDetails.providerLocation ? (
-            <TrackServiceMap
-              key={bookingId} 
-              center={[bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng]}
-              providerName={bookingDetails.provider.name}
-            />
-          ) : (
-            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
-              <MapPin className="h-12 w-12 text-muted-foreground" />
-              <p className="ml-4 text-muted-foreground text-center">{t.providerLocation} not available.</p>
-            </div>
-          )}
+
+          {/* Placeholder for map */}
+          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
+            <MapPin className="h-12 w-12 text-muted-foreground" />
+            <p className="ml-4 text-muted-foreground text-center">{t.mapPlaceholderText}</p>
+          </div>
 
           <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel}: {bookingDetails.serviceAddress}</p>
-
 
           <div className="grid grid-cols-2 gap-4 pt-4">
             <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground">
