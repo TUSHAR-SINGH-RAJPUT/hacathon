@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Phone, MessageSquare, ArrowLeft, Info, Loader2, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-// Removed dynamic import for TrackServiceMap
+import { useEffect, useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 
 // Hardcoded English strings
 const t = {
@@ -27,7 +27,7 @@ const t = {
   messageProvider: "Message",
   contactOptionsSimulated: "Contact options are simulated for this demo.",
   backButton: "Back",
-  mapPlaceholderText: "Map display is currently unavailable." // Placeholder text
+  mapPlaceholderText: "Map display is currently unavailable." // Fallback if map fails to load
 };
 
 const fetchBookingDetails = async (bookingId: string) => {
@@ -47,11 +47,18 @@ const fetchBookingDetails = async (bookingId: string) => {
       status: "En Route",
       estimatedArrivalTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       serviceAddress: "123, Koramangala, Bangalore, Karnataka, 560034",
-      providerLocation: { lat: 12.9716, lng: 77.5946 }, // Kept for data structure, but won't be used by map
+      providerLocation: { lat: 12.9716, lng: 77.5946 }, // Example coordinates for Bangalore
     };
   }
   return null;
 };
+
+// Dynamically import the map component with SSR disabled
+const TrackServiceMap = dynamic(() => import('@/components/TrackServiceMap'), {
+  ssr: false,
+  loading: () => <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-muted rounded-lg"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2 text-muted-foreground">Loading Map...</p></div>,
+});
+
 
 export default function TrackServicePage() {
   const params = useParams();
@@ -61,8 +68,10 @@ export default function TrackServicePage() {
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true); // Indicate component has mounted on client
     if (bookingId) {
       setLoading(true);
       setError(null);
@@ -84,6 +93,14 @@ export default function TrackServicePage() {
       setLoading(false);
     }
   }, [bookingId]);
+
+  const mapCenter = useMemo(() => {
+    if (bookingDetails?.providerLocation) {
+      return [bookingDetails.providerLocation.lat, bookingDetails.providerLocation.lng] as [number, number];
+    }
+    return [12.9716, 77.5946] as [number, number]; // Default center if no location
+  }, [bookingDetails?.providerLocation]);
+
 
   if (loading) {
     return (
@@ -159,12 +176,20 @@ export default function TrackServicePage() {
               )}
             </CardContent>
           </Card>
+          
+          {isClient && bookingDetails.providerLocation ? (
+            <TrackServiceMap 
+              key={bookingId} // Force remount when bookingId changes
+              center={mapCenter} 
+              providerName={bookingDetails.provider.name} 
+            />
+          ) : (
+            <div style={{ height: '300px', width: '100%' }} className="flex items-center justify-center bg-muted rounded-lg shadow">
+              <MapPin className="h-12 w-12 text-muted-foreground" />
+              <p className="ml-4 text-muted-foreground text-center">{t.mapPlaceholderText}</p>
+            </div>
+          )}
 
-          {/* Placeholder for map */}
-          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center p-4 shadow">
-            <MapPin className="h-12 w-12 text-muted-foreground" />
-            <p className="ml-4 text-muted-foreground text-center">{t.mapPlaceholderText}</p>
-          </div>
 
           <p className="text-xs text-center text-muted-foreground">{t.serviceAddressLabel}: {bookingDetails.serviceAddress}</p>
 

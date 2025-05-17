@@ -6,21 +6,13 @@ import Header from '@/components/layout/Header';
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { MessageCircle, X as CloseIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
-// Removed Leaflet-specific imports from here
 
-const layoutTranslations = {
-  chatWithUsTitle: "Chat with Our Assistant",
-  chatWithUs: "Chat with Us",
-  closeChat: "Close Chat",
-  pageTitle: "kariGaar - Your Local Service Solution",
-  pageDescription: "Find reliable local service professionals for all your needs.",
-  footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`,
-  googleTranslateLabel: "Translate Page"
-};
+// For Leaflet CSS
+import 'leaflet/dist/leaflet.css';
 
 export default function RootLayout({
   children,
@@ -37,33 +29,70 @@ export default function RootLayout({
     // Define the global Google Translate initialization function
     if (typeof window !== 'undefined') {
       (window as any).googleTranslateElementInitGlobal = () => {
-        // This function will be called by the Google Translate script
-        // The actual new google.translate.TranslateElement calls are now in Header.tsx
         console.log("Global Google Translate Init Function is ready.");
       };
     }
+
+    // Global Leaflet Icon Setup (client-side only)
+    const setupLeafletIcons = async () => {
+      if (typeof window !== 'undefined') {
+        const L = (await import('leaflet')).default;
+        // @ts-ignore
+        if (!L.Icon.Default.prototype._iconInitialConfigured) {
+          // @ts-ignore
+          delete L.Icon.Default.prototype._getIconUrl;
+          L.Icon.Default.mergeOptions({
+            iconRetinaUrl: (await import('leaflet/dist/images/marker-icon-2x.png')).default.src,
+            iconUrl: (await import('leaflet/dist/images/marker-icon.png')).default.src,
+            shadowUrl: (await import('leaflet/dist/images/marker-shadow.png')).default.src,
+          });
+          // @ts-ignore
+          L.Icon.Default.prototype._iconInitialConfigured = true;
+          console.log("Leaflet default icons configured globally.");
+        }
+      }
+    };
+    setupLeafletIcons();
+
   }, []);
 
+  const layoutTranslations = {
+    chatWithUsTitle: "Chat with Our Assistant",
+    chatWithUs: "Chat with Us",
+    closeChat: "Close Chat",
+    pageTitle: "kariGaar - Your Local Service Solution",
+    pageDescription: "Find reliable local service professionals for all your needs.",
+    footerCopyright: (year: number) => `© ${year} kariGaar. All rights reserved.`,
+    googleTranslateLabel: "Translate Page"
+  };
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <title>{layoutTranslations.pageTitle}</title>
         <meta name="description" content={layoutTranslations.pageDescription} />
+         {/* Leaflet CSS - also imported via JS to ensure it's bundled */}
       </head>
       <body className={cn("antialiased flex flex-col min-h-screen bg-background font-sans")}>
         <AuthProvider>
           <CartProvider>
-            <Header /> {/* Header now handles its own translate widget initialization */}
+            <Header />
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
               {children}
             </main>
             <Toaster />
             <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-              {layoutTranslations.footerCopyright(currentYear)}
+               {layoutTranslations.footerCopyright(currentYear)}
             </footer>
           </CartProvider>
         </AuthProvider>
+
+        {/* Google Translate API Script */}
+        <Script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal"
+          strategy="afterInteractive"
+          id="google-translate-api-script"
+        />
 
         {isClient && (
           <>
@@ -107,13 +136,6 @@ export default function RootLayout({
           </>
         )}
         
-        {/* Google Translate API Script */}
-        <Script
-          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInitGlobal"
-          strategy="afterInteractive"
-          id="google-translate-api-script"
-        />
-
         <Script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js' strategy="lazyOnload" />
         <Script id="jotform-init-layout" strategy="lazyOnload">
           {`
